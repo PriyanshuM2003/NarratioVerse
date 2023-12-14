@@ -29,7 +29,7 @@ const Login = () => {
             <CardContent className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="" />
+                <Input id="email" type="email" />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
