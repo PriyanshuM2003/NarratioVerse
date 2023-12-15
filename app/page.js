@@ -1,3 +1,4 @@
+"use client";
 import { PlusCircle } from "lucide-react";
 import { Menu } from "./(home)/components/menu";
 import Sidebar from "./(home)/components/sidebar";
