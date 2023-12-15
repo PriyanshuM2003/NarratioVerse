@@ -8,19 +8,13 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-enum Gender {
-  MALE
-  FEMALE
-  OTHER
-}
-
 model User {
-  id      String  @id @default(uuid())
-  name    String
-  email   String  @unique
-  phone   String  @unique
-  creator Boolean @default(false)
-  gender  Gender?
+  id       String  @id @default(uuid())
+  name     String
+  email    String  @unique
+  phone    String  @unique
+  creator  Boolean @default(false)
+  password String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

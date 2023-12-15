@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,19 +9,65 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-// import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const { toast } = useToast();
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.push("/");
+    }
+  }, [router]);
+
+  const handleLogin = async () => {
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const { token, user, message } = await response.json();
+        localStorage.setItem("token", token);
+        toast({
+          description: "Logged in successfully",
+        });
+        console.log(message, user);
+        router.push("/");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        const { error } = await response.json();
+        console.error("Login failed:", error);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+    }
+  };
+
   return (
     <>
       <div className="relative flex flex-col justify-center items-center min-h-screen overflow-hidden">
-        <div className="w-full m-auto bg-white lg:max-w-lg">
-          <Card>
+        <div className="w-full m-auto lg:max-w-lg">
+          <Card className="bg-gray-900">
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl text-center">Log in</CardTitle>
+              <CardTitle className="text-2xl text-center text-white">
+                Log in
+              </CardTitle>
               <CardDescription className="text-center">
                 Enter your email and password to login
               </CardDescription>
@@ -29,28 +75,37 @@ const Login = () => {
             <CardContent className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" />
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </div>
-              {/* <div className="flex items-center space-x-2">
-                <Checkbox id="terms" />
-                <label
-                  htmlFor="terms"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Remember me
-                </label>
-              </div> */}
             </CardContent>
             <CardFooter className="flex flex-col">
-              <Button className="w-full">Login</Button>
-              <p className="mt-2 text-xs text-center text-gray-700">
+              <Button
+                className="w-full bg-black font-semibold"
+                onClick={handleLogin}
+              >
+                Login
+              </Button>
+              <p className="mt-2 text-xs text-center text-gray-400">
                 {" "}
                 Don't have an account?{" "}
-                <Link href="/signup" className=" text-blue-600 hover:underline">
+                <Link
+                  href="/signup"
+                  className=" text-blue-600 font-semibold hover:underline"
+                >
                   Sign up
                 </Link>
               </p>

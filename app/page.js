@@ -1,7 +1,9 @@
 export default function Home() {
   return (
     <>
-      <p>HOME PAGE</p>
+      <div>
+        <p className="text-pink-600">HOME PAGE</p>
+      </div>
     </>
   );
 }
