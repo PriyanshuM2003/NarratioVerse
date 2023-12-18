@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Head from "next/head";
-import { Menu } from "./home/homeComponents/menu";
-import Sidebar from "./home/homeComponents/sidebar";
-import { listenNowAlbums, madeForYouAlbums } from "./home/data/albums";
-import AlbumArtwork from "./home/homeComponents/album-artwork";
-import { PodcastEmptyPlaceholder } from "./home/homeComponents/podcast-empty-placeholder";
-import playlists from "./home/data/playlists";
+import { Menu } from "../components/menu";
+import Sidebar from "../components/sidebar";
+import { listenNowAlbums, madeForYouAlbums } from "../data/albums";
+import AlbumArtwork from "../components/album-artwork";
+import { PodcastEmptyPlaceholder } from "../components/podcast-empty-placeholder";
+import playlists from "../data/playlists";
 
 export default function Home() {
   return (
