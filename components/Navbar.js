@@ -1,8 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useToast } from "@/components/ui/use-toast";
 import { CreditCard, LogOut, User, Menu, Search, Podcast } from "lucide-react";
 import {
   Tooltip,
@@ -19,30 +17,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const Navbar = () => {
+const Navbar = ({ isLoggedIn, handleLogout }) => {
   const [state, setState] = useState(false);
-  const router = useRouter();
-  const { toast } = useToast();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token");
-      setIsLoggedIn(!!token);
-    }
-  }, []);
-
-  const handleLogout = () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("token");
-      setIsLoggedIn(false);
-      toast({
-        description: "Logged out successfully",
-      });
-      router.push("/login");
-    }
-  };
+  // const handleLogoutClick = () => {
+  //   handleLogout();
+  // };
 
   const toggleSearch = () => {
     setShowSearch(!showSearch);
