@@ -1,16 +1,9 @@
 "use client";
 import { PlusCircle } from "lucide-react";
-// import { Menu } from "./(home)/components/menu";
-// import Sidebar from "./(home)/components/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-// import AlbumArtwork from "./(home)/components/album-artwork";
-// import { PodcastEmptyPlaceholder } from "./(home)/components/podcast-empty-placeholder";
-// import { listenNowAlbums, madeForYouAlbums } from "./(home)/data/albums";
-// import Image from "next/image";
-// import playlists from "./(home)/data/playlists";
 import Head from "next/head";
 import { Menu } from "./home/components/menu";
 import Sidebar from "./home/components/sidebar";
@@ -25,7 +18,7 @@ export default function Home() {
       <Head>
         <title>Narratioverse</title>
         <meta name="description" content="Narratioverse" />
-        {/* <link rel="icon" href="/store.png" /> */}
+        <link rel="icon" href="/logo.png" />
       </Head>
       {/* <div className="md:hidden">
         <Image
