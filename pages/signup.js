@@ -21,6 +21,8 @@ const Signup = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    country: "",
+    state: "",
     phone: "",
     password: "",
     cpassword: "",
@@ -115,6 +117,26 @@ const Signup = () => {
                   type="email"
                   onChange={handleInputChange}
                 />
+              </div>
+              <div className="flex justify-between flex-wrap">
+                <div className="grid gap-2">
+                  <Label htmlFor="country">Country</Label>
+                  <Input
+                    id="country"
+                    name="country"
+                    type="text"
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="email">State</Label>
+                  <Input
+                    id="state"
+                    name="state"
+                    type="text"
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="phone">Phone No.</Label>

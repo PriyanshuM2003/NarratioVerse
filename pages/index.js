@@ -46,24 +46,25 @@ export default function Home() {
                 <Sidebar playlists={playlists} className="hidden lg:block" />
                 <div className="col-span-3 lg:col-span-4 lg:border-l">
                   <div className="h-full px-4 py-6 lg:px-8">
-                    <Tabs defaultValue="music" className="h-full space-y-6">
+                    <Tabs defaultValue="trending" className="h-full space-y-6">
                       <div className="space-between flex items-center">
                         <TabsList className="bg-gray-950 text-white">
-                          <TabsTrigger value="music" className="relative">
-                            Music
+                          <TabsTrigger value="trending" className="relative">
+                            Trending
                           </TabsTrigger>
+                          <TabsTrigger value="books">Audio Books</TabsTrigger>
                           <TabsTrigger value="podcasts">Podcasts</TabsTrigger>
                           <TabsTrigger value="live">Live</TabsTrigger>
                         </TabsList>
-                        <div className="ml-auto mr-4">
+                        {/* <div className="ml-auto mr-4">
                           <Button>
                             <PlusCircle className="mr-2 h-4 w-4" />
                             Add music
                           </Button>
-                        </div>
+                        </div> */}
                       </div>
                       <TabsContent
-                        value="music"
+                        value="trending"
                         className="border-none p-0 outline-none"
                       >
                         <div className="flex items-center justify-between">

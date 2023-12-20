@@ -4,9 +4,9 @@ import bcrypt from "bcryptjs";
 export default async function handler(req, res) {
   try {
     if (req.method === "POST") {
-      const { name, email, phone, password } = req.body;
+      const { name, email, phone, password, country, state } = req.body;
 
-      if (!name || !email || !phone || !password) {
+      if (!name || !email || !phone || !password || !country || !state) {
         return res
           .status(400)
           .json({ error: "Please provide all required fields." });
@@ -20,6 +20,8 @@ export default async function handler(req, res) {
           email,
           phone,
           password: hashedPassword,
+          country,
+          state,
         },
       });
 

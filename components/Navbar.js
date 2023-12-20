@@ -21,10 +21,6 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
   const [state, setState] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
 
-  // const handleLogoutClick = () => {
-  //   handleLogout();
-  // };
-
   const toggleSearch = () => {
     setShowSearch(!showSearch);
   };
@@ -119,14 +115,18 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
                       <DropdownMenuLabel>My Account</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuGroup>
-                        <DropdownMenuItem className="cursor-pointer">
-                          <User className="mr-2 h-4 w-4" />
-                          <span>Profile</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">
-                          <CreditCard className="mr-2 h-4 w-4" />
-                          <span>Billing</span>
-                        </DropdownMenuItem>
+                        <Link href="/profile">
+                          <DropdownMenuItem className="cursor-pointer">
+                            <User className="mr-2 h-4 w-4" />
+                            <span>Profile</span>
+                          </DropdownMenuItem>
+                        </Link>
+                        <Link href="/plans">
+                          <DropdownMenuItem className="cursor-pointer">
+                            <CreditCard className="mr-2 h-4 w-4" />
+                            <span>Billing</span>
+                          </DropdownMenuItem>
+                        </Link>
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator />
                       <DropdownMenuGroup>

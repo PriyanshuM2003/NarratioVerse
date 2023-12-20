@@ -13,7 +13,11 @@ model User {
   name     String
   email    String  @unique
   phone    String  @unique
+  country  String
+  state    String
+  bio      String?
   creator  Boolean @default(false)
+  premium  Boolean @default(false)
   password String
 
   createdAt DateTime @default(now())
