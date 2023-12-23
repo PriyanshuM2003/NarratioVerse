@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -12,26 +13,23 @@ function MyApp({ Component, pageProps }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token");
-      setIsLoggedIn(!!token);
-    }
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
   }, []);
 
   const handleLogout = () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("token");
-      setIsLoggedIn(false);
-      toast({
-        description: "Logged out successfully",
-      });
-      router.push("/login");
-    }
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    toast({
+      description: "Logged out successfully",
+    });
+    router.push("/login");
   };
 
   return (
     <>
       <TooltipProvider>
+        <Toaster />
         <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
         <Component {...pageProps} />
         <Footer />

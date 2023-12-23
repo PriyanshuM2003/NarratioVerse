@@ -81,7 +81,7 @@ const Signup = () => {
       console.error("Error:", error);
       toast({
         variant: "destructive",
-        description: "Something went wrong",
+        description: `Something went wrong:${error}`,
       });
     }
   };

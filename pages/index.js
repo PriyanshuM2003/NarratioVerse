@@ -39,7 +39,7 @@ export default function Home() {
       <main>
         <div className="hidden md:block">
           {/* <div className="overflow-hidden md:block"> */}
-          <Menu />
+          {/* <Menu /> */}
           <div className="border-t">
             <div className="bg-gray-800 text-white">
               <div className="grid lg:grid-cols-5">

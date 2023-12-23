@@ -1,7 +1,15 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { CreditCard, LogOut, User, Menu, Search, Podcast } from "lucide-react";
+import {
+  CreditCard,
+  LogOut,
+  User,
+  Menu,
+  Search,
+  Podcast,
+  UserPlus,
+} from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -31,7 +39,7 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
         <div className="items-center px-4 mx-auto md:flex md:px-8">
           <div className="flex items-center justify-between py-3 md:py-3 md:block">
             <Link href="/">
-              <h1 className="text-3xl font-bold text-white hover:text-pink-600">
+              <h1 className="text-xl font-bold text-white hover:text-pink-600">
                 Narratioverse
               </h1>
             </Link>
@@ -53,12 +61,34 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
             <ul className="md:justify-end justify-center items-center space-y-8 md:flex md:space-x-6 md:space-y-0">
               {!isLoggedIn && (
                 <>
-                  <li className="font-bold text-white hover:text-pink-600">
-                    <Link href="/login">Login</Link>
-                  </li>
-                  <li className="font-bold text-white hover:text-pink-600">
-                    <Link href="/signup">Signup</Link>
-                  </li>
+                  <DropdownMenu>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <DropdownMenuTrigger asChild>
+                          <User className="h-8 w-8 text-white hover:text-pink-600" />
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="font-semibold">Account</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <DropdownMenuContent className="w-40 font-semibold bg-slate-900 text-white">
+                      <DropdownMenuGroup>
+                        <Link href="/login">
+                          <DropdownMenuItem>
+                            <User className="mr-2 h-4 w-4" />
+                            <span>Login</span>
+                          </DropdownMenuItem>
+                        </Link>
+                        <Link href="/signup">
+                          <DropdownMenuItem>
+                            <UserPlus className="mr-2 h-4 w-4" />
+                            <span>Signup</span>
+                          </DropdownMenuItem>
+                        </Link>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </>
               )}
               {isLoggedIn && (
@@ -104,25 +134,29 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
                     <Tooltip>
                       <TooltipTrigger>
                         <DropdownMenuTrigger asChild>
-                          <User className="h-8 w-8 text-white cursor-pointer hover:text-pink-600" />
+                          <User className="h-8 w-8 text-white hover:text-pink-600" />
                         </DropdownMenuTrigger>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p className="font-semibold">My Account</p>
                       </TooltipContent>
                     </Tooltip>
-                    <DropdownMenuContent className="w-56 font-semibold bg-slate-900 text-white">
+                    <DropdownMenuContent className="w-40 font-semibold bg-slate-900 text-white">
                       <DropdownMenuLabel>My Account</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuGroup>
                         <Link href="/profile">
-                          <DropdownMenuItem className="cursor-pointer">
+                          <DropdownMenuItem>
                             <User className="mr-2 h-4 w-4" />
                             <span>Profile</span>
                           </DropdownMenuItem>
                         </Link>
+                        <DropdownMenuItem>
+                          <User className="mr-2 h-4 w-4" />
+                          <span>Preferences</span>
+                        </DropdownMenuItem>
                         <Link href="/plans">
-                          <DropdownMenuItem className="cursor-pointer">
+                          <DropdownMenuItem>
                             <CreditCard className="mr-2 h-4 w-4" />
                             <span>Billing</span>
                           </DropdownMenuItem>
@@ -130,10 +164,7 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator />
                       <DropdownMenuGroup>
-                        <DropdownMenuItem
-                          onClick={handleLogout}
-                          className="cursor-pointer"
-                        >
+                        <DropdownMenuItem onClick={handleLogout}>
                           <LogOut className="mr-2 h-4 w-4" />
                           <span>Log out</span>
                         </DropdownMenuItem>

@@ -29,11 +29,19 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: "Invalid credentials." });
       }
 
-      const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, {
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
         expiresIn: "1d",
       });
 
-      return res.status(200).json({ message: "Login successful", token, user });
+      const userResponse = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      };
+
+      return res
+        .status(200)
+        .json({ message: "Login successful", token, user: userResponse });
     } else {
       return res.status(405).json({ message: "Method Not Allowed" });
     }

@@ -12,8 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -52,13 +52,19 @@ const Login = () => {
         router.push("/");
         setTimeout(() => {
           window.location.reload();
-        }, 1000);
+        }, 500);
       } else {
         const { error } = await response.json();
-        console.error("Login failed:", error);
+        toast({
+          variant: "destructive",
+          description: `Login failed: ${error}`,
+        });
       }
     } catch (error) {
-      console.error("Login error:", error);
+      toast({
+        variant: "destructive",
+        description: `Login failed: ${error}`,
+      });
     }
   };
 

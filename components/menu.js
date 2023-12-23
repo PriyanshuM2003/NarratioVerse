@@ -15,12 +15,18 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from "@/components/ui/menubar";
+import Link from "next/link";
 
 export function Menu() {
   return (
-    <Menubar className="bg-gray-800 text-white rounded-none border-b border-none px-2 lg:px-4">
-      <MenubarMenu>
-        <MenubarTrigger className="font-bold">Music</MenubarTrigger>
+    <Menubar className="bg-gray-900 flex items-center text-white rounded-none border-b border-none px-2 lg:px-4">
+      <Link href="/">
+        <h1 className="text-xl font-bold mr-4 hover:text-pink-600">
+          Narratioverse
+        </h1>
+      </Link>
+      {/* <MenubarMenu>
+        <MenubarTrigger className="">Music</MenubarTrigger>
         <MenubarContent className="bg-gray-900 text-white">
           <MenubarItem>About Music</MenubarItem>
           <MenubarSeparator />
@@ -39,8 +45,8 @@ export function Menu() {
             Quit Music <MenubarShortcut>⌘Q</MenubarShortcut>
           </MenubarItem>
         </MenubarContent>
-      </MenubarMenu>
-      <MenubarMenu>
+      </MenubarMenu> */}
+      {/* <MenubarMenu>
         <MenubarTrigger className="relative">File</MenubarTrigger>
         <MenubarContent className="bg-gray-900 text-white">
           <MenubarSub>
@@ -98,12 +104,12 @@ export function Menu() {
             Print... <MenubarShortcut>⌘P</MenubarShortcut>
           </MenubarItem>
         </MenubarContent>
-      </MenubarMenu>
+      </MenubarMenu> */}
       <MenubarMenu>
         <MenubarTrigger>Edit</MenubarTrigger>
         <MenubarContent className="bg-gray-900 text-white">
-          <MenubarItem disabled>
-            Undo <MenubarShortcut>⌘Z</MenubarShortcut>
+          <MenubarItem>
+            Preferences<MenubarShortcut>⌘,</MenubarShortcut>
           </MenubarItem>
           <MenubarItem disabled>
             Redo <MenubarShortcut>⇧⌘Z</MenubarShortcut>

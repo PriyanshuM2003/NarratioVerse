@@ -8,6 +8,14 @@ import { Input } from "@/components/ui/input";
 
 const Profile = () => {
   const router = useRouter();
+  const [userData, setUserData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    country: "",
+    state: "",
+    bio: "",
+  });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -15,6 +23,26 @@ const Profile = () => {
       router.push("/");
       return;
     }
+    fetch(`${process.env.NEXT_PUBLIC_HOST}/api/getuser`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Unauthorized");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setUserData(data.user);
+      })
+      .catch((error) => {
+        console.error("Token verification failed:", error);
+        router.push("/");
+      });
   }, [router]);
 
   return (
@@ -27,11 +55,28 @@ const Profile = () => {
           <div className="flex flex-wrap -mx-3 mb-6">
             <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
               <Label htmlFor="name">Name</Label>
-              <Input name="name" id="name" type="text" />
+              <Input
+                name="name"
+                value={userData.name || ""}
+                onChange={(e) =>
+                  setUserData({ ...userData, name: e.target.value })
+                }
+                id="name"
+                type="text"
+              />
             </div>
             <div className="w-full md:w-1/2 px-3">
               <Label htmlFor="email">Email</Label>
-              <Input type="email" name="email" id="email" readOnly />
+              <Input
+                type="email"
+                value={userData.email || ""}
+                onChange={(e) =>
+                  setUserData({ ...userData, email: e.target.value })
+                }
+                name="email"
+                id="email"
+                readOnly
+              />
               <span id="email" className="text-xs font-semibold text-red-500">
                 You cannot change your email.
               </span>
@@ -46,24 +91,56 @@ const Profile = () => {
                 name="phone"
                 id="phone"
                 type="text"
+                value={userData.phone || ""}
+                onChange={(e) =>
+                  setUserData({ ...userData, phone: e.target.value })
+                }
                 placeholder="Please enter your 10 digit mobile no."
               />
             </div>
             <div className="w-full md:w-1/3 px-3 mb-6 md:mb-6">
               <Label htmlFor="country">Country</Label>
-              <Input type="text" name="country" id="country" />
+              <Input
+                type="text"
+                name="country"
+                id="country"
+                value={userData.country || ""}
+                onChange={(e) =>
+                  setUserData({ ...userData, country: e.target.value })
+                }
+              />
             </div>
             <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
               <Label htmlFor="state">State</Label>
-              <Input type="text" name="state" id="state" />
+              <Input
+                type="text"
+                name="state"
+                id="state"
+                value={userData.state || ""}
+                onChange={(e) =>
+                  setUserData({ ...userData, state: e.target.value })
+                }
+              />
             </div>
           </div>
-          <div className="flex flex-wrap -mx-3 mb-6">
-            <div className="w-full px-3">
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea name="bio" id="bio" type="text" />
+          {userData.creator ? (
+            <div className="flex flex-wrap -mx-3 mb-6">
+              <div className="w-full px-3">
+                <Label htmlFor="bio">Bio</Label>
+                <Textarea
+                  name="bio"
+                  id="bio"
+                  type="text"
+                  value={userData.bio || ""}
+                  onChange={(e) =>
+                    setUserData({ ...userData, bio: e.target.value })
+                  }
+                />
+              </div>
             </div>
-          </div>
+          ) : (
+            <></>
+          )}
           <p className="mt-2 text-sm text-gray-300 dark:text-gray-400">
             We’ll never share your details. Read our{" "}
             <a
