@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import "../styles/globals.css";
 import Footer from "@/components/Footer";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 
