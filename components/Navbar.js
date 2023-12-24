@@ -9,6 +9,7 @@ import {
   Search,
   Podcast,
   UserPlus,
+  Settings2,
 } from "lucide-react";
 import {
   Tooltip,
@@ -152,7 +153,7 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
                           </DropdownMenuItem>
                         </Link>
                         <DropdownMenuItem>
-                          <User className="mr-2 h-4 w-4" />
+                          <Settings2 className="mr-2 h-4 w-4" />
                           <span>Preferences</span>
                         </DropdownMenuItem>
                         <Link href="/plans">

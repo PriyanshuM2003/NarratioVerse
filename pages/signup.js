@@ -69,6 +69,7 @@ const Signup = () => {
         toast({
           description: "Account created successfully",
         });
+        setFormData("");
         router.push("/login");
       } else {
         const errorData = await response.json();
@@ -76,6 +77,7 @@ const Signup = () => {
           variant: "destructive",
           description: errorData.error || "Error creating account",
         });
+        setFormData("");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -83,6 +85,7 @@ const Signup = () => {
         variant: "destructive",
         description: `Something went wrong:${error}`,
       });
+      setFormData("");
     }
   };
 

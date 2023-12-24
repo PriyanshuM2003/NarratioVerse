@@ -48,6 +48,8 @@ const Login = () => {
         toast({
           description: "Logged in successfully",
         });
+        setEmail("");
+        setPassword("");
         console.log(message, user);
         router.push("/");
         setTimeout(() => {
@@ -59,12 +61,16 @@ const Login = () => {
           variant: "destructive",
           description: `Login failed: ${error}`,
         });
+        setEmail("");
+        setPassword("");
       }
     } catch (error) {
       toast({
         variant: "destructive",
         description: `Login failed: ${error}`,
       });
+      setEmail("");
+      setPassword("");
     }
   };
 

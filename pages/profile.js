@@ -5,9 +5,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 
 const Profile = () => {
   const router = useRouter();
+  const { toast } = useToast();
   const [userData, setUserData] = useState({
     name: "",
     email: "",
@@ -15,35 +17,127 @@ const Profile = () => {
     country: "",
     state: "",
     bio: "",
+    password: "",
+    newpassword: "",
+    confpassword: "",
   });
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/");
-      return;
-    }
-    fetch(`${process.env.NEXT_PUBLIC_HOST}/api/getuser`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Unauthorized");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setUserData(data.user);
-      })
-      .catch((error) => {
-        console.error("Token verification failed:", error);
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
         router.push("/");
+        return;
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_HOST}/api/getuser`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Unauthorized");
+      }
+
+      const data = await response.json();
+      setUserData(data.user);
+    } catch (error) {
+      console.error("Token verification failed:", error);
+      router.push("/");
+    }
+  };
+
+  const handleUpdateProfile = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/");
+        return;
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_HOST}/api/updateuser`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(userData),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+      toast({
+        description: "Profile updated successfully",
       });
-  }, [router]);
+    } catch (error) {
+      console.error("Profile update failed:", error);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/");
+        return;
+      }
+
+      const currentPassword = userData.password;
+      const newPassword = userData.newpassword;
+      const confirmedPassword = userData.confpassword;
+
+      if (newPassword !== confirmedPassword) {
+        toast({
+          variant: "destructive",
+          description: "New password and confirmed password do not match",
+        });
+        return;
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_HOST}/api/updatepassword`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ currentPassword, newPassword }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to change password");
+      }
+      toast({
+        description: "Password changed successfully",
+      });
+      setUserData({
+        ...userData,
+        password: "",
+        newpassword: "",
+        confpassword: "",
+      });
+    } catch (error) {
+      console.error("Password change failed:", error);
+      toast({
+        variant: "destructive",
+        description: "Failed to change password",
+      });
+    }
+  };
 
   return (
     <>
@@ -153,7 +247,7 @@ const Profile = () => {
           </p>
         </form>
         <div className="flex mx-auto justify-center mt-4">
-          <Button>Update Profile</Button>
+          <Button onClick={handleUpdateProfile}>Update Profile</Button>
         </div>
       </div>
       <div className="mx-auto px-16">
@@ -164,20 +258,44 @@ const Profile = () => {
           <div className="flex flex-wrap -mx-3 mb-2">
             <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
               <Label htmlFor="password">Current Password</Label>
-              <Input name="password" id="curpassword" type="password" />
+              <Input
+                name="password"
+                id="curpassword"
+                type="password"
+                value={userData.password || ""}
+                onChange={(e) =>
+                  setUserData({ ...userData, password: e.target.value })
+                }
+              />
             </div>
             <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
               <Label htmlFor="newpassword">New Password</Label>
-              <Input name="newpassword" id="newpassword" type="password" />
+              <Input
+                name="newpassword"
+                id="newpassword"
+                type="password"
+                value={userData.newpassword || ""}
+                onChange={(e) =>
+                  setUserData({ ...userData, newpassword: e.target.value })
+                }
+              />
             </div>
             <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
               <Label htmlFor="confpassword">Confirm Password</Label>
-              <Input name="confpassword" id="confpassword" type="password" />
+              <Input
+                name="confpassword"
+                id="confpassword"
+                type="password"
+                value={userData.confpassword || ""}
+                onChange={(e) =>
+                  setUserData({ ...userData, confpassword: e.target.value })
+                }
+              />
             </div>
           </div>
         </form>
         <div className="flex justify-end items-end mr-4 mb-4">
-          <Button>Change</Button>
+          <Button onClick={handleChangePassword}>Change</Button>
         </div>
       </div>
     </>
