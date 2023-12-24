@@ -6,13 +6,22 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
+import LoadingBar from "react-top-loading-bar";
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    router.events.on("routeChangeStart", () => {
+      setProgress(35);
+    });
+    router.events.on("routeChangeComplete", () => {
+      setProgress(100);
+    });
+
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
   }, []);
@@ -28,6 +37,12 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <>
+      <LoadingBar
+        color="#03cafc"
+        waitingTime={400}
+        progress={progress}
+        onLoaderFinished={() => setProgress(0)}
+      />
       <TooltipProvider>
         <Toaster />
         <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
