@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import LoadingBar from "react-top-loading-bar";
+import { Dialog } from "@/components/ui/dialog";
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -43,11 +44,13 @@ function MyApp({ Component, pageProps }) {
         progress={progress}
         onLoaderFinished={() => setProgress(0)}
       />
+      <Toaster />
       <TooltipProvider>
-        <Toaster />
-        <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
-        <Component {...pageProps} />
-        <Footer />
+        <Dialog>
+          <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+          <Component {...pageProps} />
+          <Footer />
+        </Dialog>
       </TooltipProvider>
     </>
   );

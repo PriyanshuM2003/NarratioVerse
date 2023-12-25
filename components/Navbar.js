@@ -25,6 +25,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { DialogTrigger } from "./ui/dialog";
+import Preferences from "@/pages/preferences";
 
 const Navbar = ({ isLoggedIn, handleLogout }) => {
   const [state, setState] = useState(false);
@@ -152,10 +154,13 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
                             <span>Profile</span>
                           </DropdownMenuItem>
                         </Link>
-                        <DropdownMenuItem>
-                          <Settings2 className="mr-2 h-4 w-4" />
-                          <span>Preferences</span>
-                        </DropdownMenuItem>
+                        <DialogTrigger asChild>
+                          <div className="flex cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm focus:bg-accent focus:text-accent-foreground overflow-hidden hover:bg-popover hover:text-popover-foreground hover:shadow-lg">
+                            <Settings2 className="mr-2 h-4 w-4" />
+                            <span>Preferences</span>
+                          </div>
+                        </DialogTrigger>
+                        <Preferences />
                         <Link href="/plans">
                           <DropdownMenuItem>
                             <CreditCard className="mr-2 h-4 w-4" />

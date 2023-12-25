@@ -7,11 +7,13 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Award, Music2 } from "lucide-react";
 
 const Profile = () => {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
+  const [showDetails, setShowDetails] = useState(false);
   const [userData, setUserData] = useState({
     name: "",
     email: "",
@@ -144,200 +146,254 @@ const Profile = () => {
   return (
     <>
       <div className="min-h-screen mx-auto p-12">
-        <form className="w-full">
-          <div className="my-4">
-            <u className="font-bold text-pink-500 text-xl">Personal Details</u>
-          </div>
-          {loading ? (
-            <>
-              <div className="flex flex-wrap -mx-3 mb-6">
-                <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                  <Skeleton className="h-10 w-full" />
-                </div>
-                <div className="w-full md:w-1/2 px-3">
-                  <Skeleton className="h-10 w-full" />
-                </div>
+        {loading ? (
+          <>
+            <div className="container mx-auto flex items-center justify-center flex-col">
+              <Skeleton className="md:w-52 md:h-52 w-32 h-32 mx-auto mb-5 rounded-full" />
+              <div className="space-y-2 flex items-center justify-center flex-col">
+                <Skeleton className="h-4 w-[200px]" />
+                <Skeleton className="h-4 w-[200px]" />
+                <Skeleton className="h-4 w-[800px]" />
+                <Skeleton className="h-4 w-[100px]" />
               </div>
-              <div className="flex flex-wrap -mx-3 mb-2">
-                <div className="w-full md:w-1/3 px-3 mb-6 md:mb-6">
-                  <Skeleton className="h-10 w-full" />
+            </div>
+          </>
+        ) : (
+          <>
+            {userData.creator ? (
+              <div className="container mx-auto flex items-center mb-10 justify-center flex-row">
+                <div className="flex items-center justify-center mb-5 mr-5 flex-col">
+                  <img
+                    className="md:w-52 md:h-52 w-32 h-32 mx-auto object-cover object-center rounded-full"
+                    alt="hero"
+                    src="https://images.unsplash.com/photo-1468817814611-b7edf94b5d60?w=300&dpr=2&q=80"
+                  />
+                  <Music2 className="text-white mt-2" />
                 </div>
-                <div className="w-full md:w-1/3 px-3 mb-6 md:mb-6">
-                  <Skeleton className="h-10 w-full" />
-                </div>
-                <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                  <Skeleton className="h-10 w-full" />
-                </div>
-              </div>
-              {userData.creator ? (
-                <div className="flex flex-wrap -mx-3 mb-6">
-                  <div className="w-full px-3">
-                    <Skeleton className="min-h-[80px] w-full" />
+                <div className="text-center lg:w-2/3 w-full">
+                  <h1 className="title-font sm:text-4xl text-3xl font-medium text-white">
+                    {userData.name}
+                  </h1>
+                  <p className="text-sm text-slate-400 mb-4">
+                    {userData.state}, {userData.country}
+                  </p>
+                  <p className="mb-8 text-white leading-relaxed">
+                    {userData.bio}
+                  </p>
+                  <div className="flex justify-center">
+                    <Button onClick={() => setShowDetails(true)}>
+                      Edit Profile
+                    </Button>
                   </div>
                 </div>
-              ) : (
-                <></>
-              )}
-            </>
-          ) : (
-            <>
-              <div className="flex flex-wrap -mx-3 mb-6">
-                <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    name="name"
-                    value={userData.name || ""}
-                    onChange={(e) =>
-                      setUserData({ ...userData, name: e.target.value })
-                    }
-                    id="name"
-                    type="text"
-                  />
-                </div>
-                <div className="w-full md:w-1/2 px-3">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    type="email"
-                    value={userData.email || ""}
-                    onChange={(e) =>
-                      setUserData({ ...userData, email: e.target.value })
-                    }
-                    name="email"
-                    id="email"
-                    readOnly
-                  />
-                  <span
-                    id="email"
-                    className="text-xs font-semibold text-red-500"
-                  >
-                    You cannot change your email.
-                  </span>
-                </div>
               </div>
-              <div className="flex flex-wrap -mx-3 mb-2">
-                <div className="w-full md:w-1/3 px-3 mb-6 md:mb-6">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input
-                    maxLength="10"
-                    pattern="\d{10}"
-                    name="phone"
-                    id="phone"
-                    type="text"
-                    value={userData.phone || ""}
-                    onChange={(e) =>
-                      setUserData({ ...userData, phone: e.target.value })
-                    }
-                    placeholder="Please enter your 10 digit mobile no."
-                  />
-                </div>
-                <div className="w-full md:w-1/3 px-3 mb-6 md:mb-6">
-                  <Label htmlFor="country">Country</Label>
-                  <Input
-                    type="text"
-                    name="country"
-                    id="country"
-                    value={userData.country || ""}
-                    onChange={(e) =>
-                      setUserData({ ...userData, country: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                  <Label htmlFor="state">State</Label>
-                  <Input
-                    type="text"
-                    name="state"
-                    id="state"
-                    value={userData.state || ""}
-                    onChange={(e) =>
-                      setUserData({ ...userData, state: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-              {userData.creator ? (
-                <div className="flex flex-wrap -mx-3 mb-6">
-                  <div className="w-full px-3">
-                    <Label htmlFor="bio">Bio</Label>
-                    <Textarea
-                      name="bio"
-                      id="bio"
-                      type="text"
-                      value={userData.bio || ""}
-                      onChange={(e) =>
-                        setUserData({ ...userData, bio: e.target.value })
-                      }
-                    />
+            ) : (
+              <div className="container mx-auto flex items-center mb-10 justify-center flex-col">
+                <img
+                  className="md:w-52 md:h-52 w-32 h-32 mx-auto mb-2 object-cover object-center rounded-full"
+                  alt="hero"
+                  src="https://images.unsplash.com/photo-1468817814611-b7edf94b5d60?w=300&dpr=2&q=80"
+                />
+                <Award className="text-white" />
+                <div className="text-center lg:w-2/3 w-full">
+                  <h1 className="title-font sm:text-4xl text-3xl font-medium text-white">
+                    {userData.name}
+                  </h1>
+                  <p className="text-sm text-slate-400 mb-4">
+                    {userData.state}, {userData.country}
+                  </p>
+                  <div className="flex justify-center">
+                    <Button onClick={() => setShowDetails(true)}>
+                      Edit Profile
+                    </Button>
                   </div>
                 </div>
-              ) : (
-                <></>
-              )}
-            </>
-          )}
-          <p className="mt-2 text-sm text-gray-300 dark:text-gray-400">
-            We’ll never share your details. Read our{" "}
-            <a
-              href="#"
-              className="font-medium text-pink-500 hover:underline dark:text-pink-500"
+              </div>
+            )}
+          </>
+        )}
+        {showDetails ? (
+          <form className="w-full">
+            <div className="my-4">
+              <u className="font-bold text-pink-500 text-xl">
+                Personal Details
+              </u>
+            </div>
+            <div className="flex flex-wrap -mx-3 mb-6">
+              <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  name="name"
+                  value={userData.name || ""}
+                  onChange={(e) =>
+                    setUserData({ ...userData, name: e.target.value })
+                  }
+                  id="name"
+                  type="text"
+                />
+              </div>
+              <div className="w-full md:w-1/2 px-3">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  type="email"
+                  value={userData.email || ""}
+                  onChange={(e) =>
+                    setUserData({ ...userData, email: e.target.value })
+                  }
+                  name="email"
+                  id="email"
+                  readOnly
+                />
+                <span id="email" className="text-xs font-semibold text-red-500">
+                  You cannot change your email.
+                </span>
+              </div>
+            </div>
+            <div className="flex flex-wrap -mx-3 mb-2">
+              <div className="w-full md:w-1/3 px-3 mb-6 md:mb-6">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  maxLength="10"
+                  pattern="\d{10}"
+                  name="phone"
+                  id="phone"
+                  type="text"
+                  value={userData.phone || ""}
+                  onChange={(e) =>
+                    setUserData({ ...userData, phone: e.target.value })
+                  }
+                  placeholder="Please enter your 10 digit mobile no."
+                />
+              </div>
+              <div className="w-full md:w-1/3 px-3 mb-6 md:mb-6">
+                <Label htmlFor="country">Country</Label>
+                <Input
+                  type="text"
+                  name="country"
+                  id="country"
+                  value={userData.country || ""}
+                  onChange={(e) =>
+                    setUserData({ ...userData, country: e.target.value })
+                  }
+                />
+              </div>
+              <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                <Label htmlFor="state">State</Label>
+                <Input
+                  type="text"
+                  name="state"
+                  id="state"
+                  value={userData.state || ""}
+                  onChange={(e) =>
+                    setUserData({ ...userData, state: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+            {userData.creator ? (
+              <div className="flex flex-wrap -mx-3 mb-6">
+                <div className="w-full px-3">
+                  <Label htmlFor="bio">Bio</Label>
+                  <Textarea
+                    name="bio"
+                    id="bio"
+                    type="text"
+                    value={userData.bio || ""}
+                    onChange={(e) =>
+                      setUserData({ ...userData, bio: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+            ) : (
+              <></>
+            )}
+            <p className="mt-2 text-sm text-gray-300 dark:text-gray-400">
+              We’ll never share your details. Read our{" "}
+              <a
+                href="#"
+                className="font-medium text-pink-500 hover:underline dark:text-pink-500"
+              >
+                Privacy Policy
+              </a>
+              .
+            </p>
+            <div className="flex mx-auto justify-center mt-4">
+              <Button
+                onClick={() => {
+                  setShowDetails(false);
+                  handleUpdateProfile();
+                }}
+              >
+                Update Profile
+              </Button>
+              {/* <Button onClick={handleUpdateProfile}>Update Profile</Button> */}
+            </div>
+          </form>
+        ) : (
+          <></>
+        )}
+      </div>
+      {showDetails ? (
+        <div className="mx-auto px-16">
+          <form className="w-full">
+            <div className="mb-4">
+              <u className="font-bold text-pink-500 text-xl">Change Password</u>
+            </div>
+            <div className="flex flex-wrap -mx-3 mb-2">
+              <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                <Label htmlFor="password">Current Password</Label>
+                <Input
+                  name="password"
+                  id="curpassword"
+                  type="password"
+                  value={userData.password || ""}
+                  onChange={(e) =>
+                    setUserData({ ...userData, password: e.target.value })
+                  }
+                />
+              </div>
+              <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                <Label htmlFor="newpassword">New Password</Label>
+                <Input
+                  name="newpassword"
+                  id="newpassword"
+                  type="password"
+                  value={userData.newpassword || ""}
+                  onChange={(e) =>
+                    setUserData({ ...userData, newpassword: e.target.value })
+                  }
+                />
+              </div>
+              <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                <Label htmlFor="confpassword">Confirm Password</Label>
+                <Input
+                  name="confpassword"
+                  id="confpassword"
+                  type="password"
+                  value={userData.confpassword || ""}
+                  onChange={(e) =>
+                    setUserData({ ...userData, confpassword: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+          </form>
+          <div className="flex justify-end items-end mr-4 mb-4">
+            <Button
+              onClick={() => {
+                setShowDetails(false);
+                handleChangePassword();
+              }}
             >
-              Privacy Policy
-            </a>
-            .
-          </p>
-        </form>
-        <div className="flex mx-auto justify-center mt-4">
-          <Button onClick={handleUpdateProfile}>Update Profile</Button>
-        </div>
-      </div>
-      <div className="mx-auto px-16">
-        <form className="w-full">
-          <div className="mb-4">
-            <u className="font-bold text-pink-500 text-xl">Change Password</u>
+              Change
+            </Button>
+            {/* <Button onClick={handleChangePassword}>Change</Button> */}
           </div>
-          <div className="flex flex-wrap -mx-3 mb-2">
-            <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-              <Label htmlFor="password">Current Password</Label>
-              <Input
-                name="password"
-                id="curpassword"
-                type="password"
-                value={userData.password || ""}
-                onChange={(e) =>
-                  setUserData({ ...userData, password: e.target.value })
-                }
-              />
-            </div>
-            <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-              <Label htmlFor="newpassword">New Password</Label>
-              <Input
-                name="newpassword"
-                id="newpassword"
-                type="password"
-                value={userData.newpassword || ""}
-                onChange={(e) =>
-                  setUserData({ ...userData, newpassword: e.target.value })
-                }
-              />
-            </div>
-            <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-              <Label htmlFor="confpassword">Confirm Password</Label>
-              <Input
-                name="confpassword"
-                id="confpassword"
-                type="password"
-                value={userData.confpassword || ""}
-                onChange={(e) =>
-                  setUserData({ ...userData, confpassword: e.target.value })
-                }
-              />
-            </div>
-          </div>
-        </form>
-        <div className="flex justify-end items-end mr-4 mb-4">
-          <Button onClick={handleChangePassword}>Change</Button>
         </div>
-      </div>
+      ) : (
+        <></>
+      )}
     </>
   );
 };
