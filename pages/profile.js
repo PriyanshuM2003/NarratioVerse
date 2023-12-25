@@ -161,14 +161,14 @@ const Profile = () => {
         ) : (
           <>
             {userData.creator ? (
-              <div className="container mx-auto flex items-center mb-10 justify-center flex-row">
-                <div className="flex items-center justify-center mb-5 mr-5 flex-col">
+              <div className="container mx-auto flex items-center mb-10 justify-center md:flex-row flex-col">
+                <div className="flex items-center justify-center md:mb-5 md:mr-5 flex-col">
                   <img
                     className="md:w-52 md:h-52 w-32 h-32 mx-auto object-cover object-center rounded-full"
                     alt="hero"
                     src="https://images.unsplash.com/photo-1468817814611-b7edf94b5d60?w=300&dpr=2&q=80"
                   />
-                  <Music2 className="text-white mt-2" />
+                  <Music2 className="text-yellow-400 mt-2" />
                 </div>
                 <div className="text-center lg:w-2/3 w-full">
                   <h1 className="title-font sm:text-4xl text-3xl font-medium text-white">
@@ -194,7 +194,11 @@ const Profile = () => {
                   alt="hero"
                   src="https://images.unsplash.com/photo-1468817814611-b7edf94b5d60?w=300&dpr=2&q=80"
                 />
-                <Award className="text-white" />
+                {userData.premium ? (
+                  <Award className="text-yellow-400" />
+                ) : (
+                  <></>
+                )}
                 <div className="text-center lg:w-2/3 w-full">
                   <h1 className="title-font sm:text-4xl text-3xl font-medium text-white">
                     {userData.name}
@@ -296,6 +300,7 @@ const Profile = () => {
                   <Label htmlFor="bio">Bio</Label>
                   <Textarea
                     name="bio"
+                    className="h-72 md:h-52"
                     id="bio"
                     type="text"
                     value={userData.bio || ""}
@@ -379,7 +384,7 @@ const Profile = () => {
               </div>
             </div>
           </form>
-          <div className="flex justify-end items-end mr-4 mb-4">
+          <div className="flex md:justify-end justify-center items-center mr-4 mb-4">
             <Button
               onClick={() => {
                 setShowDetails(false);
