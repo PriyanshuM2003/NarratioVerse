@@ -6,8 +6,8 @@ import { Facebook, Instagram, Linkedin, X } from "lucide-react";
 const Footer = () => {
   return (
     <>
-      <footer className="bg-gray-900 text-white">
-        <div className="container flex flex-wrap items-center justify-center px-0 py-4 mx-auto lg:justify-between">
+      <footer className="bg-gray-900 text-white border-t-2">
+        <div className="container flex flex-wrap items-center justify-center px-0 py-2 mx-auto lg:justify-between">
           <div className="flex flex-wrap justify-center">
             <ul className="flex items-center space-x-4">
               <li>

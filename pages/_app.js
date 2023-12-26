@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Navbar from "@/components/Navbar";
 import "../styles/globals.css";
 import Footer from "@/components/Footer";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import LoadingBar from "react-top-loading-bar";
 import { Dialog } from "@/components/ui/dialog";
+import { Menu } from "@/components/menu";
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -47,7 +47,7 @@ function MyApp({ Component, pageProps }) {
       <Toaster />
       <TooltipProvider>
         <Dialog>
-          <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+          <Menu isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
           <Component {...pageProps} />
           <Footer />
         </Dialog>

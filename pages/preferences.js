@@ -8,63 +8,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { language, genre } from "@/data/preferences";
 
 const Preferences = () => {
-  const language = [
-    {
-      id: "Hindi",
-      label: "Hindi",
-    },
-    {
-      id: "English",
-      label: "English",
-    },
-    {
-      id: "Sanskrit",
-      label: "Sanskrit",
-    },
-    {
-      id: "Punjabi",
-      label: "Punjabi",
-    },
-    {
-      id: "Marathi",
-      label: "Marathi",
-    },
-    {
-      id: "Tamil",
-      label: "Tamil",
-    },
-  ];
-  const genre = [
-    {
-      id: "Action",
-      label: "Action",
-    },
-    {
-      id: "Romance",
-      label: "Romance",
-    },
-    {
-      id: "Motivation",
-      label: "Motivation",
-    },
-    {
-      id: "Culture",
-      label: "Culture",
-    },
-    {
-      id: "Regional",
-      label: "Regional",
-    },
-    {
-      id: "Horror",
-      label: "Horror",
-    },
-  ];
   return (
     <>
       <DialogContent className="sm:max-w-[375px]">
