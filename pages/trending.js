@@ -5,16 +5,17 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { listenNowAlbums, madeForYouAlbums } from "../data/albums";
 import AlbumArtwork from "../components/album-artwork";
+
 const Trending = () => {
   return (
     <>
-      <div className="bg-gray-800 overflow-hidden text-white">
+      <div className="bg-gray-800 text-white">
         <div className="grid grid-cols-3 lg:grid-cols-4">
           <div className="col-span-3 lg:col-span-4">
             <div className="h-full px-4 py-6 lg:px-8">
               <Tabs defaultValue="trending" className="h-full space-y-6">
                 <div className="space-between flex items-center">
-                  <TabsList className="bg-gray-950 text-white">
+                  <TabsList className="bg-gray-950 flex-wrap text-white">
                     <TabsTrigger value="trending" className="relative">
                       Trending
                     </TabsTrigger>

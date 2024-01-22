@@ -9,7 +9,7 @@ const Footer = () => {
       <footer className="bg-gray-900 text-white border-t-2">
         <div className="container flex flex-wrap items-center justify-center px-0 py-2 mx-auto lg:justify-between">
           <div className="flex flex-wrap justify-center">
-            <ul className="flex items-center space-x-4">
+            <ul className="flex max-md:flex-col justify-center items-center md:space-x-4">
               <li>
                 <Link className="hover:text-pink-600" href="#">
                   About Us
@@ -17,7 +17,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link className="hover:text-pink-600" href="#">
-                  Contact US
+                  Contact Us
                 </Link>
               </li>
               <li>

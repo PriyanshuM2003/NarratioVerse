@@ -16,10 +16,10 @@ import React from "react";
 const Dashboard = () => {
   return (
     <>
-      <div className="flex-1 space-y-4 p-8 pt-6 text-white">
+      <div className="flex-1 space-y-4 md:p-8 pt-6 text-white">
         <div className="flex flex-wrap items-center justify-between space-y-2">
           <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-          <div className="md:flex space-y-4 items-center space-x-2">
+          <div className="md:flex max-md:space-y-4 items-center md:space-x-2">
             <Search />
             <CalendarDateRangePicker />
           </div>

@@ -29,7 +29,7 @@ export function Navbar({
   isSidebarVisible,
 }) {
   return (
-    <Menubar className="bg-gray-900 flex items-center justify-between text-white border-b-2 rounded-none px-2 lg:px-6">
+    <Menubar className="bg-gray-900 sticky top-0 z-10 flex items-center justify-between text-white border-b-2 rounded-none px-2 lg:px-6">
       {isSidebarVisible ? (
         <X className="md:hidden hover:text-pink-500" onClick={toggleSidebar} />
       ) : (
