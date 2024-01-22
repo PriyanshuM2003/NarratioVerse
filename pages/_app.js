@@ -7,7 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import LoadingBar from "react-top-loading-bar";
 import { Dialog } from "@/components/ui/dialog";
-import { Menu } from "@/components/menu";
+import { Navbar } from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 
 function MyApp({ Component, pageProps }) {
@@ -15,6 +15,7 @@ function MyApp({ Component, pageProps }) {
   const { toast } = useToast();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
 
   useEffect(() => {
     router.events.on("routeChangeStart", () => {
@@ -37,6 +38,30 @@ function MyApp({ Component, pageProps }) {
     router.push("/login");
   };
 
+  const handleToggleSidebar = () => {
+    setIsSidebarVisible(!isSidebarVisible);
+  };
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 768px)");
+
+    const handleResize = () => {
+      if (mediaQuery.matches) {
+        setIsSidebarVisible(false);
+      } else {
+        setIsSidebarVisible(true);
+      }
+    };
+
+    handleResize();
+
+    mediaQuery.addListener(handleResize);
+
+    return () => {
+      mediaQuery.removeListener(handleResize);
+    };
+  }, []);
+
   return (
     <>
       <LoadingBar
@@ -48,13 +73,14 @@ function MyApp({ Component, pageProps }) {
       <Toaster />
       <TooltipProvider>
         <Dialog>
-          <Menu isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
-          {/* <div className="grid grid-cols-[minmax(0,1fr),minmax(0,6fr)]">
-            <Sidebar />
-            <Component {...pageProps} />
-          </div> */}
+          <Navbar
+            isLoggedIn={isLoggedIn}
+            handleLogout={handleLogout}
+            toggleSidebar={handleToggleSidebar}
+            isSidebarVisible={isSidebarVisible}
+          />
           <div style={{ display: "flex" }}>
-            <Sidebar />
+            {isSidebarVisible && <Sidebar />}
             <div style={{ flex: 1 }}>
               <Component {...pageProps} />
             </div>

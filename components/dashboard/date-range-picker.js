@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import { addDays, format } from "date-fns";
-import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { CalendarDays } from "lucide-react";
 import { Calendar } from "../ui/calendar";

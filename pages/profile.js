@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Award, Music2 } from "lucide-react";
+import Link from "next/link";
 
 const Profile = () => {
   const router = useRouter();
@@ -157,12 +158,12 @@ const Profile = () => {
       <div className="min-h-screen mx-auto p-12">
         {loading ? (
           <>
-            <div className="container mx-auto flex items-center justify-center flex-col">
+            <div className="mx-auto flex items-center justify-center flex-col">
               <Skeleton className="md:w-52 md:h-52 w-32 h-32 mx-auto mb-5 rounded-full" />
               <div className="space-y-2 flex items-center justify-center flex-col">
                 <Skeleton className="h-4 w-[200px]" />
                 <Skeleton className="h-4 w-[200px]" />
-                <Skeleton className="h-4 w-[800px]" />
+                <Skeleton className="h-4 w-[200px] md:w-[800px]" />
                 <Skeleton className="h-4 w-[100px]" />
               </div>
             </div>
@@ -170,7 +171,7 @@ const Profile = () => {
         ) : (
           <>
             {userData.creator ? (
-              <div className="container mx-auto flex items-center mb-10 justify-center md:flex-row flex-col">
+              <div className="mx-auto flex items-center mb-10 justify-center md:flex-row flex-col">
                 <div className="flex items-center justify-center md:mb-5 md:mr-5 flex-col">
                   <img
                     className="md:w-52 md:h-52 w-32 h-32 mx-auto object-cover object-center rounded-full"
@@ -197,7 +198,7 @@ const Profile = () => {
                 </div>
               </div>
             ) : (
-              <div className="container mx-auto flex items-center mb-10 justify-center flex-col">
+              <div className="mx-auto flex items-center mb-10 justify-center flex-col">
                 <img
                   className="md:w-52 md:h-52 w-32 h-32 mx-auto mb-2 object-cover object-center rounded-full"
                   alt="hero"
@@ -228,9 +229,7 @@ const Profile = () => {
         {showDetails ? (
           <form className="w-full">
             <div className="my-4">
-              <u className="font-bold text-pink-500 text-xl">
-                Personal Details
-              </u>
+              <u className="font-bold text-white text-2xl">Personal Details</u>
             </div>
             <div className="flex flex-wrap -mx-3 mb-6">
               <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
@@ -331,14 +330,14 @@ const Profile = () => {
             ) : (
               <></>
             )}
-            <p className="mt-2 text-sm text-gray-300 dark:text-gray-400">
-              We’ll never share your details. Read our{" "}
-              <a
+            <p className="text-sm text-gray-300 dark:text-gray-400">
+              We’ll never share your details. Read our&nbsp;
+              <Link
                 href="#"
-                className="font-medium text-pink-500 hover:underline dark:text-pink-500"
+                className="font-medium text-blue-500 hover:underline"
               >
                 Privacy Policy
-              </a>
+              </Link>
               .
             </p>
             <div className="flex mx-auto justify-center mt-4">
@@ -357,10 +356,10 @@ const Profile = () => {
         )}
       </div>
       {showDetails ? (
-        <div className="mx-auto px-16">
+        <div className="mx-auto px-12">
           <form className="w-full">
             <div className="mb-4">
-              <u className="font-bold text-pink-500 text-xl">Change Password</u>
+              <u className="font-bold text-white text-2xl">Change Password</u>
             </div>
             <div className="flex flex-wrap -mx-3 mb-2">
               <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">

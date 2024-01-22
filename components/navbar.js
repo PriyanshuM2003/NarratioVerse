@@ -15,16 +15,31 @@ import {
   Settings2,
   User,
   UserPlus,
+  Menu,
+  X,
   LayoutDashboard,
 } from "lucide-react";
 import { DialogTrigger } from "./ui/dialog";
 import Preferences from "@/pages/preferences";
 
-export function Menu({ isLoggedIn, handleLogout }) {
+export function Navbar({
+  isLoggedIn,
+  handleLogout,
+  toggleSidebar,
+  isSidebarVisible,
+}) {
   return (
     <Menubar className="bg-gray-900 flex items-center justify-between text-white border-b-2 rounded-none px-2 lg:px-6">
+      {isSidebarVisible ? (
+        <X className="md:hidden hover:text-pink-500" onClick={toggleSidebar} />
+      ) : (
+        <Menu
+          className="md:hidden hover:text-pink-500"
+          onClick={toggleSidebar}
+        />
+      )}
       <Link href="/">
-        <h1 className="text-xl font-bold mr-4 hover:text-pink-600">
+        <h1 className="text-xl font-bold md:mr-4 hover:text-pink-600">
           Narratioverse
         </h1>
       </Link>

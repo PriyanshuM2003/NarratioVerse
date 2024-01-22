@@ -15,7 +15,7 @@ const Sidebar = () => {
   };
   return (
     <>
-      <div className="text-white block border-r-2 w-52 bg-gray-900">
+      <div className="text-white block max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:top-10 z-50 min-h-screen border-r-2 w-52 bg-gray-900">
         <div className="px-3 py-2">
           <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
             Discover
