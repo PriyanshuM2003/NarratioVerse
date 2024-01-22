@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { Facebook, Instagram, Linkedin, X } from "lucide-react";
+import { Facebook, Instagram, Linkedin } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -11,18 +11,23 @@ const Footer = () => {
           <div className="flex flex-wrap justify-center">
             <ul className="flex items-center space-x-4">
               <li>
-                <Link className="hover:text-pink-600" href={"/"}>
+                <Link className="hover:text-pink-600" href="#">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-pink-600" href={"/"}>
+                <Link className="hover:text-pink-600" href="#">
                   Contact US
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-pink-600" href={"/"}>
-                  Terms & Condition
+                <Link className="hover:text-pink-600" href="#">
+                  Terms & Conditions
+                </Link>
+              </li>
+              <li>
+                <Link className="hover:text-pink-600" href="#">
+                  Privacy Policy
                 </Link>
               </li>
             </ul>
@@ -37,7 +42,15 @@ const Footer = () => {
               <Facebook />
             </Link>
             <Link href="#" className="hover:text-pink-600">
-              <X size={28} />
+              <svg
+                className="h-5 w-5 fill-current"
+                height="23"
+                viewBox="0 0 1200 1227"
+                width="23"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"></path>
+              </svg>
             </Link>
             <Link href="#" className="hover:text-pink-600">
               <Instagram />

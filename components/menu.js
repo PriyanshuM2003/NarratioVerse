@@ -9,7 +9,14 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import Link from "next/link";
-import { CreditCard, LogOut, Settings2, User, UserPlus } from "lucide-react";
+import {
+  CreditCard,
+  LogOut,
+  Settings2,
+  User,
+  UserPlus,
+  LayoutDashboard,
+} from "lucide-react";
 import { DialogTrigger } from "./ui/dialog";
 import Preferences from "@/pages/preferences";
 
@@ -41,6 +48,12 @@ export function Menu({ isLoggedIn, handleLogout }) {
               </div>
             </DialogTrigger>
             <Preferences />
+            <Link href="/dashboard">
+              <MenubarItem>
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                <span>Dashboard</span>
+              </MenubarItem>
+            </Link>
             <Link href="/plans">
               <MenubarItem>
                 <CreditCard className="mr-2 h-4 w-4" />
@@ -70,7 +83,7 @@ export function Menu({ isLoggedIn, handleLogout }) {
             <Link href="/signup">
               <MenubarItem>
                 <UserPlus className="mr-2 h-4 w-4" />
-                <span>Signup</span>
+                <span>Create Account</span>
               </MenubarItem>
             </Link>
           </MenubarContent>

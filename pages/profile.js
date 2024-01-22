@@ -24,6 +24,7 @@ const Profile = () => {
     password: "",
     newpassword: "",
     confpassword: "",
+    profileImage: "",
   });
 
   useEffect(() => {
@@ -59,6 +60,14 @@ const Profile = () => {
       console.error("Token verification failed:", error);
       router.push("/");
     }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFormData({
+      ...formData,
+      profileImage: file,
+    });
   };
 
   const handleUpdateProfile = async () => {
@@ -166,7 +175,7 @@ const Profile = () => {
                   <img
                     className="md:w-52 md:h-52 w-32 h-32 mx-auto object-cover object-center rounded-full"
                     alt="hero"
-                    src="https://images.unsplash.com/photo-1468817814611-b7edf94b5d60?w=300&dpr=2&q=80"
+                    src={userData.profileImage}
                   />
                   <Music2 className="text-yellow-400 mt-2" />
                 </div>
@@ -192,7 +201,7 @@ const Profile = () => {
                 <img
                   className="md:w-52 md:h-52 w-32 h-32 mx-auto mb-2 object-cover object-center rounded-full"
                   alt="hero"
-                  src="https://images.unsplash.com/photo-1468817814611-b7edf94b5d60?w=300&dpr=2&q=80"
+                  src={userData.profileImage}
                 />
                 {userData.premium ? (
                   <Award className="text-yellow-400" />
@@ -281,7 +290,7 @@ const Profile = () => {
                   }
                 />
               </div>
-              <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+              <div className="w-full md:w-1/3 px-3 mb-6 md:mb-6">
                 <Label htmlFor="state">State</Label>
                 <Input
                   type="text"
@@ -291,6 +300,15 @@ const Profile = () => {
                   onChange={(e) =>
                     setUserData({ ...userData, state: e.target.value })
                   }
+                />
+              </div>
+              <div className="w-full md:w-1/3 px-3 mb-6 md:mb-6">
+                <Label htmlFor="profileImage">Profile Image</Label>
+                <Input
+                  id="profileImage"
+                  name="profileImage"
+                  type="file"
+                  onChange={handleFileChange}
                 />
               </div>
             </div>
@@ -332,7 +350,6 @@ const Profile = () => {
               >
                 Update Profile
               </Button>
-              {/* <Button onClick={handleUpdateProfile}>Update Profile</Button> */}
             </div>
           </form>
         ) : (
@@ -393,7 +410,6 @@ const Profile = () => {
             >
               Change
             </Button>
-            {/* <Button onClick={handleChangePassword}>Change</Button> */}
           </div>
         </div>
       ) : (

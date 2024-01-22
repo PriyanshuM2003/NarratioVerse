@@ -10,12 +10,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Loader } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
 
 const Signup = () => {
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -26,6 +28,7 @@ const Signup = () => {
     phone: "",
     password: "",
     cpassword: "",
+    profileImage: "",
   });
 
   useEffect(() => {
@@ -54,6 +57,7 @@ const Signup = () => {
     }
 
     try {
+      setLoading(true);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_HOST}/api/signup`,
         {
@@ -71,6 +75,7 @@ const Signup = () => {
         });
         setFormData("");
         router.push("/login");
+        setLoading(false);
       } else {
         const errorData = await response.json();
         toast({
@@ -78,6 +83,7 @@ const Signup = () => {
           description: errorData.error || "Error creating account",
         });
         setFormData("");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -86,20 +92,29 @@ const Signup = () => {
         description: `Something went wrong:${error}`,
       });
       setFormData("");
+      setLoading(false);
     }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFormData({
+      ...formData,
+      profileImage: file,
+    });
   };
 
   return (
     <>
-      <div className="relative flex flex-col justify-center items-center min-h-screen overflow-hidden">
+      <div className="flex flex-col justify-center items-center min-h-screen overflow-hidden">
         <div className="w-full m-auto lg:max-w-lg">
           <Card className="bg-gray-900">
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl text-center text-white">
-                Sign up
+                Create an account
               </CardTitle>
               <CardDescription className="text-center">
-                Enter your details to signup
+                Enter your details below to create your account
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
@@ -168,17 +183,45 @@ const Signup = () => {
                   onChange={handleInputChange}
                 />
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="profileImage">Profile Image</Label>
+                <Input
+                  id="profileImage"
+                  name="profileImage"
+                  type="file"
+                  onChange={handleFileChange}
+                />
+              </div>
             </CardContent>
             <CardFooter className="flex flex-col">
               <Button
                 className="w-full bg-black font-semibold"
                 onClick={handleSignup}
               >
-                Create Account
+                {loading ? (
+                  <Loader className="animate-spin" />
+                ) : (
+                  <p>Create Account</p>
+                )}
               </Button>
               <p className="mt-2 text-xs text-center text-gray-400">
-                {" "}
-                Already have an account?{" "}
+                By clicking Create Account, you agree to our&nbsp;
+                <Link
+                  href="#"
+                  className=" text-blue-600 font-semibold hover:underline"
+                >
+                  Terms of Service
+                </Link>
+                &nbsp;and&nbsp;
+                <Link
+                  href="#"
+                  className=" text-blue-600 font-semibold hover:underline"
+                >
+                  Privacy Policy.
+                </Link>
+              </p>
+              <p className="mt-2 text-xs text-center text-gray-400">
+                Already have an account?
                 <Link
                   href="/login"
                   className=" text-blue-600 font-semibold hover:underline"

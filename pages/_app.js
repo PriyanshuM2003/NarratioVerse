@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import LoadingBar from "react-top-loading-bar";
 import { Dialog } from "@/components/ui/dialog";
 import { Menu } from "@/components/menu";
+import Sidebar from "@/components/sidebar";
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -48,7 +49,16 @@ function MyApp({ Component, pageProps }) {
       <TooltipProvider>
         <Dialog>
           <Menu isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
-          <Component {...pageProps} />
+          {/* <div className="grid grid-cols-[minmax(0,1fr),minmax(0,6fr)]">
+            <Sidebar />
+            <Component {...pageProps} />
+          </div> */}
+          <div style={{ display: "flex" }}>
+            <Sidebar />
+            <div style={{ flex: 1 }}>
+              <Component {...pageProps} />
+            </div>
+          </div>
           <Footer />
         </Dialog>
       </TooltipProvider>

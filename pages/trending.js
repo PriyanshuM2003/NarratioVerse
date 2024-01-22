@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { listenNowAlbums, madeForYouAlbums } from "../data/albums";
 import AlbumArtwork from "../components/album-artwork";
-const Listen = () => {
+const Trending = () => {
   return (
     <>
       <div className="hidden md:block">
@@ -110,4 +110,4 @@ const Listen = () => {
   );
 };
 
-export default Listen;
+export default Trending;

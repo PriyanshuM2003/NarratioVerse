@@ -29,6 +29,7 @@ export default async function handler(req, res) {
           bio: true,
           creator: true,
           premium: true,
+          profileImage: true,
         },
       });
 

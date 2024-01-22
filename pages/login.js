@@ -14,11 +14,12 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
+import { Loader } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -31,6 +32,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
+      setLoading(true);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_HOST}/api/login`,
         {
@@ -55,6 +57,7 @@ const Login = () => {
         setTimeout(() => {
           window.location.reload();
         }, 500);
+        setLoading(false);
       } else {
         const { error } = await response.json();
         toast({
@@ -63,6 +66,7 @@ const Login = () => {
         });
         setEmail("");
         setPassword("");
+        setLoading(false);
       }
     } catch (error) {
       toast({
@@ -71,12 +75,13 @@ const Login = () => {
       });
       setEmail("");
       setPassword("");
+      setLoading(false);
     }
   };
 
   return (
     <>
-      <div className="relative flex flex-col justify-center items-center min-h-screen overflow-hidden">
+      <div className="flex flex-col justify-center items-center min-h-screen overflow-hidden">
         <div className="w-full m-auto lg:max-w-lg">
           <Card className="bg-gray-900">
             <CardHeader className="space-y-1">
@@ -112,8 +117,14 @@ const Login = () => {
                 className="w-full bg-black font-semibold"
                 onClick={handleLogin}
               >
-                Login
+                {loading ? <Loader className="animate-spin" /> : <p>Login</p>}
               </Button>
+              <Link
+                href="#"
+                className="text-blue-600 font-semibold mt-2 text-xs text-center hover:underline"
+              >
+                Forgot Password?
+              </Link>
               <p className="mt-2 text-xs text-center text-gray-400">
                 {" "}
                 Don't have an account?{" "}
@@ -121,7 +132,7 @@ const Login = () => {
                   href="/signup"
                   className=" text-blue-600 font-semibold hover:underline"
                 >
-                  Sign up
+                  Create Account
                 </Link>
               </p>
             </CardFooter>

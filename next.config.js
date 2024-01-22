@@ -16,6 +16,16 @@ const nextConfig = {
         hostname: "dummyimage.com",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "pluspng.com",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "**",
+      },
     ],
   },
 };

@@ -9,16 +9,17 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(uuid())
-  name     String
-  email    String  @unique
-  phone    String  @unique
-  country  String
-  state    String
-  bio      String?
-  creator  Boolean @default(false)
-  premium  Boolean @default(false)
-  password String
+  id           String  @id @default(uuid())
+  name         String
+  email        String  @unique
+  phone        String  @unique
+  country      String
+  state        String
+  bio          String?
+  creator      Boolean @default(false)
+  premium      Boolean @default(false)
+  password     String
+  profileImage String  @default("https://pluspng.com/img-png/user-png-icon-big-image-png-2240.png")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
