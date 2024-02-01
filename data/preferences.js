@@ -24,7 +24,7 @@ export const language = [
     label: "Tamil",
   },
 ];
-export const genre = [
+export const genres = [
   {
     id: "Action",
     label: "Action",
@@ -46,7 +46,79 @@ export const genre = [
     label: "Regional",
   },
   {
+    id: "Historical Fiction",
+    label: "Historical Fiction",
+  },
+  {
+    id: "Biography",
+    label: "Biography",
+  },
+  {
+    id: "Autobiography",
+    label: "Autobiography",
+  },
+  {
+    id: "Self-help",
+    label: "Self-help",
+  },
+  {
+    id: "Adventure",
+    label: "Adventure",
+  },
+  {
+    id: "Simulation",
+    label: "Simulation",
+  },
+  {
+    id: "Strategy",
+    label: "Strategy",
+  },
+  {
+    id: "Sports",
+    label: "Sports",
+  },
+  {
+    id: "Comedy",
+    label: "Comedy",
+  },
+  {
+    id: "Drama",
+    label: "Drama",
+  },
+  {
+    id: "Science",
+    label: "Science",
+  },
+  {
+    id: "Science Fiction",
+    label: "Science Fiction",
+  },
+  {
+    id: "Teachnology",
+    label: "Teachnology",
+  },
+  {
+    id: "Fantasy",
+    label: "Fantasy",
+  },
+  {
+    id: "Mystery",
+    label: "Mystery",
+  },
+  {
+    id: "Crime",
+    label: "Crime",
+  },
+  {
+    id: "Thriller",
+    label: "Thriller",
+  },
+  {
     id: "Horror",
     label: "Horror",
+  },
+  {
+    id: "Documentary",
+    label: "Documentary",
   },
 ];

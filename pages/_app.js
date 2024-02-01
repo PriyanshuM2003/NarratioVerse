@@ -80,7 +80,9 @@ function MyApp({ Component, pageProps }) {
             isSidebarVisible={isSidebarVisible}
           />
           <div style={{ display: "flex" }}>
-            {isSidebarVisible && <Sidebar />}
+            {isSidebarVisible && (
+              <Sidebar toggleSidebar={handleToggleSidebar} />
+            )}
             <div style={{ flex: 1 }}>
               <Component {...pageProps} />
             </div>

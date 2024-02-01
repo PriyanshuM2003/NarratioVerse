@@ -1,5 +1,11 @@
 "use client";
-import { PlayCircle, PlusCircle, Podcast, Search } from "lucide-react";
+import {
+  FolderTree,
+  PlusCircle,
+  Podcast,
+  Search,
+  BookAudio,
+} from "lucide-react";
 import React from "react";
 import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
@@ -7,21 +13,26 @@ import playlists from "@/data/playlists";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-const Sidebar = () => {
+const Sidebar = ({ toggleSidebar }) => {
   const router = useRouter();
 
   const isActiveLink = (href) => {
     return router.pathname === href;
   };
+
   return (
     <>
+      <div
+        onClick={toggleSidebar}
+        className="fixed md:hidden inset-0 bg-black opacity-50 z-50"
+      ></div>
       <div className="text-white block max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:top-10 max-md:z-50 min-h-screen border-r-2 w-52 bg-gray-900">
         <div className="px-3 py-2">
           <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
             Discover
           </h2>
           <div className="flex-nowrap flex-col space-y-2 text-white">
-            <Link
+            {/* <Link
               href="/"
               className={`w-full flex items-center justify-start hover:text-pink-600 ${
                 isActiveLink("/") &&
@@ -30,7 +41,7 @@ const Sidebar = () => {
             >
               <PlayCircle className="w-4 h-4 mr-2" />
               Trending
-            </Link>
+            </Link> */}
             <Link
               href="#"
               className={`w-full flex items-center justify-start hover:text-pink-600 ${
@@ -52,24 +63,26 @@ const Sidebar = () => {
               Go Live
             </Link>
             <Link
-              href="/addpodcast"
+              href="/add"
               className={`w-full flex items-center justify-start hover:text-pink-600 ${
-                isActiveLink("/addpodcast") &&
+                isActiveLink("/add") &&
                 "rounded-sm px-2 py-1.5 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
               }`}
             >
               <PlusCircle className="w-4 h-4 mr-2" />
-              Add Podcast
+              Add&nbsp;
+              <Podcast className="w-5 h-5" /><BookAudio className="w-5 h-5" />
             </Link>
             <Link
-              href="/addaudiobook"
+              href="/your"
               className={`w-full flex items-center justify-start hover:text-pink-600 ${
-                isActiveLink("/addaudiobook") &&
+                isActiveLink("/your") &&
                 "rounded-sm px-2 py-1.5 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
               }`}
             >
-              <PlusCircle className="w-4 h-4 mr-2" />
-              Add Audio Book
+              <FolderTree className="w-4 h-4 mr-2" />
+              Your&nbsp;
+              <Podcast className="w-5 h-5" /><BookAudio className="w-5 h-5" />
             </Link>
           </div>
         </div>

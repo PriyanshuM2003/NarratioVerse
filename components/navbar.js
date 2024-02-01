@@ -15,12 +15,18 @@ import {
   Settings2,
   User,
   UserPlus,
-  Menu,
-  X,
+  Radio,
+  BookAudio,
+  BadgePlus,
   LayoutDashboard,
+  PlayCircle,
+  Podcast,
+  PanelLeftOpen,
+  PanelLeftClose,
 } from "lucide-react";
 import { DialogTrigger } from "./ui/dialog";
 import Preferences from "@/pages/preferences";
+import { useRouter } from "next/router";
 
 export function Navbar({
   isLoggedIn,
@@ -28,21 +34,84 @@ export function Navbar({
   toggleSidebar,
   isSidebarVisible,
 }) {
+  const router = useRouter();
+
+  const isActiveLink = (href) => {
+    return router.pathname === href;
+  };
+
   return (
     <Menubar className="bg-gray-900 sticky top-0 z-10 flex items-center justify-between text-white border-b-2 rounded-none px-2 lg:px-6">
-      {isSidebarVisible ? (
-        <X className="md:hidden hover:text-pink-500" onClick={toggleSidebar} />
-      ) : (
-        <Menu
-          className="md:hidden hover:text-pink-500"
-          onClick={toggleSidebar}
-        />
-      )}
-      <Link href="/">
-        <h1 className="text-xl font-bold md:mr-4 hover:text-pink-600">
-          Narratioverse
-        </h1>
-      </Link>
+      <div className="flex items-center space-x-2">
+        {isSidebarVisible ? (
+          <PanelLeftClose
+            className="hover:text-pink-500"
+            onClick={toggleSidebar}
+          />
+        ) : (
+          <PanelLeftOpen
+            className="hover:text-pink-500"
+            onClick={toggleSidebar}
+          />
+        )}
+        <Link href="/">
+          <h1 className="text-xl font-bold md:mr-4 hover:text-pink-600">
+            Narratioverse
+          </h1>
+        </Link>
+      </div>
+      <div className="space-x-6 flex items-center justify-center">
+        <Link
+          href="/"
+          className={`flex w-fit items-center hover:text-pink-600 ${
+            isActiveLink("/") &&
+            "rounded-sm py-1 px-2 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
+          }`}
+        >
+          <PlayCircle className="w-4 h-4 mr-0.5" />
+          Trending
+        </Link>
+        <Link
+          href="#"
+          className={`flex w-fit items-center hover:text-pink-600 ${
+            isActiveLink("#") &&
+            "rounded-sm py-1 px-2 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
+          }`}
+        >
+          <BookAudio className="w-4 h-4 mr-0.5" />
+          Audio Books
+        </Link>
+        <Link
+          href="/podcasts"
+          className={`flex w-fit items-center hover:text-pink-600 ${
+            isActiveLink("/podcasts") &&
+            "rounded-sm py-1 px-2 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
+          }`}
+        >
+          <Podcast className="w-4 h-4 mr-0.5" />
+          Podcasts
+        </Link>
+        <Link
+          href="#"
+          className={`flex w-fit items-center hover:text-pink-600 ${
+            isActiveLink("#") &&
+            "rounded-sm py-1 px-2 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
+          }`}
+        >
+          <Radio className="w-4 h-4 mr-0.5" />
+          Live
+        </Link>
+        <Link
+          href="#"
+          className={`flex w-fit items-center hover:text-pink-600 ${
+            isActiveLink("#") &&
+            "rounded-sm py-1 px-2 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
+          }`}
+        >
+          <BadgePlus className="w-4 h-4 mr-0.5" />
+          New
+        </Link>
+      </div>
       {isLoggedIn ? (
         <MenubarMenu>
           <MenubarTrigger className="flex items-center">
