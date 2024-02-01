@@ -1,8 +1,10 @@
+"use client";
 import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
+import YourPodcasts from "./yourpodcasts";
+import YourAudiobooks from "./youraudiobooks";
 
-const Your = () => {
+const YourTab = () => {
   const [selectedTab, setSelectedTab] = useState("podcast");
 
   const handleTabChange = (value) => {
@@ -36,20 +38,10 @@ const Your = () => {
             </TabsList>
           </div>
           <TabsContent value="podcast">
-            <div className="space-y-1">
-              <h2 className="text-2xl font-semibold tracking-tight">
-                Your Podcasts
-              </h2>
-            </div>
-            <Separator className="my-4" />
+            <YourPodcasts />
           </TabsContent>
           <TabsContent value="audiobook">
-            <div className="space-y-1">
-              <h2 className="text-2xl font-semibold tracking-tight">
-                Your Audio Books
-              </h2>
-            </div>
-            <Separator className="my-4" />
+            <YourAudiobooks />
           </TabsContent>
         </Tabs>
       </div>
@@ -57,4 +49,4 @@ const Your = () => {
   );
 };
 
-export default Your;
+export default YourTab;

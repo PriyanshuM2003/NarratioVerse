@@ -63,9 +63,9 @@ const Sidebar = ({ toggleSidebar }) => {
               Go Live
             </Link>
             <Link
-              href="/add"
+              href="/addtab"
               className={`w-full flex items-center justify-start hover:text-pink-600 ${
-                isActiveLink("/add") &&
+                isActiveLink("/addtab") &&
                 "rounded-sm px-2 py-1.5 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
               }`}
             >
@@ -74,9 +74,9 @@ const Sidebar = ({ toggleSidebar }) => {
               <Podcast className="w-5 h-5" /><BookAudio className="w-5 h-5" />
             </Link>
             <Link
-              href="/your"
+              href="/yourtab"
               className={`w-full flex items-center justify-start hover:text-pink-600 ${
-                isActiveLink("/your") &&
+                isActiveLink("/yourtab") &&
                 "rounded-sm px-2 py-1.5 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
               }`}
             >
