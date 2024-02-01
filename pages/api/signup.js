@@ -4,7 +4,8 @@ import bcrypt from "bcryptjs";
 export default async function handler(req, res) {
   try {
     if (req.method === "POST") {
-      const { name, email, phone, password, country, state } = req.body;
+      const { name, email, phone, password, country, state, profileImage } =
+        req.body;
 
       if (!name || !email || !phone || !password || !country || !state) {
         return res
@@ -22,6 +23,7 @@ export default async function handler(req, res) {
           password: hashedPassword,
           country,
           state,
+          profileImage,
         },
       });
 

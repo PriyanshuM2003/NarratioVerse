@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
+import supabase from "@/lib/supabase";
 
 const Signup = () => {
   const [loading, setLoading] = useState(false);
@@ -28,7 +29,8 @@ const Signup = () => {
     phone: "",
     password: "",
     cpassword: "",
-    profileImage: "",
+    profileImage:
+      "https://pluspng.com/img-png/user-png-icon-big-image-png-2240.png",
   });
 
   useEffect(() => {
@@ -96,17 +98,54 @@ const Signup = () => {
     }
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    setFormData({
-      ...formData,
-      profileImage: file,
-    });
+
+    if (file) {
+      try {
+        setLoading(true);
+        const uniqueId = Math.random().toString(36).substring(7);
+        const { data, error } = await supabase.storage
+          .from("Images")
+          .upload(`Avatar/${uniqueId}_${file.name}`, file);
+
+        if (error) {
+          toast({
+            variant: "destructive",
+            description: "Error uploading profile image",
+          });
+        } else {
+          const downloadUrl = await supabase.storage
+            .from("Images")
+            .getPublicUrl(`Avatar/${uniqueId}_${file.name}`);
+          setFormData({
+            ...formData,
+            profileImage: downloadUrl.data.publicUrl,
+          });
+          toast({
+            description: "Profile image uploaded successfully",
+          });
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          description: "Error uploading profile image",
+        });
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setFormData({
+        ...formData,
+        profileImage:
+          "https://pluspng.com/img-png/user-png-icon-big-image-png-2240.png",
+      });
+    }
   };
 
   return (
     <>
-      <div className="flex flex-col justify-center items-center min-h-screen overflow-hidden">
+      <div className="flex py-4 flex-col justify-center items-center min-h-screen overflow-hidden">
         <div className="w-full m-auto lg:max-w-lg">
           <Card className="bg-gray-900">
             <CardHeader className="space-y-1">
