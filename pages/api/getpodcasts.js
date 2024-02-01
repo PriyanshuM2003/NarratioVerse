@@ -14,6 +14,22 @@ export default async function handler(req, res) {
       if (!decoded || !decoded.id) {
         return res.status(401).json({ error: "Unauthorized" });
       }
+      const userPodcasts = await prisma.podcast.findMany({
+        where: {
+          userId: decoded.id,
+        },
+        select: {
+          id: true,
+          podcastName: true,
+          podcastImage: true,
+          genres: true,
+          keywords: true,
+          podcastParts: true,
+          userId: true,
+        },
+      });
+
+      return res.status(200).json({ podcasts: userPodcasts });
     } else {
       return res.status(405).json({ message: "Method Not Allowed" });
     }

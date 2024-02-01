@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Award, Music2 } from "lucide-react";
+import { Award, Loader, Music2 } from "lucide-react";
 import Link from "next/link";
 import supabase from "@/lib/supabase";
 
@@ -120,6 +120,7 @@ const Profile = () => {
 
   const handleUpdateProfile = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem("token");
       if (!token) {
         router.push("/");
@@ -146,11 +147,14 @@ const Profile = () => {
       window.location.reload();
     } catch (error) {
       console.error("Profile update failed:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleChangePassword = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem("token");
       if (!token) {
         router.push("/");
@@ -199,6 +203,8 @@ const Profile = () => {
         variant: "destructive",
         description: "Failed to change password",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -396,7 +402,11 @@ const Profile = () => {
                   handleUpdateProfile();
                 }}
               >
-                Update Profile
+                {loading ? (
+                  <Loader className="animate-spin" />
+                ) : (
+                  <>Update Profile</>
+                )}
               </Button>
             </div>
           </form>
@@ -456,7 +466,7 @@ const Profile = () => {
                 handleChangePassword();
               }}
             >
-              Change
+              {loading ? <Loader className="animate-spin" /> : <>Change</>}
             </Button>
           </div>
         </div>

@@ -14,6 +14,27 @@ export default async function handler(req, res) {
       if (!decoded || !decoded.id) {
         return res.status(401).json({ error: "Unauthorized" });
       }
+
+      const { podcastName, podcastImage, genres, keywords, podcastParts } =
+        req.body;
+
+      const podcastNameAudioParts = podcastParts.map((part) => ({
+        partName: part.partName,
+        audioUrl: part.audioUrl,
+      }));
+
+      const createdPodcast = await prisma.podcast.create({
+        data: {
+          podcastName,
+          podcastImage,
+          genres: { set: genres },
+          keywords: { set: keywords },
+          podcastParts: { set: podcastNameAudioParts },
+          userId: decoded.id,
+        },
+      });
+
+      return res.status(200).json({ podcast: createdPodcast });
     } else {
       return res.status(405).json({ message: "Method Not Allowed" });
     }

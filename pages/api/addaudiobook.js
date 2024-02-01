@@ -14,6 +14,31 @@ export default async function handler(req, res) {
       if (!decoded || !decoded.id) {
         return res.status(401).json({ error: "Unauthorized" });
       }
+      const {
+        audiobookName,
+        audiobookImage,
+        genres,
+        keywords,
+        audiobookParts,
+      } = req.body;
+
+      const audiobookNameAudioParts = audiobookParts.map((part) => ({
+        partName: part.partName,
+        audioUrl: part.audioUrl,
+      }));
+
+      const createdaudiobook = await prisma.audiobook.create({
+        data: {
+          audiobookName,
+          audiobookImage,
+          genres: { set: genres },
+          keywords: { set: keywords },
+          audiobookParts: { set: audiobookNameAudioParts },
+          userId: decoded.id,
+        },
+      });
+
+      return res.status(200).json({ audiobook: createdaudiobook });
     } else {
       return res.status(405).json({ message: "Method Not Allowed" });
     }

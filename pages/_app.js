@@ -9,6 +9,7 @@ import LoadingBar from "react-top-loading-bar";
 import { Dialog } from "@/components/ui/dialog";
 import { Navbar } from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
+import Player from "./player/[slug]";
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -87,6 +88,7 @@ function MyApp({ Component, pageProps }) {
               <Component {...pageProps} />
             </div>
           </div>
+          <Player />
           <Footer />
         </Dialog>
       </TooltipProvider>

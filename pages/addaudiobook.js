@@ -2,17 +2,18 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { PlusCircle, X } from "lucide-react";
+import { Loader, PlusCircle, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { genres } from "@/data/preferences";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
+import supabase from "@/lib/supabase";
 
 const AddAudiobook = () => {
   const router = useRouter();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [audiobookName, setAudiobookName] = useState("");
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState("");
@@ -22,6 +23,7 @@ const AddAudiobook = () => {
     {
       id: 1,
       partName: "",
+      file: null,
     },
   ]);
 
@@ -31,7 +33,6 @@ const AddAudiobook = () => {
     genre: [],
     keyword: [],
     audiobookParts: [],
-    audiobookAudioParts: [],
   });
 
   const handleAudiobookName = (event) => {
@@ -86,9 +87,12 @@ const AddAudiobook = () => {
     event.preventDefault();
     if (
       currentKeyword.trim() !== "" &&
-      !keywords.includes(currentKeyword.trim())
+      !keywords.includes(currentKeyword.trim().toLowerCase())
     ) {
-      setKeywords((prevKeywords) => [...prevKeywords, currentKeyword.trim()]);
+      setKeywords((prevKeywords) => [
+        ...prevKeywords,
+        currentKeyword.trim().toLowerCase(),
+      ]);
       setCurrentKeyword("");
     }
   };
@@ -99,18 +103,93 @@ const AddAudiobook = () => {
     );
   };
 
-  const handleaudiobookImage = async (e) => {
+  const handleAddAudiobook = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/");
+        return;
+      }
+
+      setLoading(true);
+      const postData = {
+        audiobookName,
+        audiobookImage: audiobookData.audiobookImage,
+        genres: selectedGenres,
+        keywords,
+        audiobookParts: audiobookFields.map((field) => ({
+          partName: field.partName,
+          audioUrl: field.audioUrl,
+        })),
+      };
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_HOST}/api/addaudiobook`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(postData),
+        }
+      );
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("Audiobook added successfully:", responseData);
+        toast({
+          description: "Audiobook added successfully",
+        });
+        setAudiobookName("");
+        setAudiobookData({
+          audiobookName: "",
+          audiobookImage: "",
+          genres: [],
+          keywords: [],
+          audiobookParts: [],
+        });
+        setSelectedGenres([]);
+        setKeywords([]);
+        setAudiobookFields([
+          {
+            id: 1,
+            partName: "",
+            file: null,
+          },
+        ]);
+      } else {
+        console.error("Error adding audiobook:", response.statusText);
+        toast({
+          variant: "destructive",
+          description: "Error adding audiobook",
+        });
+      }
+    } catch (error) {
+      console.error("Error adding audiobook:", error.message);
+      toast({
+        variant: "destructive",
+        description: "Error adding audiobook",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAudiobookImage = async (e) => {
     const file = e.target.files[0];
 
     if (file) {
       try {
         setLoading(true);
-        const oldImageFileName = audiobookData.profileImage.split("/").pop();
-        if (oldImageFileName) {
+        const oldAudiobookImageFileName = audiobookData.audiobookImage
+          .split("/")
+          .pop();
+        if (oldAudiobookImageFileName) {
           const { data: removeData, error: removeError } =
             await supabase.storage
               .from("Images")
-              .remove([`Audiobook/${oldImageFileName}`]);
+              .remove([`Audiobook/${oldAudiobookImageFileName}`]);
 
           if (removeError) {
             console.error("Error removing old image:", removeError);
@@ -152,11 +231,73 @@ const AddAudiobook = () => {
     }
   };
 
+  const handleAudiobookAudioParts = async (e, fieldId) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      try {
+        setLoading(true);
+
+        const oldAudioFileName = audiobookFields.find(
+          (field) => field.id === fieldId
+        ).file?.name;
+
+        if (oldAudioFileName) {
+          const { data: removeData, error: removeError } =
+            await supabase.storage
+              .from("AudioFiles")
+              .remove([`Audiobook/${oldAudioFileName}`]);
+
+          if (removeError) {
+            console.error("Error removing old audio file:", removeError);
+          } else {
+            console.log("Old audio removed successfully:", removeData);
+          }
+        }
+
+        const uniqueId = Math.random().toString(36).substring(7);
+        const { data, error } = await supabase.storage
+          .from("AudioFiles")
+          .upload(`Audiobook/${uniqueId}_${file.name}`, file);
+
+        if (error) {
+          toast({
+            variant: "destructive",
+            description: "Error uploading audio file",
+          });
+        } else {
+          const downloadUrl = await supabase.storage
+            .from("AudioFiles")
+            .getPublicUrl(`Audiobook/${uniqueId}_${file.name}`);
+
+          const updatedFields = audiobookFields.map((field) =>
+            field.id === fieldId
+              ? { ...field, file: file, audioUrl: downloadUrl.data.publicUrl }
+              : field
+          );
+
+          setAudiobookFields(updatedFields);
+
+          toast({
+            description: "Audio file uploaded successfully",
+          });
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          description: "Error uploading audio file",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   return (
     <>
       <div className="flex flex-wrap -mx-3 mb-6">
         <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-          <Label htmlFor="eName">Episode Name</Label>
+          <Label htmlFor="eName">Audio Book Name</Label>
           <Input
             name="audiobookName"
             id="audiobookName"
@@ -166,19 +307,19 @@ const AddAudiobook = () => {
           />
         </div>
         <div className="w-full md:w-1/2 px-3">
-          <Label htmlFor="audiobookImage">Upload audiobook Image</Label>
+          <Label htmlFor="audiobookImage">Upload Audio Book cover Image</Label>
           <Input
             className="text-black cursor-pointer bg-gray-50"
             id="audiobookImage"
             name="audiobookImage"
             type="file"
-            onChange={handleaudiobookImage}
+            onChange={handleAudiobookImage}
           />
         </div>
       </div>
       <div className="flex flex-wrap -mx-3 mb-2">
         <div className="w-full text-black px-3 mb-6">
-          <Label>Genre</Label>
+          <Label>Genres</Label>
           <div className="flex items-center space-x-1">
             <select
               className="w-[180px] border p-2 rounded-lg"
@@ -257,19 +398,19 @@ const AddAudiobook = () => {
             key={field.id}
           >
             <div className="w-full">
-              <Label htmlFor={`epName-${field.id}`}>{`Episode Part ${
+              <Label htmlFor={`abpName-${field.id}`}>{`Audio Book Part ${
                 index + 1
               } Name`}</Label>
               <Input
-                name={`epName-${field.id}`}
-                id={`epName-${field.id}`}
+                name={`abpName-${field.id}`}
+                id={`abpName-${field.id}`}
                 value={field.partName}
                 onChange={(event) => handleAudiobookPartName(event, field.id)}
                 type="text"
               />
             </div>
             <div className="w-full">
-              <Label htmlFor={`file-${field.id}`}>{`Upload EP ${
+              <Label htmlFor={`file-${field.id}`}>{`Upload ABP ${
                 index + 1
               } Audio`}</Label>
               <div className="flex items-center space-x-1">
@@ -277,6 +418,7 @@ const AddAudiobook = () => {
                   className="text-black cursor-pointer bg-gray-50"
                   id={`file-${field.id}`}
                   type="file"
+                  onChange={(e) => handleAudiobookAudioParts(e, field.id)}
                 />
                 {field.id !== audiobookFields[0].id && (
                   <Button onClick={() => handleRemoveAudiobookPart(field.id)}>
@@ -289,9 +431,15 @@ const AddAudiobook = () => {
         ))}
       </div>
       <div className="flex mx-auto items-center justify-center mt-4">
-        <Button>
-          <PlusCircle className="w-4 h-4" />
-          &nbsp;Audio Book
+        <Button onClick={handleAddAudiobook}>
+          {loading ? (
+            <Loader className="animate-spin" />
+          ) : (
+            <>
+              <PlusCircle className="w-4 h-4" />
+              &nbsp;Audio Book
+            </>
+          )}
         </Button>
       </div>
     </>

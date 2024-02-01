@@ -2,26 +2,28 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { PlusCircle, X } from "lucide-react";
+import { Loader, PlusCircle, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { genres } from "@/data/preferences";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
+import supabase from "@/lib/supabase";
 
 const AddPodcast = () => {
   const router = useRouter();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [podcastName, setPodcastName] = useState("");
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState("");
   const [keywords, setKeywords] = useState([]);
   const [currentKeyword, setCurrentKeyword] = useState("");
-  const [podcastFields, setEPodcastFields] = useState([
+  const [podcastFields, setPodcastFields] = useState([
     {
       id: 1,
       partName: "",
+      file: null,
     },
   ]);
 
@@ -31,7 +33,6 @@ const AddPodcast = () => {
     genres: [],
     keywords: [],
     podcastParts: [],
-    podcastAudioParts: [],
   });
 
   const handlePodcastName = (event) => {
@@ -57,13 +58,13 @@ const AddPodcast = () => {
     const updatedFields = podcastFields.map((field) =>
       field.id === fieldId ? { ...field, partName: event.target.value } : field
     );
-    setEPodcastFields(updatedFields);
+    setPodcastFields(updatedFields);
   };
 
-  const handleAddPocastPart = (e) => {
+  const handleAddPodcastPart = (e) => {
     e.preventDefault();
     const nextId = podcastFields.length + 1;
-    setEPodcastFields((prevFields) => [
+    setPodcastFields((prevFields) => [
       ...prevFields,
       {
         id: nextId,
@@ -73,7 +74,7 @@ const AddPodcast = () => {
   };
 
   const handleRemovePocastPart = (fieldId) => {
-    setEPodcastFields((prevFields) =>
+    setPodcastFields((prevFields) =>
       prevFields.filter((field) => field.id !== fieldId)
     );
   };
@@ -86,9 +87,12 @@ const AddPodcast = () => {
     event.preventDefault();
     if (
       currentKeyword.trim() !== "" &&
-      !keywords.includes(currentKeyword.trim())
+      !keywords.includes(currentKeyword.trim().toLowerCase())
     ) {
-      setKeywords((prevKeywords) => [...prevKeywords, currentKeyword.trim()]);
+      setKeywords((prevKeywords) => [
+        ...prevKeywords,
+        currentKeyword.trim().toLowerCase(),
+      ]);
       setCurrentKeyword("");
     }
   };
@@ -99,18 +103,93 @@ const AddPodcast = () => {
     );
   };
 
+  const handleAddPodcast = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/");
+        return;
+      }
+
+      setLoading(true);
+      const postData = {
+        podcastName,
+        podcastImage: podcastData.podcastImage,
+        genres: selectedGenres,
+        keywords,
+        podcastParts: podcastFields.map((field) => ({
+          partName: field.partName,
+          audioUrl: field.audioUrl,
+        })),
+      };
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_HOST}/api/addpodcast`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(postData),
+        }
+      );
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("Podcast added successfully:", responseData);
+        toast({
+          description: "Podcast added successfully",
+        });
+        setPodcastName("");
+        setPodcastData({
+          podcastName: "",
+          podcastImage: "",
+          genres: [],
+          keywords: [],
+          podcastParts: [],
+        });
+        setSelectedGenres([]);
+        setKeywords([]);
+        setPodcastFields([
+          {
+            id: 1,
+            partName: "",
+            file: null,
+          },
+        ]);
+      } else {
+        console.error("Error adding podcast:", response.statusText);
+        toast({
+          variant: "destructive",
+          description: "Error adding podcast",
+        });
+      }
+    } catch (error) {
+      console.error("Error adding podcast:", error.message);
+      toast({
+        variant: "destructive",
+        description: "Error adding podcast",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handlePodcastImage = async (e) => {
     const file = e.target.files[0];
 
     if (file) {
       try {
         setLoading(true);
-        const oldImageFileName = podcastData.profileImage.split("/").pop();
-        if (oldImageFileName) {
+        const oldPodcastImageFileName = podcastData.podcastImage
+          .split("/")
+          .pop();
+        if (oldPodcastImageFileName) {
           const { data: removeData, error: removeError } =
             await supabase.storage
               .from("Images")
-              .remove([`Podcast/${oldImageFileName}`]);
+              .remove([`Podcast/${oldPodcastImageFileName}`]);
 
           if (removeError) {
             console.error("Error removing old image:", removeError);
@@ -127,7 +206,7 @@ const AddPodcast = () => {
         if (error) {
           toast({
             variant: "destructive",
-            description: "Error uploading profile image",
+            description: "Error uploading podcast image",
           });
         } else {
           const downloadUrl = await supabase.storage
@@ -135,16 +214,78 @@ const AddPodcast = () => {
             .getPublicUrl(`Podcast/${uniqueId}_${file.name}`);
           setPodcastData({
             ...podcastData,
-            coverImage: downloadUrl.data.publicUrl,
+            podcastImage: downloadUrl.data.publicUrl,
           });
           toast({
-            description: "Profile image uploaded successfully",
+            description: "Podcast image uploaded successfully",
           });
         }
       } catch (error) {
         toast({
           variant: "destructive",
-          description: "Error uploading profile image",
+          description: "Error uploading podcast image",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handlePodcastAudioParts = async (e, fieldId) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      try {
+        setLoading(true);
+
+        const oldAudioFileName = podcastFields.find(
+          (field) => field.id === fieldId
+        ).file?.name;
+
+        if (oldAudioFileName) {
+          const { data: removeData, error: removeError } =
+            await supabase.storage
+              .from("AudioFiles")
+              .remove([`Podcast/${oldAudioFileName}`]);
+
+          if (removeError) {
+            console.error("Error removing old audio file:", removeError);
+          } else {
+            console.log("Old audio removed successfully:", removeData);
+          }
+        }
+
+        const uniqueId = Math.random().toString(36).substring(7);
+        const { data, error } = await supabase.storage
+          .from("AudioFiles")
+          .upload(`Podcast/${uniqueId}_${file.name}`, file);
+
+        if (error) {
+          toast({
+            variant: "destructive",
+            description: "Error uploading audio file",
+          });
+        } else {
+          const downloadUrl = await supabase.storage
+            .from("AudioFiles")
+            .getPublicUrl(`Podcast/${uniqueId}_${file.name}`);
+
+          const updatedFields = podcastFields.map((field) =>
+            field.id === fieldId
+              ? { ...field, file: file, audioUrl: downloadUrl.data.publicUrl }
+              : field
+          );
+
+          setPodcastFields(updatedFields);
+
+          toast({
+            description: "Audio file uploaded successfully",
+          });
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          description: "Error uploading audio file",
         });
       } finally {
         setLoading(false);
@@ -154,7 +295,7 @@ const AddPodcast = () => {
 
   return (
     <>
-      <div className="flex flex-wrap -mx-3 mb-6">
+      <div className="flex flex-wrap -mx-3 mb-6 text-black">
         <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
           <Label htmlFor="eName">Podcast Name</Label>
           <Input
@@ -170,7 +311,7 @@ const AddPodcast = () => {
           <Input
             className="text-black cursor-pointer bg-gray-50"
             id="podcastImage"
-            name="coverImage"
+            name="podcastImage"
             type="file"
             onChange={handlePodcastImage}
           />
@@ -247,10 +388,10 @@ const AddPodcast = () => {
           </div>
         </div>
       </div>
-      <Button onClick={handleAddPocastPart}>
+      <Button onClick={handleAddPodcastPart}>
         <PlusCircle color="#ffffff" />
       </Button>
-      <div className="flex flex-wrap items-center -mx-3 mb-2">
+      <div className="flex flex-wrap items-center text-black -mx-3 mb-2">
         {podcastFields.map((field, index) => (
           <div
             className="w-full space-x-2 md:w-1/2 flex items-center px-3 mb-6"
@@ -277,6 +418,7 @@ const AddPodcast = () => {
                   className="text-black cursor-pointer bg-gray-50"
                   id={`file-${field.id}`}
                   type="file"
+                  onChange={(e) => handlePodcastAudioParts(e, field.id)}
                 />
                 {field.id !== podcastFields[0].id && (
                   <Button onClick={() => handleRemovePocastPart(field.id)}>
@@ -289,9 +431,15 @@ const AddPodcast = () => {
         ))}
       </div>
       <div className="flex mx-auto items-center justify-center mt-4">
-        <Button>
-          <PlusCircle className="w-4 h-4" />
-          &nbsp;Podcast
+        <Button onClick={handleAddPodcast}>
+          {loading ? (
+            <Loader className="animate-spin" />
+          ) : (
+            <>
+              <PlusCircle className="w-4 h-4" />
+              &nbsp;Podcast
+            </>
+          )}
         </Button>
       </div>
     </>

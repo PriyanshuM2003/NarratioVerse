@@ -34,8 +34,7 @@ model Podcast {
   podcastImage      String
   genres            String[]
   keywords          String[]
-  podcastParts      String[]
-  podcastAudioParts String[]
+  podcastParts      Json[]
   userId            String
   user              User     @relation(fields: [userId], references: [id])
 
@@ -49,8 +48,7 @@ model Audiobook {
   audiobookImage      String
   genres              String[]
   keywords            String[]
-  audiobookParts      String[]
-  audiobookAudioParts String[]
+  audiobookParts      Json[]
   userId              String
   user                User     @relation(fields: [userId], references: [id])
 
