@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Award, Music2 } from "lucide-react";
 import Link from "next/link";
+import supabase from "@/lib/supabase";
 
 const Profile = () => {
   const router = useRouter();
@@ -63,12 +64,58 @@ const Profile = () => {
     }
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    setFormData({
-      ...formData,
-      profileImage: file,
-    });
+
+    if (file) {
+      try {
+        setLoading(true);
+
+        const oldImageFileName = userData.profileImage.split("/").pop();
+        if (oldImageFileName) {
+          const { data: removeData, error: removeError } =
+            await supabase.storage
+              .from("Images")
+              .remove([`Avatar/${oldImageFileName}`]);
+
+          if (removeError) {
+            console.error("Error removing old image:", removeError);
+          } else {
+            console.log("Old image removed successfully:", removeData);
+          }
+        }
+
+        const uniqueId = Math.random().toString(36).substring(7);
+        const { data, error } = await supabase.storage
+          .from("Images")
+          .upload(`Avatar/${uniqueId}_${file.name}`, file);
+
+        if (error) {
+          toast({
+            variant: "destructive",
+            description: "Error uploading profile image",
+          });
+        } else {
+          const downloadUrl = await supabase.storage
+            .from("Images")
+            .getPublicUrl(`Avatar/${uniqueId}_${file.name}`);
+          setUserData({
+            ...userData,
+            profileImage: downloadUrl.data.publicUrl,
+          });
+          toast({
+            description: "Profile image uploaded successfully",
+          });
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          description: "Error uploading profile image",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const handleUpdateProfile = async () => {
@@ -96,6 +143,7 @@ const Profile = () => {
       toast({
         description: "Profile updated successfully",
       });
+      window.location.reload();
     } catch (error) {
       console.error("Profile update failed:", error);
     }
@@ -144,6 +192,7 @@ const Profile = () => {
         newpassword: "",
         confpassword: "",
       });
+      window.location.reload();
     } catch (error) {
       console.error("Password change failed:", error);
       toast({
