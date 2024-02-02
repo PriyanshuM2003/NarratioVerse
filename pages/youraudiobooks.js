@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAudioPlayer } from "@/components/AudioPlayerContext";
 
 const YourAudiobooks = () => {
   const router = useRouter();
@@ -19,9 +20,21 @@ const YourAudiobooks = () => {
   const [loading, setLoading] = useState(true);
   const [audiobooks, setAudiobooks] = useState([]);
   const [expandedItem, setExpandedItem] = useState(null);
+  const { setAudioData, setCurrentIndex, playPauseHandler, audioRef } =
+    useAudioPlayer();
 
   const toggleAccordionItem = (value) => {
     setExpandedItem((prevItem) => (prevItem === value ? null : value));
+  };
+
+  const handleAudiobookSelect = (audiobook, startIndex = 0) => {
+    setAudioData(audiobook);
+    setCurrentIndex(startIndex);
+    if (audioRef.current) {
+      audioRef.current.src = audiobook.parts[startIndex].audioUrl;
+      audioRef.current.load();
+      playPauseHandler();
+    }
   };
 
   useEffect(() => {
@@ -100,7 +113,10 @@ const YourAudiobooks = () => {
                 className="flex justify-between"
                 onClick={() => toggleAccordionItem(`item-${audiobook.id}`)}
               >
-                <div className="flex items-center">
+                <div
+                  onClick={() => handleAudiobookSelect(audiobook)}
+                  className="flex items-center"
+                >
                   <img
                     src={audiobook.coverImage}
                     alt={audiobook.title}
@@ -128,11 +144,12 @@ const YourAudiobooks = () => {
                       <li
                         className="flex items-center text-base"
                         key={part.partName}
+                        onClick={() => handleAudiobookSelect(audiobook, index)}
                       >
                         <span className="mr-2">{index + 1}.</span>
-                        <Link href={part.audioUrl} className="hover:underline">
+                        <div className="hover:underline cursor-pointer">
                           {part.partName}
-                        </Link>
+                        </div>
                       </li>
                     ))}
                   </ul>

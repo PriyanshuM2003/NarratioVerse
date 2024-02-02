@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAudioPlayer } from "@/components/AudioPlayerContext";
 
 const YourPodcasts = () => {
   const router = useRouter();
@@ -19,9 +20,21 @@ const YourPodcasts = () => {
   const [loading, setLoading] = useState(true);
   const [podcasts, setPodcasts] = useState([]);
   const [expandedItem, setExpandedItem] = useState(null);
+  const { setAudioData, setCurrentIndex, playPauseHandler, audioRef } =
+    useAudioPlayer();
 
   const toggleAccordionItem = (value) => {
     setExpandedItem((prevItem) => (prevItem === value ? null : value));
+  };
+
+  const handlePodcastSelect = (podcast, startIndex = 0) => {
+    setAudioData(podcast);
+    setCurrentIndex(startIndex);
+    if (audioRef.current) {
+      audioRef.current.src = podcast.parts[startIndex].audioUrl;
+      audioRef.current.load();
+      playPauseHandler();
+    }
   };
 
   useEffect(() => {
@@ -65,7 +78,7 @@ const YourPodcasts = () => {
     };
 
     fetchPodcasts();
-  }, [toast, router]);
+  }, [toast, router, setAudioData]);
 
   return (
     <>
@@ -98,7 +111,10 @@ const YourPodcasts = () => {
                 className="flex justify-between"
                 onClick={() => toggleAccordionItem(`item-${podcast.id}`)}
               >
-                <div className="flex items-center">
+                <div
+                  onClick={() => handlePodcastSelect(podcast)}
+                  className="flex items-center"
+                >
                   <img
                     src={podcast.coverImage}
                     alt={podcast.title}
@@ -124,11 +140,12 @@ const YourPodcasts = () => {
                       <li
                         className="flex items-center text-base"
                         key={part.partName}
+                        onClick={() => handlePodcastSelect(podcast, index)}
                       >
                         <span className="mr-2">{index + 1}.</span>
-                        <Link href={part.audioUrl} className="hover:underline">
+                        <div className="hover:underline cursor-pointer">
                           {part.partName}
-                        </Link>
+                        </div>
                       </li>
                     ))}
                   </ul>

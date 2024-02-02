@@ -331,7 +331,7 @@ const AddAudio = () => {
                     value="Podcast"
                     checked={category === "Podcast"}
                     onChange={() => setCategory("Podcast")}
-                    className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                    className="h-5 w-5"
                   />
                   <Label htmlFor="podcast">Podcast</Label>
                 </div>
@@ -446,16 +446,13 @@ const AddAudio = () => {
                   </div>
                 </div>
               </div>
-              <Button onClick={handleAddAudioDataPart}>
-                <PlusCircle color="#ffffff" />
-              </Button>
-              <div className="flex flex-wrap items-center text-black -mx-3 mb-2">
+              <div className="flex flex-wrap items-center text-black mb-2">
                 {fields.map((field, index) => (
                   <div
-                    className="w-full space-x-2 md:w-1/2 flex items-center px-3 mb-6"
+                    className="w-full md:w-1/2 flex items-center mb-6"
                     key={field.id}
                   >
-                    <div className="w-full">
+                    <div className="w-full mr-1">
                       <Label htmlFor={`partName-${field.id}`}>{`${String(
                         category
                       )} Part ${index + 1} Name`}</Label>
@@ -469,7 +466,7 @@ const AddAudio = () => {
                         type="text"
                       />
                     </div>
-                    <div className="w-full">
+                    <div className="w-full mr-1">
                       <Label htmlFor={`file-${field.id}`}>{`Upload Audio Part ${
                         index + 1
                       }`}</Label>
@@ -491,6 +488,10 @@ const AddAudio = () => {
                     </div>
                   </div>
                 ))}
+                <Button onClick={handleAddAudioDataPart}>
+                  <PlusCircle color="#ffffff" />
+                  &nbsp;Add Field
+                </Button>
               </div>
               <div className="flex mx-auto items-center justify-center mt-4">
                 <Button onClick={handleAddAudioData}>

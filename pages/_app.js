@@ -9,7 +9,8 @@ import LoadingBar from "react-top-loading-bar";
 import { Dialog } from "@/components/ui/dialog";
 import { Navbar } from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
-import Player from "./player/[slug]";
+import { AudioPlayerProvider } from "@/components/AudioPlayerContext";
+import Layout from "@/components/Layout";
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -85,10 +86,13 @@ function MyApp({ Component, pageProps }) {
               <Sidebar toggleSidebar={handleToggleSidebar} />
             )}
             <div style={{ flex: 1 }}>
-              <Component {...pageProps} />
+              <AudioPlayerProvider>
+                <Layout>
+                  <Component {...pageProps} />
+                </Layout>
+              </AudioPlayerProvider>
             </div>
           </div>
-          <Player />
           <Footer />
         </Dialog>
       </TooltipProvider>
