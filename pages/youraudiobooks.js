@@ -34,7 +34,7 @@ const YourAudiobooks = () => {
         }
         setLoading(true);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_HOST}/api/getaudiobooks`,
+          `${process.env.NEXT_PUBLIC_HOST}/api/getuseraudios`,
           {
             method: "GET",
             headers: {
@@ -49,7 +49,10 @@ const YourAudiobooks = () => {
         }
 
         const data = await response.json();
-        setAudiobooks(data.audiobooks);
+        const filteredAudioCategory = data.userAudio.filter(
+          (audiobook) => audiobook.category === "Audiobook"
+        );
+        setAudiobooks(filteredAudioCategory);
       } catch (error) {
         console.error("Error fetching audiobooks:", error);
         toast({
@@ -99,13 +102,11 @@ const YourAudiobooks = () => {
               >
                 <div className="flex items-center">
                   <img
-                    src={audiobook.audiobookImage}
-                    alt={audiobook.audiobookName}
+                    src={audiobook.coverImage}
+                    alt={audiobook.title}
                     className="w-10 mr-4"
                   />
-                  <p className="text-2xl hover:underline">
-                    {audiobook.audiobookName}
-                  </p>
+                  <p className="text-2xl hover:underline">{audiobook.title}</p>
                 </div>
                 <div className="flex items-center space-x-4">
                   <Link href="#" className="text-sm hover:underline">
@@ -123,7 +124,7 @@ const YourAudiobooks = () => {
               <AccordionContent>
                 <div>
                   <ul>
-                    {audiobook.audiobookParts.map((part, index) => (
+                    {audiobook.parts.map((part, index) => (
                       <li
                         className="flex items-center text-base"
                         key={part.partName}

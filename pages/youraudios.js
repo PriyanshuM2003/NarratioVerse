@@ -4,7 +4,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import YourPodcasts from "./yourpodcasts";
 import YourAudiobooks from "./youraudiobooks";
 
-const YourTab = () => {
+const YourAudios = () => {
   const [selectedTab, setSelectedTab] = useState("podcast");
 
   const handleTabChange = (value) => {
@@ -49,4 +49,4 @@ const YourTab = () => {
   );
 };
 
-export default YourTab;
+export default YourAudios;

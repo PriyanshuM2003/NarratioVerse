@@ -34,7 +34,7 @@ const YourPodcasts = () => {
         }
         setLoading(true);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_HOST}/api/getpodcasts`,
+          `${process.env.NEXT_PUBLIC_HOST}/api/getuseraudios`,
           {
             method: "GET",
             headers: {
@@ -49,7 +49,10 @@ const YourPodcasts = () => {
         }
 
         const data = await response.json();
-        setPodcasts(data.podcasts);
+        const filteredAudioCategory = data.userAudio.filter(
+          (podcast) => podcast.category === "Podcast"
+        );
+        setPodcasts(filteredAudioCategory);
       } catch (error) {
         console.error("Error fetching podcasts:", error);
         toast({
@@ -97,11 +100,11 @@ const YourPodcasts = () => {
               >
                 <div className="flex items-center">
                   <img
-                    src={podcast.podcastImage}
-                    alt={podcast.podcastName}
+                    src={podcast.coverImage}
+                    alt={podcast.title}
                     className="w-10 mr-4"
                   />
-                  <p className="text-2xl hover:underline">{podcast.podcastName}</p>
+                  <p className="text-2xl hover:underline">{podcast.title}</p>
                 </div>
                 <div className="flex items-center space-x-4">
                   <Link href="#" className="text-sm hover:underline">
@@ -117,7 +120,7 @@ const YourPodcasts = () => {
               <AccordionContent>
                 <div>
                   <ul>
-                    {podcast.podcastParts.map((part, index) => (
+                    {podcast.parts.map((part, index) => (
                       <li
                         className="flex items-center text-base"
                         key={part.partName}

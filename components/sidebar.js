@@ -63,26 +63,28 @@ const Sidebar = ({ toggleSidebar }) => {
               Go Live
             </Link>
             <Link
-              href="/addtab"
+              href="/addaudio"
               className={`w-full flex items-center justify-start hover:text-pink-600 ${
-                isActiveLink("/addtab") &&
+                isActiveLink("/addaudio") &&
                 "rounded-sm px-2 py-1.5 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
               }`}
             >
               <PlusCircle className="w-4 h-4 mr-2" />
               Add&nbsp;
-              <Podcast className="w-5 h-5" /><BookAudio className="w-5 h-5" />
+              <Podcast className="w-5 h-5" />
+              <BookAudio className="w-5 h-5" />
             </Link>
             <Link
-              href="/yourtab"
+              href="/youraudios"
               className={`w-full flex items-center justify-start hover:text-pink-600 ${
-                isActiveLink("/yourtab") &&
+                isActiveLink("/youraudios") &&
                 "rounded-sm px-2 py-1.5 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
               }`}
             >
               <FolderTree className="w-4 h-4 mr-2" />
               Your&nbsp;
-              <Podcast className="w-5 h-5" /><BookAudio className="w-5 h-5" />
+              <Podcast className="w-5 h-5" />
+              <BookAudio className="w-5 h-5" />
             </Link>
           </div>
         </div>

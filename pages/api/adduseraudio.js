@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 
 export default async function handler(req, res) {
   try {
-    if (req.method === "GET") {
+    if (req.method === "POST") {
       const token = req.headers.authorization?.replace("Bearer ", "");
       if (!token) {
         return res.status(401).json({ error: "Unauthorized" });
@@ -14,27 +14,34 @@ export default async function handler(req, res) {
       if (!decoded || !decoded.id) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      const userPodcasts = await prisma.podcast.findMany({
-        where: {
+
+      const { title, slug, coverImage, category, genres, keywords, parts } =
+        req.body;
+
+      const audioParts = parts.map((part) => ({
+        partName: part.partName,
+        audioUrl: part.audioUrl,
+      }));
+
+      const createdUserAudio = await prisma.audio.create({
+        data: {
+          title,
+          slug,
+          coverImage,
+          category,
+          genres: { set: genres },
+          keywords: { set: keywords },
+          parts: { set: audioParts },
           userId: decoded.id,
-        },
-        select: {
-          id: true,
-          podcastName: true,
-          podcastImage: true,
-          genres: true,
-          keywords: true,
-          podcastParts: true,
-          userId: true,
         },
       });
 
-      return res.status(200).json({ podcasts: userPodcasts });
+      return res.status(200).json({ userAudio: createdUserAudio });
     } else {
       return res.status(405).json({ message: "Method Not Allowed" });
     }
   } catch (error) {
-    console.error("Error updating user data:", error);
+    console.error("Error creating audio data:", error);
     return res.status(500).json({ error: "Something went wrong" });
   }
 }

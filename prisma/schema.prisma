@@ -21,36 +21,23 @@ model User {
   password     String
   profileImage String?
 
-  podcasts   Podcast[]
-  audiobooks Audiobook[]
+  Audio Audio[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Podcast {
-  id                String   @id @default(uuid())
-  podcastName       String
-  podcastImage      String
-  genres            String[]
-  keywords          String[]
-  podcastParts      Json[]
-  userId            String
-  user              User     @relation(fields: [userId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Audiobook {
-  id                  String   @id @default(uuid())
-  audiobookName       String
-  audiobookImage      String
-  genres              String[]
-  keywords            String[]
-  audiobookParts      Json[]
-  userId              String
-  user                User     @relation(fields: [userId], references: [id])
+model Audio {
+  id         String   @id @default(uuid())
+  title      String
+  slug       String   @unique
+  coverImage String
+  category   String
+  genres     String[]
+  keywords   String[]
+  parts      Json[]
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
