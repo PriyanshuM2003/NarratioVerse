@@ -17,9 +17,9 @@ export default function Player() {
 
   const skipHandler = (direction) => {
     if (direction === "forward") {
-      setCurrentSongIndex((prevIndex) => (prevIndex + 1) % songs.length);
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % songs.length);
     } else {
-      setCurrentSongIndex(
+      setCurrentIndex(
         (prevIndex) => (prevIndex - 1 + songs.length) % songs.length
       );
     }
