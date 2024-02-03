@@ -11,7 +11,18 @@ import {
   VolumeX,
   Volume1,
   Volume,
+  ListOrdered,
+  Loader,
 } from "lucide-react";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "./ui/drawer";
 
 const Player = () => {
   const {
@@ -26,10 +37,12 @@ const Player = () => {
   } = useAudioPlayer();
 
   const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isAudioLoaded, setIsAudioLoaded] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [selectedPartIndex, setSelectedPartIndex] = useState(0);
 
   const handleEnded = () => {
     if (currentIndex === audioData.parts.length - 1) {
@@ -39,6 +52,20 @@ const Player = () => {
     }
 
     playPauseHandler();
+  };
+
+  const handlePartClick = (partIndex) => {
+    if (selectedPartIndex !== partIndex) {
+      setSelectedPartIndex(partIndex);
+      setCurrentIndex(partIndex);
+
+      if (audioRef.current) {
+        setLoading(true);
+        audioRef.current.src = audioData.parts[partIndex].audioUrl;
+        audioRef.current.load();
+        playPauseHandler();
+      }
+    }
   };
 
   const handleRestartClick = () => {
@@ -80,7 +107,8 @@ const Player = () => {
 
     const handleLoadedData = () => {
       setIsAudioLoaded(true);
-      if (!isPlaying) {
+      setLoading(false);
+      if (!isPlaying && audioRef.current) {
         playPauseHandler();
       }
     };
@@ -138,96 +166,138 @@ const Player = () => {
   return (
     <>
       <div className="music-player sticky bottom-0 flex items-center justify-between z-50 bg-gray-900 text-white p-4">
-        <div className="song-bar flex items-center justify-between">
-          <div className="song-infos flex space-x-2 items-center">
-            <div className="image-container flex-shrink-0 w-16 h-16">
-              <img
-                src={audioData.coverImage}
-                alt={audioData.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="song-description">
-              <p className="title text-lg overflow-hidden font-semibold overflow-ellipsis whitespace-nowrap max-w-xs">
-                {audioData.title}
-              </p>
-              <p className="partName text-sm text-pink-600 font-semibold overflow-hidden overflow-ellipsis whitespace-nowrap max-w-xs">
-                {audioData.parts[currentIndex].partName}
-              </p>
-              <p className="artist text-gray-400">{audioData.category}</p>
-            </div>
-          </div>
-        </div>
-        <div className="progress-controller flex flex-col items-center w-full space-y-4">
-          <div className="control-buttons cursor-pointer flex items-center gap-8">
-            <SkipBack onClick={() => skipHandler("backward")} />
-            {isPlaying ? (
-              <Pause onClick={playPauseHandler} />
-            ) : (
-              <Play onClick={playPauseHandler} />
-            )}
-            <SkipForward onClick={() => skipHandler("forward")} />
-            <RotateCcw onClick={handleRestartClick} />
-          </div>
-          <div className="progress-container flex items-center cursor-pointer space-x-1 justify-center w-4/5">
-            <span className="text-sm">
-              {formatTime(currentTime)}
-            </span>
-            {isAudioLoaded && (
-              <div
-                className="progress-bar relative h-2 w-2/3 bg-white rounded-full"
-                onClick={handleProgressBarClick}
-              >
-                <div
-                  className="progress absolute top-0 left-0 h-full bg-pink-600 rounded-full"
-                  style={{ width: `${progress}%` }}
-                ></div>
+        <Drawer>
+          <div className="song-bar flex items-center justify-between">
+            <div className="song-infos flex space-x-2 items-center">
+              <div className="image-container flex-shrink-0 w-16 h-16">
+                <img
+                  src={audioData.coverImage}
+                  alt={audioData.title}
+                  className="w-full h-full object-cover"
+                />
               </div>
-            )}
-            <span className="text-sm">
-              {formatTime(duration)}
-            </span>
+              <div className="song-description">
+                <p className="title text-lg overflow-hidden font-semibold overflow-ellipsis whitespace-nowrap max-w-xs">
+                  {audioData.title}
+                </p>
+                <p className="partName text-sm text-pink-600 font-semibold overflow-hidden overflow-ellipsis whitespace-nowrap max-w-xs">
+                  {audioData.parts[currentIndex].partName}
+                </p>
+                <p className="artist text-gray-400">{audioData.category}</p>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="other-features flex items-center gap-4">
-          <div className="volume-bar cursor-pointer flex items-center gap-4">
-            {isMuted && <VolumeX onClick={handleMuteToggle} />}
-            {!isMuted && audioRef.current && audioRef.current?.volume === 0 && (
-              <VolumeX onClick={handleMuteToggle} />
-            )}
-            {!isMuted && audioRef.current && audioRef.current?.volume > 0.7 && (
-              <Volume2 onClick={handleMuteToggle} />
-            )}
-            {!isMuted &&
-              audioRef.current &&
-              audioRef.current?.volume <= 0.7 &&
-              audioRef.current?.volume > 0.3 && (
-                <Volume1 onClick={handleMuteToggle} />
-              )}
-            {!isMuted &&
-              audioRef.current &&
-              audioRef.current?.volume <= 0.3 &&
-              audioRef.current?.volume > 0 && (
-                <Volume onClick={handleMuteToggle} />
+          <div className="progress-controller flex flex-col items-center w-full space-y-4">
+            <div className="control-buttons cursor-pointer flex items-center gap-8">
+              <RotateCcw onClick={handleRestartClick} />
+              <SkipBack onClick={() => skipHandler("backward")} />
+
+              {loading ? (
+                <Loader className="animate-spin" />
+              ) : (
+                <>
+                  {isPlaying ? (
+                    <Pause onClick={playPauseHandler} />
+                  ) : (
+                    <Play onClick={playPauseHandler} />
+                  )}
+                </>
               )}
 
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={isMuted ? 0 : audioRef.current?.volume || 0}
-              onChange={handleVolumeChange}
-              className="slider"
-              disabled={!isPlaying}
-            />
+              <SkipForward onClick={() => skipHandler("forward")} />
+              <DrawerTrigger asChild>
+                <ListOrdered />
+              </DrawerTrigger>
+            </div>
+            <div className="progress-container flex items-center cursor-pointer space-x-1 justify-center w-4/5">
+              <span className="text-sm">{formatTime(currentTime)}</span>
+              {isAudioLoaded && (
+                <div
+                  className="progress-bar relative h-2 w-2/3 bg-white rounded-full"
+                  onClick={handleProgressBarClick}
+                >
+                  <div
+                    className="progress absolute top-0 left-0 h-full bg-pink-600 rounded-full"
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
+              )}
+              <span className="text-sm">{formatTime(duration)}</span>
+            </div>
           </div>
-        </div>
-        <audio
-          ref={audioRef}
-          src={audioData.parts[currentIndex].audioUrl}
-          preload="metadata"
-        />
+          <div className="other-features flex items-center gap-4">
+            <div className="volume-bar cursor-pointer flex items-center gap-4">
+              {isMuted && <VolumeX onClick={handleMuteToggle} />}
+              {!isMuted &&
+                audioRef.current &&
+                audioRef.current?.volume === 0 && (
+                  <VolumeX onClick={handleMuteToggle} />
+                )}
+              {!isMuted &&
+                audioRef.current &&
+                audioRef.current?.volume > 0.7 && (
+                  <Volume2 onClick={handleMuteToggle} />
+                )}
+              {!isMuted &&
+                audioRef.current &&
+                audioRef.current?.volume <= 0.7 &&
+                audioRef.current?.volume > 0.3 && (
+                  <Volume1 onClick={handleMuteToggle} />
+                )}
+              {!isMuted &&
+                audioRef.current &&
+                audioRef.current?.volume <= 0.3 &&
+                audioRef.current?.volume > 0 && (
+                  <Volume onClick={handleMuteToggle} />
+                )}
+
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={isMuted ? 0 : audioRef.current?.volume || 0}
+                onChange={handleVolumeChange}
+                className="slider"
+                disabled={!isPlaying}
+              />
+            </div>
+          </div>
+          <audio
+            ref={audioRef}
+            src={audioData.parts[currentIndex].audioUrl}
+            preload="metadata"
+          />
+          <DrawerContent>
+            <div className="text-white px-4 w-full max-w-sm">
+              <DrawerHeader>
+                <DrawerTitle>
+                  <DrawerDescription>{audioData.category}</DrawerDescription>
+                  {audioData.title}
+                </DrawerTitle>
+                <DrawerDescription>Parts</DrawerDescription>
+              </DrawerHeader>
+              <DrawerClose asChild>
+                <ul className="space-y-2 mb-4 cursor-pointer">
+                  {audioData.parts.map((part, index) => (
+                    <li
+                      key={index}
+                      className={`part-name flex items-center ${
+                        index === selectedPartIndex ? "active" : ""
+                      }`}
+                      onClick={() => handlePartClick(index)}
+                    >
+                      <span className="mr-2">{index + 1}.</span>
+                      <div className="hover:underline cursor-pointer">
+                        {part.partName}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </DrawerClose>
+            </div>
+          </DrawerContent>
+        </Drawer>
       </div>
     </>
   );
