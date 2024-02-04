@@ -64,18 +64,21 @@ const Verify = () => {
   }, [router.query]);
 
   return (
-    <>
+    <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
       {loading ? (
-        <Loader className="text-white" />
+        <div className="text-center">
+          <Loader className="text-white" />
+          <p className="text-lg mt-4">Verifying...</p>
+        </div>
       ) : (
-        <div className="flex py-4 text-white flex-col justify-center items-center min-h-screen">
-          <div className="w-full m-auto lg:max-w-lg text-center">
-            <p className="text-2xl font-semibold mb-4">{message}</p>
-            {timer >= 0 && <p>Redirecting in {timer} seconds...</p>}
-          </div>
+        <div className="max-w-lg p-6 bg-gray-800 rounded shadow-lg">
+          <p className="text-3xl font-semibold mb-4">{message}</p>
+          {timer >= 0 && (
+            <p className="text-lg">Redirecting in {timer} seconds...</p>
+          )}
         </div>
       )}
-    </>
+    </div>
   );
 };
 
