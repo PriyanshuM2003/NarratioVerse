@@ -29,6 +29,10 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: "Invalid credentials." });
       }
 
+      if (!user.isVerified) {
+        return res.status(401).json({ error: "User not verified." });
+      }
+      
       const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
         expiresIn: "1d",
       });

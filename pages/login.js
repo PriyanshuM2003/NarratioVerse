@@ -60,10 +60,19 @@ const Login = () => {
         setLoading(false);
       } else {
         const { error } = await response.json();
-        toast({
-          variant: "destructive",
-          description: `Login failed: ${error}`,
-        });
+
+        if (error === "User not verified.") {
+          toast({
+            variant: "destructive",
+            description:
+              "User not verified. Please verify your email before logging in.",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            description: `Login failed: ${error}`,
+          });
+        }
         setEmail("");
         setPassword("");
         setLoading(false);

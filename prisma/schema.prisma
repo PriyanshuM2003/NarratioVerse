@@ -9,17 +9,19 @@ datasource db {
 }
 
 model User {
-  id           String  @id @default(uuid())
-  name         String
-  email        String  @unique
-  phone        String  @unique
-  country      String
-  state        String
-  bio          String?
-  creator      Boolean @default(false)
-  premium      Boolean @default(false)
-  password     String
-  profileImage String?
+  id                String  @id @default(uuid())
+  name              String
+  email             String  @unique
+  phone             String  @unique
+  country           String
+  state             String
+  bio               String?
+  creator           Boolean @default(false)
+  premium           Boolean @default(false)
+  isVerified        Boolean @default(false)
+  verificationToken String?
+  password          String
+  profileImage      String?
 
   Audio Audio[]
 

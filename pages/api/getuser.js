@@ -27,6 +27,7 @@ export default async function handler(req, res) {
           country: true,
           state: true,
           bio: true,
+          isVerified: true,
           creator: true,
           premium: true,
           profileImage: true,
