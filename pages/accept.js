@@ -5,14 +5,14 @@ import prisma from "@/lib/prisma";
 
 const Accept = ({ liveTalkInfo }) => {
   const router = useRouter();
-  
+
   const token = localStorage.getItem("token");
   if (!token) {
     console.error("Token not found in localStorage");
     router.push("/login");
     return;
   }
-  
+
   const handleAccept = async () => {
     try {
       router.push(`/live/${liveTalkInfo.slug}`);
@@ -26,20 +26,22 @@ const Accept = ({ liveTalkInfo }) => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="w-[350px]">
-        <div>
-          <h2>Join Live Podcast as Guest : {liveTalkInfo.title}</h2>
-          <p>Hosted by: {liveTalkInfo.hostname}</p>
-        </div>
-        <div className="flex justify-between">
-          <Button onClick={handleAccept}>Accept</Button>
-          <Button variant="outline" onClick={() => router.push("/")}>
-            Decline
-          </Button>
+    <>
+      <div className="flex min-h-screen items-center justify-center text-white">
+        <div className="w-[350px]">
+          <div>
+            <h2>Join Live Podcast as Guest : {liveTalkInfo.title}</h2>
+            <p>Hosted by: {liveTalkInfo.hostname}</p>
+          </div>
+          <div className="flex justify-between">
+            <Button onClick={handleAccept}>Accept</Button>
+            <Button variant="outline" onClick={() => router.push("/")}>
+              Decline
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
