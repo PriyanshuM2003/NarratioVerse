@@ -124,59 +124,40 @@ const GoLive = () => {
                   subject: "Invitation to Live Talk",
                   htmlContent: `
                     <title>Invitation to Live Podcast</title>
-                    <style>
-                      body {
-                          font-family: Arial, sans-serif;
-                          background-color: #f5f5f5;
-                          padding: 20px;
-                      }
-                      .container {
-                          max-width: 600px;
-                          margin: 0 auto;
-                          padding: 20px;
-                          background-color: #fff;
-                          border-radius: 8px;
-                          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                      }
-                      .header {
-                          text-align: center;
-                          margin-bottom: 20px;
-                      }
-                      .title {
-                          font-size: 24px;
-                          font-weight: bold;
-                          color: #333;
-                          margin-bottom: 10px;
-                      }
-                      .content {
-                          font-size: 16px;
-                          color: #666;
-                      }
-                      .button {
-                          display: inline-block;
-                          padding: 10px 20px;
-                          background-color: #007bff;
-                          color: #fff;
-                          text-decoration: none;
-                          border-radius: 4px;
-                          transition: background-color 0.3s;
-                      }
-                      .button:hover {
-                          background-color: #0056b3;
-                      }
-                    </style>
-                  </head>
-                  <body>
-                      <div class="container">
-                          <div class="header">
-                              <h1 class="title">Invitation to Live Podcast</h1>
+                  <body style="  font-family: Arial, sans-serif;
+                  background-color: #f5f5f5;
+                  padding: 20px;">
+                      <div style=" max-width: 600px;
+                      margin: 0 auto;
+                      padding: 20px;
+                      background-color: #fff;
+                      border-radius: 8px;
+                      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                          <div style="  text-align: center;
+                          margin-bottom: 20px;">
+                              <h1 style=" font-size: 24px;
+                              font-weight: bold;
+                              color: #333;
+                              margin-bottom: 10px;">Invitation to Live Podcast</h1>
                           </div>
-                          <div class="content">
+                          <div style=" font-size: 16px;
+                          color: #666;">
                               <p>Hello,</p>
                               <p>You are invited to join our live podcast hosted by ${hostUserName}.</p>
                               <p>The podcast titled "${title}" will be starting soon. We would love to have you as a guest!</p>
                               <p>Join us by clicking the button below:</p>"
-                              <a href="${process.env.NEXT_PUBLIC_HOST}/accept?invitation=${uniqueToken}" class="button">Join Podcast</a>
+                              <a style=" display: inline-block;
+                              padding: 10px 20px;
+                              background-color: #007bff;
+                              color: #fff;
+                              text-decoration: none;
+                              border-radius: 4px;
+                              cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease,
+          border-color 0.3s ease;
+      "
+      onmouseover="this.style.backgroundColor='#333333'; this.style.color='#fff'; this.style.borderColor='#000000'"
+      onmouseout="this.style.backgroundColor='#000000'; this.style.color='#fff'; this.style.borderColor='#333333'" href="${process.env.NEXT_PUBLIC_HOST}/accept?invitation=${uniqueToken}" class="button">Join Podcast</a>
                           </div>
                       </div>
                   </body>
