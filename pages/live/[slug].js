@@ -1,6 +1,6 @@
 "use client";
 import prisma from "@/lib/prisma";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardDescription,
