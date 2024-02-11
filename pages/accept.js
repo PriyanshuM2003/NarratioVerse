@@ -3,17 +3,21 @@ import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import prisma from "@/lib/prisma";
 import { useEffect, useState } from "react";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const Accept = ({ liveTalkInfo }) => {
   const router = useRouter();
 
   const [invitation, setInvitation] = useState(null);
-  console.log("Component rendered");
-  console.log("Initial router query:", router.query);
 
   useEffect(() => {
     const { invitation } = router.query;
-    console.log("Invitation slug:", invitation); 
     setInvitation(invitation);
   }, [router.query]);
 
@@ -57,19 +61,23 @@ const Accept = ({ liveTalkInfo }) => {
 
   return (
     <>
-      <div className="flex min-h-screen items-center justify-center text-white">
-        <div className="w-[350px]">
-          <div>
-            <h2>Join Live Podcast as Guest : {liveTalkInfo.title}</h2>
-            <p>Hosted by: {liveTalkInfo.hostname}</p>
-          </div>
-          <div className="flex justify-between">
-            <Button onClick={handleAccept}>Accept</Button>
+      <div className="flex min-h-screen items-center justify-center">
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              Join Live Podcast "{liveTalkInfo.title}" as Guest
+            </CardTitle>
+            <CardDescription>
+              Hosted by: {liveTalkInfo.hostname}
+            </CardDescription>
+          </CardHeader>
+          <CardFooter className="flex justify-between">
             <Button variant="outline" onClick={handleDecline}>
               Decline
             </Button>
-          </div>
-        </div>
+            <Button onClick={handleAccept}>Accept</Button>
+          </CardFooter>
+        </Card>
       </div>
     </>
   );
@@ -101,11 +109,12 @@ export async function getServerSideProps(context) {
 
     return {
       props: {
-        liveTalkInfo: {
-          title: liveTalkInfo.title,
-          hostname: liveTalkInfo.hostUser.name,
-          slug: liveTalkInfo.slug
-        } || null,
+        liveTalkInfo:
+          {
+            title: liveTalkInfo.title,
+            hostname: liveTalkInfo.hostUser.name,
+            slug: liveTalkInfo.slug,
+          } || null,
       },
     };
   } catch (error) {
