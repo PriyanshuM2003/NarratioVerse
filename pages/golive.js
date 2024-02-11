@@ -145,7 +145,7 @@ const GoLive = () => {
                               <p>Hello,</p>
                               <p>You are invited to join our live podcast hosted by ${hostUserName}.</p>
                               <p>The podcast titled "${title}" will be starting soon. We would love to have you as a guest!</p>
-                              <p>Join us by clicking the button below:</p>"
+                              <p>Join us by clicking the button below:</p>
                               <a style=" display: inline-block;
                               padding: 10px 20px;
                               background-color: #007bff;

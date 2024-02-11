@@ -145,7 +145,6 @@ const Profile = () => {
       toast({
         description: "Profile updated successfully",
       });
-      window.location.reload();
     } catch (error) {
       console.error("Profile update failed:", error);
     } finally {
@@ -197,7 +196,6 @@ const Profile = () => {
         newpassword: "",
         confpassword: "",
       });
-      window.location.reload();
     } catch (error) {
       console.error("Password change failed:", error);
       toast({
