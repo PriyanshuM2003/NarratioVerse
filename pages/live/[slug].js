@@ -1,3 +1,4 @@
+"use client";
 import prisma from "@/lib/prisma";
 import React from "react";
 import {

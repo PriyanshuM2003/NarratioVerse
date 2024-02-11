@@ -1,51 +1,29 @@
 "use client";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import prisma from "@/lib/prisma";
 
-const Accept = () => {
+
+const Accept = ({ liveTalkInfo }) => {
   const router = useRouter();
-  const [liveTalkInfo, setLiveTalkInfo] = useState({
-    slug: "",
-    title: "",
-    hostname: "",
-    uniqueToken: "",
-  });
+  
+  const token = localStorage.getItem("token");
+  if (!token) {
+    console.error("Token not found in localStorage");
+    router.push("/login");
+    return;}
+ 
 
-  useEffect(() => {
-    const { invitation } = router.query;
-    if (invitation) {
-      handleAccept(invitation);
-    }
-  }, [router.query]);
-
-  const handleAccept = async (uniqueToken) => {
+  const handleAccept = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.error("Token not found in localStorage");
-        router.push("/login");
-        return;
-      }
-      const response = await fetch("/api/accept", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ uniqueToken }),
-      });
-      if (response.ok) {
-        const { slug, title, hostname, uniqueToken } = await response.json();
-        setLiveTalkInfo({ slug, title, hostname, uniqueToken });
-        router.push(`/live/${slug}`);
-      } else {
-        console.error("Failed to accept invitation:", response.statusText);
-      }
+      router.push(`/live/${liveTalkInfo.slug}`);
     } catch (error) {
       console.error("Error accepting invitation:", error.message);
     }
   };
+  if (!liveTalkInfo) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center">
@@ -65,4 +43,36 @@ const Accept = () => {
   );
 };
 
+export async function getServerSideProps(context) {
+  try {
+    const { invitation } = context.query;
+
+    const liveTalkParticipant = await prisma.liveTalkParticipant.findUnique({
+      where: {
+        uniqueToken: invitation,
+      },
+      include: {
+        liveTalk: {
+          include: {
+            hostUser: true,
+          },
+        },
+      },
+    });
+
+    return {
+      props: {
+        liveTalkInfo: liveTalkParticipant ? liveTalkParticipant.liveTalk : null,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching live talk details:", error.message);
+
+    return {
+      props: {
+        liveTalkInfo: null,
+      },
+    };
+  }
+}
 export default Accept;
