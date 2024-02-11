@@ -29,10 +29,6 @@ const GoLive = () => {
     setTitle(event.target.value);
   };
 
-  const handleRecordChange = (value) => {
-    setRecord(value === "Yes" ? true : false);
-  };
-
   const handleGenreSelect = (event) => {
     const selectedGenre = event.target.value;
 
@@ -94,7 +90,7 @@ const GoLive = () => {
           },
           body: JSON.stringify({
             title,
-            record,
+            record: record === "Yes",
             slug,
             genres: selectedGenres,
             participants: fields.map((field) => ({
@@ -223,7 +219,7 @@ const GoLive = () => {
                       name="record"
                       value="Yes"
                       checked={record === "Yes"}
-                      onChange={() => handleRecordChange("Yes")}
+                      onChange={() => setRecord("Yes")}
                       className="h-5 w-5"
                     />
                     <Label htmlFor="yes">Yes</Label>
@@ -235,7 +231,7 @@ const GoLive = () => {
                       name="record"
                       value="No"
                       checked={record === "No"}
-                      onChange={() => handleRecordChange("No")}
+                      onChange={() => setRecord("No")}
                       className="h-5 w-5"
                     />
                     <Label htmlFor="no">No</Label>
