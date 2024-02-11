@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Mic, MicOff, X } from "lucide-react";
-import Image from "next/image";
 
 const Live = ({ liveTalk }) => {
   const participants = liveTalk.participants.filter(
@@ -30,7 +29,7 @@ const Live = ({ liveTalk }) => {
             <CardHeader>
               <CardTitle>
                 <div className="flex items-center flex-col">
-                  <Image
+                  <img
                     className="md:w-32 md:h-32 w-24 h-24 mx-auto object-cover object-center rounded-full"
                     alt={liveTalk.hostUser.name}
                     src={liveTalk.hostUser.profileImage}
@@ -53,7 +52,7 @@ const Live = ({ liveTalk }) => {
               <CardHeader>
                 <CardTitle>
                   <div className="flex items-center flex-col">
-                    <Image
+                    <img
                       className="md:w-32 md:h-32 w-24 h-24 mx-auto object-cover object-center rounded-full"
                       alt={participant.guestUser.name}
                       src={participant.guestUser.profileImage}

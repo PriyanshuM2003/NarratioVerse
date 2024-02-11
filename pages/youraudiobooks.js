@@ -13,7 +13,6 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAudioPlayer } from "@/components/AudioPlayerContext";
-import Image from "next/image";
 
 const YourAudiobooks = () => {
   const router = useRouter();
@@ -118,7 +117,7 @@ const YourAudiobooks = () => {
                   onClick={() => handleAudiobookSelect(audiobook)}
                   className="flex items-center"
                 >
-                  <Image
+                  <img
                     src={audiobook.coverImage}
                     alt={audiobook.title}
                     className="w-10 mr-4"

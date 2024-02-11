@@ -2,7 +2,6 @@
 import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import prisma from "@/lib/prisma";
-import { useEffect, useState } from "react";
 import {
   Card,
   CardDescription,
@@ -13,13 +12,7 @@ import {
 
 const Accept = ({ liveTalkInfo }) => {
   const router = useRouter();
-
-  const [invitation, setInvitation] = useState(null);
-
-  useEffect(() => {
-    const { invitation } = router.query;
-    setInvitation(invitation);
-  }, [router.query]);
+  const { invitation } = router.query;
 
   const handleAccept = async () => {
     try {
@@ -35,12 +28,12 @@ const Accept = ({ liveTalkInfo }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ slug: invitation, accept: true }),
         }
       );
-
+      console.log("Response status:", response.status);
+      console.log("Response:", response);
       if (response.ok) {
         router.push(`/live/${liveTalkInfo.slug}`);
       } else {
