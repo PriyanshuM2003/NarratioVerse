@@ -11,10 +11,29 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Mic, MicOff, X } from "lucide-react";
 
-const Live = ({ liveTalk }) => {
-  const participants = liveTalk.participants.filter(
-    (participant) => participant.accepted
-  );
+const Live = ({ initiateLiveTalk }) => {
+  const [liveTalk, setLiveTalk] = useState(initiateLiveTalk);
+
+  useEffect(() => {
+    setLiveTalk(initiateLiveTalk);
+  }, [initiateLiveTalk]);
+
+  const handleParticipantAcceptance = (participantId) => {
+    const updatedParticipants = liveTalk.participants.map((participant) => {
+      if (participant.id === participantId) {
+        return {
+          ...participant,
+          accepted: true,
+        };
+      }
+      return participant;
+    });
+
+    setLiveTalk({
+      ...liveTalk,
+      participants: updatedParticipants,
+    });
+  };
   return (
     <>
       <div className="p-8 text-white">
@@ -31,10 +50,10 @@ const Live = ({ liveTalk }) => {
                 <div className="flex items-center flex-col">
                   <img
                     className="md:w-32 md:h-32 w-24 h-24 mx-auto object-cover object-center rounded-full"
-                    alt={liveTalk.hostUser.name}
-                    src={liveTalk.hostUser.profileImage}
+                    alt={initiateLiveTalk.hostUser.name}
+                    src={initiateLiveTalk.hostUser.profileImage}
                   />
-                  <p>{liveTalk.hostUser.name}</p>
+                  <p>{initiateLiveTalk.hostUser.name}</p>
                 </div>
               </CardTitle>
               <CardDescription>
@@ -124,7 +143,7 @@ export async function getServerSideProps(context) {
 
     return {
       props: {
-        liveTalk,
+        initiateLiveTalk: liveTalk,
       },
     };
   } catch (error) {
