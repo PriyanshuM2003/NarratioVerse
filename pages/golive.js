@@ -83,7 +83,6 @@ const GoLive = () => {
         return;
       }
       const uniqueId = Math.random().toString(36).substring(7);
-      const uniqueToken = Math.random().toString(36).substring(7);
       const slug = `${uniqueId}_${title}`.split(" ").join("+");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_HOST}/api/golive`,
@@ -97,11 +96,9 @@ const GoLive = () => {
             title,
             record,
             slug,
-            uniqueToken,
             genres: selectedGenres,
             participants: fields.map((field) => ({
               email: field.guestEmail,
-              uniqueToken,
             })),
           }),
         }
@@ -157,7 +154,7 @@ const GoLive = () => {
           border-color 0.3s ease;
       "
       onmouseover="this.style.backgroundColor='#333333'; this.style.color='#fff'; this.style.borderColor='#000000'"
-      onmouseout="this.style.backgroundColor='#000000'; this.style.color='#fff'; this.style.borderColor='#333333'" href="${process.env.NEXT_PUBLIC_HOST}/accept?invitation=${uniqueToken}" class="button">Join Podcast</a>
+      onmouseout="this.style.backgroundColor='#000000'; this.style.color='#fff'; this.style.borderColor='#333333'" href="${process.env.NEXT_PUBLIC_HOST}/accept?invitation=${slug}" class="button">Join Podcast</a>
                           </div>
                       </div>
                   </body>

@@ -55,9 +55,8 @@ export default async function handler(req, res) {
           slug,
           hostUserId,
           participants: {
-            create: guestUserIds.map((guestUserId, index) => ({
+            create: guestUserIds.map((guestUserId) => ({
               guestUserId,
-              uniqueToken: participants[index].uniqueToken,
             })),
           },
         },

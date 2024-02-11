@@ -67,7 +67,6 @@ model LiveTalkParticipant {
   liveTalkId      String
   guestUserId     String
   accepted        Boolean  @default(false)
-  uniqueToken     String?  @unique
   liveTalk        LiveTalk @relation(fields: [liveTalkId], references: [id])
   guestUser       User     @relation("GuestUser", fields: [guestUserId], references: [id])
 

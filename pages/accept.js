@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import prisma from "@/lib/prisma";
 
-
 const Accept = ({ liveTalkInfo }) => {
   const router = useRouter();
   
@@ -11,9 +10,9 @@ const Accept = ({ liveTalkInfo }) => {
   if (!token) {
     console.error("Token not found in localStorage");
     router.push("/login");
-    return;}
- 
-
+    return;
+  }
+  
   const handleAccept = async () => {
     try {
       router.push(`/live/${liveTalkInfo.slug}`);
@@ -21,6 +20,7 @@ const Accept = ({ liveTalkInfo }) => {
       console.error("Error accepting invitation:", error.message);
     }
   };
+
   if (!liveTalkInfo) {
     return <div>Loading...</div>;
   }
@@ -47,14 +47,20 @@ export async function getServerSideProps(context) {
   try {
     const { invitation } = context.query;
 
-    const liveTalkParticipant = await prisma.liveTalkParticipant.findUnique({
+    const liveTalkInfo = await prisma.liveTalk.findUnique({
       where: {
-        uniqueToken: invitation,
+        slug: invitation,
       },
       include: {
-        liveTalk: {
+        hostUser: true,
+        participants: {
           include: {
-            hostUser: true,
+            guestUser: true,
+          },
+          where: {
+            guestUser: {
+              email: context.req.user.email,
+            },
           },
         },
       },
@@ -62,7 +68,7 @@ export async function getServerSideProps(context) {
 
     return {
       props: {
-        liveTalkInfo: liveTalkParticipant ? liveTalkParticipant.liveTalk : null,
+        liveTalkInfo: liveTalkInfo || null,
       },
     };
   } catch (error) {
@@ -75,4 +81,5 @@ export async function getServerSideProps(context) {
     };
   }
 }
+
 export default Accept;
