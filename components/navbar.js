@@ -116,7 +116,7 @@ export function Navbar({
         <MenubarMenu>
           <MenubarTrigger className="flex items-center">
             <User />
-            My Account
+            <span>My Account</span>
           </MenubarTrigger>
           <MenubarContent className="bg-gray-900 text-white" forceMount>
             <Link href="/profile">
@@ -155,7 +155,7 @@ export function Navbar({
         <MenubarMenu>
           <MenubarTrigger className="flex items-center">
             <User />
-            Account
+            <span>Account</span>
           </MenubarTrigger>
           <MenubarContent className="bg-gray-900 text-white" forceMount>
             <Link href="/login">

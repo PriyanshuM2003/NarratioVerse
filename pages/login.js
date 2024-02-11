@@ -16,7 +16,7 @@ import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader } from "lucide-react";
 
-const Login = () => {
+const Login = ({ setIsLoggedIn }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -45,18 +45,15 @@ const Login = () => {
       );
 
       if (response.ok) {
-        const { token, user, message } = await response.json();
+        const { token } = await response.json();
         localStorage.setItem("token", token);
         toast({
           description: "Logged in successfully",
         });
         setEmail("");
         setPassword("");
-        console.log(message, user);
         router.push("/");
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
+        setIsLoggedIn(true);
         setLoading(false);
       } else {
         const { error } = await response.json();
@@ -135,8 +132,7 @@ const Login = () => {
                 Forgot Password?
               </Link>
               <p className="mt-2 text-xs text-center text-gray-400">
-                {" "}
-                Don't have an account?{" "}
+                Don't have an account?
                 <Link
                   href="/signup"
                   className=" text-blue-600 font-semibold hover:underline"

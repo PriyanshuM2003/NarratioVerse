@@ -23,7 +23,9 @@ model User {
   password          String
   profileImage      String?
 
-  Audio Audio[]
+  Audio            Audio[]
+  liveTalksAsHost  LiveTalk[]            @relation("HostUser")
+  liveTalksAsGuest LiveTalkParticipant[] @relation("GuestUser")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -40,6 +42,34 @@ model Audio {
   parts      Json[]
   userId     String
   user       User     @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LiveTalk {
+  id           String                @id @default(uuid())
+  hostUserId   String
+  status       String?
+  title        String
+  slug         String                @unique
+  genres       String[]
+  record       Boolean               @default(false)
+  hostUser     User                  @relation("HostUser", fields: [hostUserId], references: [id])
+  participants LiveTalkParticipant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LiveTalkParticipant {
+  id              String   @id @default(uuid())
+  liveTalkId      String
+  guestUserId     String
+  accepted        Boolean  @default(false)
+  uniqueToken     String?  @unique
+  liveTalk        LiveTalk @relation(fields: [liveTalkId], references: [id])
+  guestUser       User     @relation("GuestUser", fields: [guestUserId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

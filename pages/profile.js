@@ -230,7 +230,7 @@ const Profile = () => {
                 <div className="flex items-center justify-center md:mb-5 md:mr-5 flex-col">
                   <img
                     className="md:w-52 md:h-52 w-32 h-32 mx-auto object-cover object-center rounded-full"
-                    alt="hero"
+                    alt={userData.name}
                     src={userData.profileImage}
                   />
                   <Music2 className="text-yellow-400 mt-2" />

@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 const AudioPlayerContext = createContext();
 
@@ -80,29 +86,3 @@ export const useAudioPlayer = () => {
   }
   return context;
 };
-
-export async function getServerSideProps(context) {
-  const { slug } = context.params;
-
-  try {
-    const audioData = await prisma.audio.findUnique({
-      where: { slug },
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        coverImage: true,
-        category: true,
-        genres: true,
-        keywords: true,
-        parts: true,
-        userId: true,
-      },
-    });
-
-    return { props: { audioData } };
-  } catch (error) {
-    console.error("Error fetching audio data:", error);
-    return { notFound: true };
-  }
-}

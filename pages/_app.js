@@ -20,6 +20,11 @@ function MyApp({ Component, pageProps }) {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  }, []);
+
+  useEffect(() => {
     router.events.on("routeChangeStart", () => {
       setProgress(35);
     });
@@ -27,8 +32,10 @@ function MyApp({ Component, pageProps }) {
       setProgress(100);
     });
 
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+    return () => {
+      router.events.off("routeChangeStart");
+      router.events.off("routeChangeComplete");
+    };
   }, []);
 
   const handleLogout = () => {
@@ -41,7 +48,7 @@ function MyApp({ Component, pageProps }) {
   };
 
   const handleToggleSidebar = () => {
-    setIsSidebarVisible(!isSidebarVisible);
+    setIsSidebarVisible((prevState) => !prevState);
   };
 
   useEffect(() => {
@@ -88,7 +95,7 @@ function MyApp({ Component, pageProps }) {
             <div style={{ flex: 1 }}>
               <AudioPlayerProvider>
                 <Layout>
-                  <Component {...pageProps} />
+                  <Component {...pageProps} setIsLoggedIn={setIsLoggedIn} />
                 </Layout>
               </AudioPlayerProvider>
             </div>

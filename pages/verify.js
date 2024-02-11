@@ -66,8 +66,8 @@ const Verify = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
       {loading ? (
-        <div className="text-center">
-          <Loader className="text-white" />
+        <div className="text-center flex items-center">
+          <Loader className="text-white animate-spin" />
           <p className="text-lg mt-4">Verifying...</p>
         </div>
       ) : (
