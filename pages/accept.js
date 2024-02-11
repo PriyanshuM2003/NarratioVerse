@@ -1,4 +1,5 @@
 "use client";
+// pages/accept.js
 import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import prisma from "@/lib/prisma";
@@ -15,10 +16,27 @@ const Accept = ({ liveTalkInfo }) => {
 
   const handleAccept = async () => {
     try {
-      router.push(`/live/${liveTalkInfo.slug}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/accept`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ slug: liveTalkInfo.slug, accept: true }),
+      });
+
+      if (response.ok) {
+        router.push(`/live/${liveTalkInfo.slug}`);
+      } else {
+        console.error("Error accepting invitation:", response.statusText);
+      }
     } catch (error) {
       console.error("Error accepting invitation:", error.message);
     }
+  };
+
+  const handleDecline = () => {
+    router.push("/");
   };
 
   if (!liveTalkInfo) {
@@ -35,7 +53,7 @@ const Accept = ({ liveTalkInfo }) => {
           </div>
           <div className="flex justify-between">
             <Button onClick={handleAccept}>Accept</Button>
-            <Button variant="outline" onClick={() => router.push("/")}>
+            <Button variant="outline" onClick={handleDecline}>
               Decline
             </Button>
           </div>
@@ -67,6 +85,12 @@ export async function getServerSideProps(context) {
         },
       },
     });
+
+    if (!liveTalkInfo) {
+      return {
+        notFound: true,
+      };
+    }
 
     return {
       props: {
