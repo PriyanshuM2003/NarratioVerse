@@ -1,17 +1,17 @@
 "use client";
-// pages/accept.js
 import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import prisma from "@/lib/prisma";
 
 const Accept = ({ liveTalkInfo }) => {
   const router = useRouter();
+  const { invitation } = router.query;
 
   const token = localStorage.getItem("token");
   if (!token) {
     console.error("Token not found in localStorage");
     router.push("/login");
-    return;
+    return null;
   }
 
   const handleAccept = async () => {
@@ -22,7 +22,7 @@ const Accept = ({ liveTalkInfo }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ slug: liveTalkInfo.slug, accept: true }),
+        body: JSON.stringify({ slug: invitation, accept: true }),
       });
 
       if (response.ok) {
@@ -94,7 +94,11 @@ export async function getServerSideProps(context) {
 
     return {
       props: {
-        liveTalkInfo: liveTalkInfo || null,
+        liveTalkInfo: {
+          title: liveTalkInfo.title,
+          hostname: liveTalkInfo.hostUser.name,
+          slug: liveTalkInfo.slug
+        } || null,
       },
     };
   } catch (error) {
