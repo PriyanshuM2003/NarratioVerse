@@ -2,10 +2,14 @@
 import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import prisma from "@/lib/prisma";
+import { useEffect, useState } from "react";
 
 const Accept = ({ liveTalkInfo }) => {
   const router = useRouter();
+
   const [invitation, setInvitation] = useState(null);
+  console.log("Component rendered");
+  console.log("Initial router query:", router.query);
 
   useEffect(() => {
     const { invitation } = router.query;
@@ -85,11 +89,6 @@ export async function getServerSideProps(context) {
           include: {
             guestUser: true,
           },
-          where: {
-            guestUser: {
-              email: context.req.user.email,
-            },
-          },
         },
       },
     });
@@ -102,12 +101,11 @@ export async function getServerSideProps(context) {
 
     return {
       props: {
-        liveTalkInfo:
-          {
-            title: liveTalkInfo.title,
-            hostname: liveTalkInfo.hostUser.name,
-            slug: liveTalkInfo.slug,
-          } || null,
+        liveTalkInfo: {
+          title: liveTalkInfo.title,
+          hostname: liveTalkInfo.hostUser.name,
+          slug: liveTalkInfo.slug
+        } || null,
       },
     };
   } catch (error) {
