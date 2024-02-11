@@ -27,7 +27,7 @@ const Accept = () => {
         router.push("/login");
         return;
       }
-      const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/accept`, {
+      const response = await fetch("/api/accept", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,13 +39,11 @@ const Accept = () => {
         const { slug, title, hostname, uniqueToken } = await response.json();
         setLiveTalkInfo({ slug, title, hostname, uniqueToken });
         router.push(`/live/${slug}`);
-      } else if (response.status === 401) {
-        console.error("Unauthorized: User not authenticated");
       } else {
         console.error("Failed to accept invitation:", response.statusText);
       }
     } catch (error) {
-      console.error("Error accepting invitation:", error);
+      console.error("Error accepting invitation:", error.message);
     }
   };
 
