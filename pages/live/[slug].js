@@ -52,7 +52,7 @@ const Live = ({ liveTalk }) => {
               <CardHeader>
                 <CardTitle>
                   <div className="flex items-center flex-col">
-                    <img
+                    <Image
                       className="md:w-32 md:h-32 w-24 h-24 mx-auto object-cover object-center rounded-full"
                       alt={participant.guestUser.name}
                       src={participant.guestUser.profileImage}

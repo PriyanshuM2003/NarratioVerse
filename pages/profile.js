@@ -255,7 +255,7 @@ const Profile = () => {
               </div>
             ) : (
               <div className="mx-auto flex items-center mb-10 justify-center flex-col">
-                <img
+                <Image
                   className="md:w-52 md:h-52 w-32 h-32 mx-auto mb-2 object-cover object-center rounded-full"
                   alt="hero"
                   src={userData.profileImage}
