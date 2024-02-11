@@ -2,11 +2,9 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader } from "lucide-react";
 
 const Accept = () => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const [liveTalkInfo, setLiveTalkInfo] = useState({
     slug: "",
     title: "",
@@ -22,7 +20,6 @@ const Accept = () => {
   }, [router.query]);
 
   const handleAccept = async (uniqueToken) => {
-    setLoading(true);
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -30,7 +27,7 @@ const Accept = () => {
         router.push("/login");
         return;
       }
-      const response = await fetch("/api/accept", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/accept`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -41,16 +38,13 @@ const Accept = () => {
       if (response.ok) {
         const { slug, title, hostname, uniqueToken } = await response.json();
         setLiveTalkInfo({ slug, title, hostname, uniqueToken });
-        setLoading(false);
         router.push(`/live/${slug}`);
       } else if (response.status === 401) {
         console.error("Unauthorized: User not authenticated");
       } else {
         console.error("Failed to accept invitation:", response.statusText);
-        setLoading(false);
       }
     } catch (error) {
-      setLoading(false);
       console.error("Error accepting invitation:", error);
     }
   };
@@ -62,16 +56,12 @@ const Accept = () => {
           <h2>Join Live Podcast as Guest : {liveTalkInfo.title}</h2>
           <p>Hosted by: {liveTalkInfo.hostname}</p>
         </div>
-        {loading ? (
-          <Loader />
-        ) : (
-          <div className="flex justify-between">
-            <Button onClick={handleAccept}>Accept</Button>
-            <Button variant="outline" onClick={() => router.push("/")}>
-              Decline
-            </Button>
-          </div>
-        )}
+        <div className="flex justify-between">
+          <Button onClick={handleAccept}>Accept</Button>
+          <Button variant="outline" onClick={() => router.push("/")}>
+            Decline
+          </Button>
+        </div>
       </div>
     </div>
   );
