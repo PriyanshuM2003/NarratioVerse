@@ -5,25 +5,33 @@ import prisma from "@/lib/prisma";
 
 const Accept = ({ liveTalkInfo }) => {
   const router = useRouter();
-  const { invitation } = router.query;
+  const [invitation, setInvitation] = useState(null);
 
-  const token = localStorage.getItem("token");
-  if (!token) {
-    console.error("Token not found in localStorage");
-    router.push("/login");
-    return null;
-  }
+  useEffect(() => {
+    const { invitation } = router.query;
+    console.log("Invitation slug:", invitation); 
+    setInvitation(invitation);
+  }, [router.query]);
 
   const handleAccept = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/accept`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ slug: invitation, accept: true }),
-      });
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Token not found in localStorage");
+        router.push("/login");
+        return;
+      }
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_HOST}/api/accept`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ slug: invitation, accept: true }),
+        }
+      );
 
       if (response.ok) {
         router.push(`/live/${liveTalkInfo.slug}`);
@@ -94,11 +102,12 @@ export async function getServerSideProps(context) {
 
     return {
       props: {
-        liveTalkInfo: {
-          title: liveTalkInfo.title,
-          hostname: liveTalkInfo.hostUser.name,
-          slug: liveTalkInfo.slug
-        } || null,
+        liveTalkInfo:
+          {
+            title: liveTalkInfo.title,
+            hostname: liveTalkInfo.hostUser.name,
+            slug: liveTalkInfo.slug,
+          } || null,
       },
     };
   } catch (error) {
