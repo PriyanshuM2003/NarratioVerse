@@ -21,6 +21,7 @@ export default async function handler(req, res) {
         where: {
           guestUserId: decoded.userId,
           accepted: false,
+          uniqueToken: uniqueToken,
         },
         data: {
           accepted: true,

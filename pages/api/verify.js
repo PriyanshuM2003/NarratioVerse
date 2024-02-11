@@ -3,27 +3,30 @@ import jwt from "jsonwebtoken";
 
 export default async function handler(req, res) {
   try {
+    if (req.method === "POST") {
+      const { token } = req.body;
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      const user = await prisma.user.findUnique({
+        where: { email: decodedToken.email },
+      });
 
-    const { token } = req.body;
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    const user = await prisma.user.findUnique({
-      where: { email: decodedToken.email },
-    });
-
-    if (!user) {
-      return res.status(400).json({ error: "Invalid or expired token" });
+      if (!user) {
+        return res.status(400).json({ error: "Invalid or expired token" });
+      }
+      if (user.isVerified) {
+        return res.status(400).json({ error: "User is already verified" });
+      }
+      await prisma.user.update({
+        where: { email: decodedToken.email },
+        data: {
+          isVerified: true,
+          verificationToken: null,
+        },
+      });
+      return res.status(200).json({ message: "Email verified successfully" });
+    } else {
+      return res.status(405).json({ error: "Method Not Allowed" });
     }
-    if (user.isVerified) {
-      return res.status(400).json({ error: "User is already verified" });
-    }
-    await prisma.user.update({
-      where: { email: decodedToken.email },
-      data: {
-        isVerified: true,
-        verificationToken: null,
-      },
-    });
-    return res.status(200).json({ message: "Email verified successfully" });
   } catch (error) {
     console.error("Error verifying email:", error);
 
