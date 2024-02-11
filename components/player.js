@@ -23,6 +23,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "./ui/drawer";
+import Image from "next/image";
 
 const Player = () => {
   const {
@@ -170,7 +171,7 @@ const Player = () => {
           <div className="song-bar flex items-center justify-between">
             <div className="song-infos flex space-x-2 items-center">
               <div className="image-container flex-shrink-0 w-16 h-16">
-                <img
+                <Image
                   src={audioData.coverImage}
                   alt={audioData.title}
                   className="w-full h-full object-cover"

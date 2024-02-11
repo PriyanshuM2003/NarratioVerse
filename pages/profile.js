@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Award, Loader, Music2 } from "lucide-react";
 import Link from "next/link";
 import supabase from "@/lib/supabase";
+import Image from "next/image";
 
 const Profile = () => {
   const router = useRouter();
@@ -228,7 +229,7 @@ const Profile = () => {
             {userData.creator ? (
               <div className="mx-auto flex items-center mb-10 justify-center md:flex-row flex-col">
                 <div className="flex items-center justify-center md:mb-5 md:mr-5 flex-col">
-                  <img
+                  <Image
                     className="md:w-52 md:h-52 w-32 h-32 mx-auto object-cover object-center rounded-full"
                     alt={userData.name}
                     src={userData.profileImage}

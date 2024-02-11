@@ -13,6 +13,7 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAudioPlayer } from "@/components/AudioPlayerContext";
+import Image from "next/image";
 
 const YourPodcasts = () => {
   const router = useRouter();
@@ -115,7 +116,7 @@ const YourPodcasts = () => {
                   onClick={() => handlePodcastSelect(podcast)}
                   className="flex items-center"
                 >
-                  <img
+                  <Image
                     src={podcast.coverImage}
                     alt={podcast.title}
                     className="w-10 mr-4"
