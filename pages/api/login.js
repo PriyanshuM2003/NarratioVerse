@@ -2,6 +2,20 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+const generateRefreshToken = (userId) => {
+  return jwt.sign({ id: userId }, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: "1y",
+  });
+};
+
+const verifyRefreshToken = (token) => {
+  try {
+    return jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+  } catch (error) {
+    return null;
+  }
+};
+
 export default async function handler(req, res) {
   try {
     if (req.method === "POST") {
@@ -32,10 +46,16 @@ export default async function handler(req, res) {
       if (!user.isVerified) {
         return res.status(401).json({ error: "User not verified." });
       }
-      
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY, {
-        expiresIn: "1d",
-      });
+
+      const accessToken = jwt.sign(
+        { id: user.id },
+        process.env.JWT_SECRET_KEY,
+        {
+          expiresIn: "1d",
+        }
+      );
+
+      const refreshToken = generateRefreshToken(user.id);
 
       const userResponse = {
         id: user.id,
@@ -43,9 +63,44 @@ export default async function handler(req, res) {
         name: user.name,
       };
 
-      return res
-        .status(200)
-        .json({ message: "Login successful", token, user: userResponse });
+      return res.status(200).json({
+        message: "Login successful",
+        accessToken,
+        refreshToken,
+        user: userResponse,
+      });
+    } else if (req.method === "GET") {
+      const { refreshToken } = req.body;
+
+      if (!refreshToken) {
+        return res.status(401).json({ error: "Refresh token not provided." });
+      }
+
+      const decodedRefreshToken = verifyRefreshToken(refreshToken);
+
+      if (!decodedRefreshToken) {
+        return res.status(401).json({ error: "Invalid refresh token." });
+      }
+
+      const user = await prisma.user.findUnique({
+        where: {
+          id: decodedRefreshToken.id,
+        },
+      });
+
+      if (!user) {
+        return res.status(401).json({ error: "User not found." });
+      }
+
+      const newAccessToken = jwt.sign(
+        { id: user.id },
+        process.env.JWT_SECRET_KEY,
+        {
+          expiresIn: "1d",
+        }
+      );
+
+      return res.status(200).json({ accessToken: newAccessToken });
     } else {
       return res.status(405).json({ message: "Method Not Allowed" });
     }

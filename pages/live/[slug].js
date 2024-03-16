@@ -1,6 +1,7 @@
 "use client";
+import React, { useEffect, useRef, useState } from "react";
+import { io } from "socket.io-client";
 import prisma from "@/lib/prisma";
-import React, { useEffect, useState } from "react";
 import {
   Card,
   CardDescription,
@@ -13,27 +14,152 @@ import { Mic, MicOff, X } from "lucide-react";
 
 const Live = ({ initiateLiveTalk }) => {
   const [liveTalk, setLiveTalk] = useState(initiateLiveTalk);
+  const [acceptedParticipants, setAcceptedParticipants] = useState([]);
+  const [isMicOn, setIsMicOn] = useState(true);
+  const [participantMicStatus, setParticipantMicStatus] = useState({});
+
+  const socketRef = useRef();
 
   useEffect(() => {
-    setLiveTalk(initiateLiveTalk);
-  }, [initiateLiveTalk]);
+    const fetchAcceptedParticipants = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_HOST}/api/live?slug=${initiateLiveTalk.slug}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch live talk");
+        }
+        const data = await response.json();
+        setLiveTalk(data.initiateLiveTalk);
+        setAcceptedParticipants([...data.initiateLiveTalk.participants]);
 
-  const handleParticipantAcceptance = (participantId) => {
-    const updatedParticipants = liveTalk.participants.map((participant) => {
-      if (participant.id === participantId) {
-        return {
-          ...participant,
-          accepted: true,
-        };
+        const initialParticipantMicStatus = {};
+        data.initiateLiveTalk.participants.forEach((participant) => {
+          initialParticipantMicStatus[participant.id] = true;
+        });
+        setParticipantMicStatus(initialParticipantMicStatus);
+      } catch (error) {
+        console.error("Error fetching live talk:", error);
       }
-      return participant;
+    };
+    fetchAcceptedParticipants();
+
+    const socket = io("http://localhost:5000", {
+      transports: ["websocket"],
+      upgrade: false,
     });
 
-    setLiveTalk({
-      ...liveTalk,
-      participants: updatedParticipants,
+    socketRef.current = socket;
+    
+    socket.on("connect", () => {
+      navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+        .then((stream) => {
+          const audioContext = new AudioContext();
+          const audioSource = audioContext.createMediaStreamSource(stream);
+    
+          const bufferSize = 4096;
+          const scriptProcessorNode = audioContext.createScriptProcessor(bufferSize, 1, 1);
+          audioSource.connect(scriptProcessorNode);
+    
+          scriptProcessorNode.onaudioprocess = function (event) {
+            const audioBuffer = event.inputBuffer.getChannelData(0);
+            const audioData = encodePCM(audioBuffer);
+            socket.emit("audioStream", audioData);
+          };
+    
+          scriptProcessorNode.connect(audioContext.destination);
+        })
+        .catch((error) => {
+          console.error("Error capturing audio.", error);
+        });
+    });
+    
+    socket.on("audioStream", (audioData) => {
+      const audioContext = new AudioContext();
+      const audioBuffer = decodePCM(audioData, audioContext);
+      const audioSource = audioContext.createBufferSource();
+      audioSource.buffer = audioBuffer;
+      audioSource.connect(audioContext.destination);
+      audioSource.start();
+    });
+    
+    function encodePCM(audioBuffer) {
+      const length = audioBuffer.length * 2;
+      const buffer = new ArrayBuffer(length);
+      const view = new DataView(buffer);
+      let index = 0;
+    
+      for (let i = 0; i < audioBuffer.length; i++) {
+        view.setInt16(index, audioBuffer[i] * 0x7FFF, true);
+        index += 2;
+      }
+    
+      return buffer;
+    }
+    
+    function decodePCM(audioData, audioContext) {
+      const length = audioData.byteLength / 2;
+      const buffer = audioContext.createBuffer(1, length, audioContext.sampleRate);
+      const view = new DataView(audioData);
+      const channelData = buffer.getChannelData(0);
+    
+      let index = 0;
+      for (let i = 0; i < length; i++) {
+        channelData[i] = view.getInt16(index, true) / 0x7FFF;
+        index += 2;
+      }
+    
+      return buffer;
+    }
+
+    socket.on("participantJoined", (participant) => {
+      setAcceptedParticipants((prevParticipants) => [
+        ...prevParticipants,
+        participant,
+      ]);
+      setParticipantMicStatus((prevStatus) => ({
+        ...prevStatus,
+        [participant.id]: true,
+      }));
+    });
+
+    socket.on("micStatusChanged", ({ participantId, isMicOn }) => {
+      setParticipantMicStatus((prevStatus) => ({
+        ...prevStatus,
+        [participantId]: isMicOn,
+      }));
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, [initiateLiveTalk.slug]);
+
+  // Toggle mic for the host
+  const toggleMic = () => {
+    const newMicStatus = !isMicOn;
+    setIsMicOn(newMicStatus);
+    socketRef.current.emit("micStatusChange", {
+      participantId: initiateLiveTalk.hostUser.id,
+      isMicOn: newMicStatus,
     });
   };
+
+  // Toggle mic for a participant
+  const toggleParticipantMic = (participantId) => {
+    const newMicStatus = !participantMicStatus[participantId];
+    setParticipantMicStatus((prevStatus) => ({
+      ...prevStatus,
+      [participantId]: newMicStatus,
+    }));
+    socketRef.current.emit("micStatusChange", {
+      participantId,
+      isMicOn: newMicStatus,
+    });
+  };
+
   return (
     <>
       <div className="p-8 text-white">
@@ -61,12 +187,13 @@ const Live = ({ initiateLiveTalk }) => {
               </CardDescription>
             </CardHeader>
             <CardFooter className="flex justify-between">
-              <Mic />
-              <MicOff />
+              <button onClick={toggleMic}>
+                {isMicOn ? <Mic /> : <MicOff />}
+              </button>
               <X />
             </CardFooter>
           </Card>
-          {liveTalk.participants.map((participant) => (
+          {acceptedParticipants.map((participant) => (
             <Card key={participant.id} className="w-[250px]">
               <CardHeader>
                 <CardTitle>
@@ -84,8 +211,9 @@ const Live = ({ initiateLiveTalk }) => {
                 </CardDescription>
               </CardHeader>
               <CardFooter className="flex justify-between">
-                <Mic />
-                <MicOff />
+                <button onClick={() => toggleParticipantMic(participant.id)}>
+                  {participantMicStatus[participant.id] ? <Mic /> : <MicOff />}
+                </button>
                 <X />
               </CardFooter>
             </Card>
@@ -107,21 +235,9 @@ export async function getServerSideProps(context) {
       include: {
         hostUser: {
           select: {
+            id: true,
             name: true,
             profileImage: true,
-          },
-        },
-        participants: {
-          where: {
-            accepted: true,
-          },
-          include: {
-            guestUser: {
-              select: {
-                name: true,
-                profileImage: true,
-              },
-            },
           },
         },
       },
@@ -135,11 +251,6 @@ export async function getServerSideProps(context) {
 
     liveTalk.createdAt = new Date(liveTalk.createdAt).toISOString();
     liveTalk.updatedAt = new Date(liveTalk.updatedAt).toISOString();
-
-    liveTalk.participants.forEach((participant) => {
-      participant.createdAt = new Date(participant.createdAt).toISOString();
-      participant.updatedAt = new Date(participant.updatedAt).toISOString();
-    });
 
     return {
       props: {

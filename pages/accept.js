@@ -18,7 +18,6 @@ const Accept = ({ liveTalkInfo }) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        console.error("Token not found in localStorage");
         router.push("/login");
         return;
       }

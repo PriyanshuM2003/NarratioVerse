@@ -50,7 +50,7 @@ model Audio {
 model LiveTalk {
   id           String                @id @default(uuid())
   hostUserId   String
-  status       String?
+  status       Boolean               @default(false)
   title        String
   slug         String                @unique
   genres       String[]
@@ -63,12 +63,12 @@ model LiveTalk {
 }
 
 model LiveTalkParticipant {
-  id              String   @id @default(uuid())
-  liveTalkId      String
-  guestUserId     String
-  accepted        Boolean  @default(false)
-  liveTalk        LiveTalk @relation(fields: [liveTalkId], references: [id])
-  guestUser       User     @relation("GuestUser", fields: [guestUserId], references: [id])
+  id          String   @id @default(uuid())
+  liveTalkId  String
+  guestUserId String
+  accepted    Boolean  @default(false)
+  liveTalk    LiveTalk @relation(fields: [liveTalkId], references: [id])
+  guestUser   User     @relation("GuestUser", fields: [guestUserId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

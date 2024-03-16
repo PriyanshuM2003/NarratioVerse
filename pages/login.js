@@ -1,6 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useToast } from "@/components/ui/use-toast";
+import { Loader } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -9,12 +15,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { useToast } from "@/components/ui/use-toast";
-import { Loader } from "lucide-react";
 
 const Login = ({ setIsLoggedIn }) => {
   const [email, setEmail] = useState("");
@@ -45,8 +45,9 @@ const Login = ({ setIsLoggedIn }) => {
       );
 
       if (response.ok) {
-        const { token } = await response.json();
-        localStorage.setItem("token", token);
+        const { accessToken, refreshToken, user } = await response.json();
+        localStorage.setItem("token", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
         toast({
           description: "Logged in successfully",
         });
@@ -84,6 +85,62 @@ const Login = ({ setIsLoggedIn }) => {
       setLoading(false);
     }
   };
+
+  const refreshAccessToken = async () => {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) {
+        throw new Error("Refresh token not found");
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_HOST}/api/login`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${refreshToken}`,
+          },
+          body: JSON.stringify({ refreshToken }),
+        }
+      );
+
+      if (response.ok) {
+        const { accessToken } = await response.json();
+        localStorage.setItem("token", accessToken);
+        setIsLoggedIn(true);
+      } else {
+        throw new Error("Token refresh failed");
+      }
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+    }
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const { exp } = JSON.parse(atob(token.split(".")[1]));
+      const expirationTime = exp * 1000;
+
+      const refreshTimer = setTimeout(
+        refreshAccessToken,
+        expirationTime - Date.now() - 5 * 60 * 1000
+      );
+      if (Date.now() >= expirationTime) {
+        localStorage.removeItem("token");
+        toast({
+          variant: "destructive",
+          description: "Session expired. Please log in again.",
+        });
+        router.push("/login");
+      }
+
+      return () => clearTimeout(refreshTimer);
+    } else {
+      router.push("/login");
+    }
+  }, [setIsLoggedIn]);
 
   return (
     <>
