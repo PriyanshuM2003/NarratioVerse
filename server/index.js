@@ -2,6 +2,7 @@ const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
 const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 
@@ -20,7 +21,7 @@ app.use(cors(corsOptions));
 
 const io = socketIO(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: process.env.CLIENT_URL,
   },
 });
 
@@ -29,8 +30,12 @@ io.on("connection", (socket) => {
 
   socket.on("participantJoined", (participant) => {
     socket.join(participant.roomId);
-    console.log(`Participant ${participant.id} joined room ${participant.roomId}`);
-    socket.broadcast.to(participant.roomId).emit("participantJoined", participant);
+    console.log(
+      `Participant ${participant.id} joined room ${participant.roomId}`
+    );
+    socket.broadcast
+      .to(participant.roomId)
+      .emit("participantJoined", participant);
   });
 
   socket.on("audioStream", (audioData) => {
@@ -45,7 +50,6 @@ io.on("connection", (socket) => {
     console.log(`User disconnected: ${socket.id}`);
   });
 });
-
 
 const PORT = process.env.PORT || 5000;
 

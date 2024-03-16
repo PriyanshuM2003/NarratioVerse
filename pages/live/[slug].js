@@ -44,7 +44,7 @@ const Live = ({ initiateLiveTalk }) => {
     };
     fetchAcceptedParticipants();
 
-    const socket = io("http://localhost:5000", {
+    const socket = io(`${process.env.NEXT_PUBLIC_SERVER}`, {
       transports: ["websocket"],
       upgrade: false,
     });
