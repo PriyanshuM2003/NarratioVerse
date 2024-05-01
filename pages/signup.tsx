@@ -44,7 +44,7 @@ interface FormData {
   genres: string[];
 }
 
-const Signup = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
+const Signup = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("");
@@ -71,8 +71,9 @@ const Signup = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   }, [selectedCountry]);
 
   useEffect(() => {
-    if (isLoggedIn) {
-      router.push("/");
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.replace("/");
     }
   }, [router]);
 

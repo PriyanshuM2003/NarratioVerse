@@ -78,7 +78,7 @@ const Navbar: React.FC<NavbarProps> = ({
             Trending
           </Link>
           <Link
-            href="#"
+            href="/audiobooks"
             className={`flex w-fit items-center hover:text-pink-600 ${
               isActiveLink("#") &&
               "rounded-sm py-1 px-2 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"

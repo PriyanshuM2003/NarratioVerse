@@ -4,7 +4,6 @@ export interface User {
   email: string;
   phone: string;
   country: string;
-  state: string;
   bio?: string;
   creator: boolean;
   premium: boolean;
@@ -51,7 +50,6 @@ export interface Audio {
   coverImage: string;
   category: string;
   genres: string[];
-  keywords: string[];
   parts: any[];
   userId: string;
   user: User;

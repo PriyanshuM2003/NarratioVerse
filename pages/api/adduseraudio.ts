@@ -27,7 +27,7 @@ export default async function handler(
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const { title, slug, coverImage, category, genres, keywords, parts } =
+      const { title, slug, coverImage, category, genres, parts } =
         req.body;
 
       const audioParts = parts.map((part: Part) => ({
@@ -42,7 +42,6 @@ export default async function handler(
           coverImage,
           category,
           genres: { set: genres },
-          keywords: { set: keywords },
           parts: { set: audioParts },
           userId: decoded.id,
         },

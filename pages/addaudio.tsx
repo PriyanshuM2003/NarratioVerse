@@ -2,7 +2,7 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, Loader, PlusCircle, X } from "lucide-react";
+import { Loader, PlusCircle, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { genres } from "@/data/preferences";
@@ -31,7 +31,6 @@ interface AudioData {
   coverImage: string;
   category: string;
   genres: string[];
-  keywords: string[];
   parts: {
     partName: string;
     audioUrl: string;
@@ -45,7 +44,6 @@ const AddAudio: React.FC = () => {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("Podcast");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [keywords, setKeywords] = useState<string[]>([]);
   const [currentKeyword, setCurrentKeyword] = useState("");
   const [fields, setFields] = useState<Field[]>([
     {
@@ -61,7 +59,6 @@ const AddAudio: React.FC = () => {
     coverImage: "",
     category: "",
     genres: [],
-    keywords: [],
     parts: [],
   });
 
@@ -110,30 +107,6 @@ const AddAudio: React.FC = () => {
     );
   };
 
-  const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setCurrentKeyword(event.target.value);
-  };
-
-  const handleAddKeyword = (event: FormEvent) => {
-    event.preventDefault();
-    if (
-      currentKeyword.trim() !== "" &&
-      !keywords.includes(currentKeyword.trim().toLowerCase())
-    ) {
-      setKeywords((prevKeywords) => [
-        ...prevKeywords,
-        currentKeyword.trim().toLowerCase(),
-      ]);
-      setCurrentKeyword("");
-    }
-  };
-
-  const handleRemoveKeyword = (keywordToRemove: string) => {
-    setKeywords((prevKeywords) =>
-      prevKeywords.filter((keyword) => keyword !== keywordToRemove)
-    );
-  };
-
   const clearFileInput = (selector: string) => {
     const fileInputs = document.querySelectorAll<HTMLInputElement>(selector);
     if (fileInputs) {
@@ -162,7 +135,6 @@ const AddAudio: React.FC = () => {
         coverImage: audioData.coverImage,
         category,
         genres: selectedGenres,
-        keywords,
         parts: fields.map((field) => ({
           partName: field.partName,
           audioUrl: field.audioUrl,
@@ -192,11 +164,9 @@ const AddAudio: React.FC = () => {
           coverImage: "",
           category: "",
           genres: [],
-          keywords: [],
           parts: [],
         });
         setSelectedGenres([]);
-        setKeywords([]);
         setFields([
           {
             id: 1,
@@ -443,41 +413,6 @@ const AddAudio: React.FC = () => {
                         ))}
                       </div>
                     )}
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-wrap space-x-1">
-                <div className="w-full text-white mb-6">
-                  <Label htmlFor="kword">Key Words for Search</Label>
-                  <div className="flex items-center space-x-1">
-                    <Input
-                      type="text"
-                      name="kword"
-                      className="w-[400px]"
-                      placeholder="Enter Key word for search and Press ENTER to add it"
-                      id="kword"
-                      value={currentKeyword}
-                      onChange={handleKeywordChange}
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter") handleAddKeyword(e);
-                      }}
-                    />
-                    <div className="flex flex-wrap space-x-1 space-y-1">
-                      {keywords.map((keyword) => (
-                        <Badge
-                          key={keyword}
-                          className="px-4 text-sm cursor-pointer"
-                        >
-                          {keyword}&nbsp;
-                          <span
-                            className="text-lg"
-                            onClick={() => handleRemoveKeyword(keyword)}
-                          >
-                            &times;
-                          </span>
-                        </Badge>
-                      ))}
-                    </div>
                   </div>
                 </div>
               </div>

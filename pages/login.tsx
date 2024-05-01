@@ -29,8 +29,9 @@ const Login: React.FC<Props> = ({ setIsLoggedIn, isLoggedIn }) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoggedIn) {
-      router.push("/");
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.replace("/");
     }
   }, [router]);
 

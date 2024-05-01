@@ -46,7 +46,6 @@ model Audio {
   coverImage String
   category   String
   genres     String[]
-  keywords   String[]
   parts      Json[]
   streams    Int?
   userId     String

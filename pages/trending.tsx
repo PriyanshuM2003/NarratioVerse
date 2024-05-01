@@ -85,32 +85,36 @@ const Trending = ({
                     <ScrollBar orientation="horizontal" />
                   </ScrollArea>
                 </div>
-                <div className="mt-6 space-y-1">
-                  <h2 className="text-2xl font-semibold tracking-tight">
-                    Live Podcast sessions
-                  </h2>
-                </div>
-                <Separator className="my-4" />
-                <div className="relative">
-                  <ScrollArea>
-                    <div className="flex space-x-4 pb-4">
-                      {liveTalks?.map(
-                        (item, index) =>
-                          index < 20 && (
-                            <TrendingLive
-                              key={item.id}
-                              liveItem={item}
-                              className="w-[150px]"
-                              aspectRatio="square"
-                              width={150}
-                              height={150}
-                            />
-                          )
-                      )}
+                {liveTalks.length > 0 && liveTalks[0].status && (
+                  <>
+                    <div className="mt-6 space-y-1">
+                      <h2 className="text-2xl font-semibold tracking-tight">
+                        Live Podcast sessions
+                      </h2>
                     </div>
-                    <ScrollBar orientation="horizontal" />
-                  </ScrollArea>
-                </div>
+                    <Separator className="my-4" />
+                    <div className="relative">
+                      <ScrollArea>
+                        <div className="flex space-x-4 pb-4">
+                          {liveTalks?.map(
+                            (item, index) =>
+                              index < 20 && (
+                                <TrendingLive
+                                  key={item.id}
+                                  liveItem={item}
+                                  className="w-[150px]"
+                                  aspectRatio="square"
+                                  width={150}
+                                  height={150}
+                                />
+                              )
+                          )}
+                        </div>
+                        <ScrollBar orientation="horizontal" />
+                      </ScrollArea>
+                    </div>
+                  </>
+                )}
                 {isLoggedIn && (
                   <>
                     <div className="mt-6 space-y-1">
