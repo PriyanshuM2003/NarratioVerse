@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id                   String                @id @default(uuid())
+  name                 String
+  email                String                @unique
+  phone                String                @unique
+  country              String
+  bio                  String?
+  creator              Boolean               @default(false)
+  premium              Boolean               @default(false)
+  isVerified           Boolean               @default(false)
+  verificationToken    String?
+  password             String
+  profileImage         String?
+  Preferences          Preferences[]
+  Audio                Audio[]
+  liveTalks            LiveTalk[]
+  liveTalkParticipants LiveTalkParticipant[]
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+}
+
+model Preferences {
+  id        String   @id @default(uuid())
+  languages String[]
+  genres    String[]
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Audio {
+  id         String   @id @default(uuid())
+  title      String
+  slug       String   @unique
+  coverImage String
+  category   String
+  genres     String[]
+  keywords   String[]
+  parts      Json[]
+  streams    Int?
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LiveTalk {
+  id           String                @id @default(uuid())
+  status       Boolean               @default(false)
+  title        String
+  roomId       String                @unique
+  genres       String[]
+  record       Boolean               @default(false)
+  views        Int                   @default(0)
+  userId       String
+  user         User                  @relation(fields: [userId], references: [id])
+  participants LiveTalkParticipant[]
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+}
+
+model LiveTalkParticipant {
+  id         String  @id @default(uuid())
+  liveTalkId String
+  userId     String
+  isHost     Boolean @default(false)
+  peerId     String?
+  roomId     String?
+
+  liveTalk    LiveTalk @relation(fields: [liveTalkId], references: [id])
+  participant User     @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
