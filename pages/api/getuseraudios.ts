@@ -33,7 +33,6 @@ export default async function handler(
           coverImage: true,
           category: true,
           genres: true,
-          keywords: true,
           parts: true,
           userId: true,
         },
