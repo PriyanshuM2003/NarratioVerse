@@ -237,8 +237,8 @@ const GoLive: React.FC = () => {
                     type="text"
                   />
                 </div>
-                <div className="w-full md:w-1/2 flex items-center space-x-4">
-                  <Label htmlFor="category">
+                {/* <div className="w-full md:w-1/2 flex items-center space-x-4">
+                  <Label htmlFor="record">
                     Do you want to record this podcast audio?
                   </Label>
                   <div className="flex items-center space-x-4">
@@ -265,7 +265,7 @@ const GoLive: React.FC = () => {
                     />
                     <Label htmlFor="no">No</Label>
                   </div>
-                </div>
+                </div> */}
               </div>
               <div className="flex flex-wrap -mx-3 mb-2 text-white">
                 <div className="w-full px-3 mb-6">
