@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { Radio } from "lucide-react";
-import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { User } from "@/types/trendingTypes";
 import Link from "next/link";
@@ -20,7 +19,7 @@ interface Props {
 }
 
 const TrendingLive: React.FC<Props> = ({ liveItem }) => {
-  if (!liveItem.status) {
+  if (!liveItem?.status) {
     return null;
   }
   return (
