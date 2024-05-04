@@ -40,7 +40,7 @@ const Preferences = ({
   const [preferenceData, setPreferenceData] = useState<{ id: string } | null>(
     null
   );
-  
+
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
 
@@ -131,6 +131,7 @@ const Preferences = ({
         description: "Preferences saved successfully",
       });
       setDialogOpen(false);
+      window.location.reload();
     } catch (error) {
       console.error("Error saving preferences:", error);
     }

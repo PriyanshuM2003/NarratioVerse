@@ -66,7 +66,7 @@ const Live = ({ liveTalks }: { liveTalks: LiveTalk[] }) => {
         <Separator className="my-4" />
         <div className="flex items-center gap-4 flex-wrap">
           {liveTalks?.map((live) => (
-            <div className="space-y-3">
+            <div className="space-y-3" key={live.roomId}>
               <Link href={`/live/${live.roomId}`}>
                 <div className="relative">
                   <Image
@@ -92,6 +92,7 @@ const Live = ({ liveTalks }: { liveTalks: LiveTalk[] }) => {
             </div>
           ))}
         </div>
+        <Separator />
       </div>
     </>
   );

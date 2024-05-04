@@ -22,18 +22,26 @@ export default async function handler(
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const userAudio = await prisma.audio.findMany({
+      const userLiveHistory = await prisma.liveTalk.findMany({
         where: {
           userId: decoded.id,
         },
+        include: {
+          participants: {
+            include: {
+              participant: true,
+            },
+          },
+          user: true,
+        },
       });
 
-      return res.status(200).json({ userAudio });
+      return res.status(200).json({ userLiveHistory });
     } else {
       return res.status(405).json({ message: "Method Not Allowed" });
     }
   } catch (error) {
-    console.error("Error getting audio data:", error);
+    console.error("Error getting live history data:", error);
     return res.status(500).json({ error: "Something went wrong" });
   }
 }

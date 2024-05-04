@@ -183,7 +183,7 @@ const Player: React.FC = () => {
 
   return (
     <>
-      <div className="sticky bottom-7 flex items-center justify-between z-50 bg-gray-900 text-white p-4">
+      <div className="sticky bottom-5 flex items-center justify-between z-50 bg-gray-900 text-white p-4">
         <Drawer>
           <div className="flex items-center justify-between">
             <div className="flex space-x-2 items-center">

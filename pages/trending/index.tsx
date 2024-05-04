@@ -2,12 +2,13 @@
 import React, { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import TrendingAudio from "@/components/trending/trendingAudio";
+import TrendingAudio from "@/pages/trending/trendingParts/trendingAudio";
 import { Audio, LiveTalk } from "@/types/trendingTypes";
-import TrendingLive from "@/components/trending/trendingLive";
-import AudioMadeForYou from "@/components/trending/foryou";
-import NewReleases from "@/components/trending/newReleases";
+import TrendingLive from "@/pages/trending/trendingParts/trendingLive";
+import AudioMadeForYou from "@/pages/trending/trendingParts/foryou";
+import NewReleases from "@/pages/trending/trendingParts/newReleases";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Trending = ({
   audio,
@@ -21,9 +22,11 @@ const Trending = ({
   liveTalks: LiveTalk[];
 }) => {
   const [madeForYouData, setMadeForYouData] = useState<Audio[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   useEffect(() => {
     const fetchPreferenceData = async () => {
       try {
+        setLoading(true);
         const token = localStorage.getItem("token");
         if (!token) return;
         const response = await fetch(
@@ -45,6 +48,8 @@ const Trending = ({
         setMadeForYouData(data);
       } catch (error) {
         console.error("Error fetching preferences:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -69,11 +74,22 @@ const Trending = ({
                 <div className="relative">
                   <ScrollArea>
                     <div className="flex space-x-4 pb-4">
-                      {audio?.map(
-                        (item, index) =>
-                          index < 20 && (
-                            <TrendingAudio key={item.id} audioItem={item} />
-                          )
+                      {loading ? (
+                        Array.from({ length: 7 }, (_, index) => (
+                          <Skeleton
+                            key={index}
+                            className="h-[150px] w-[150px] bg-gray-300 rounded-md"
+                          />
+                        ))
+                      ) : (
+                        <>
+                          {audio?.map(
+                            (item, index) =>
+                              index < 20 && (
+                                <TrendingAudio key={item.id} audioItem={item} />
+                              )
+                          )}
+                        </>
                       )}
                     </div>
                     <ScrollBar orientation="horizontal" />
@@ -93,11 +109,22 @@ const Trending = ({
                 <div className="relative">
                   <ScrollArea>
                     <div className="flex space-x-4 pb-4">
-                      {newAudio?.map(
-                        (item, index) =>
-                          index < 20 && (
-                            <NewReleases key={item.id} audioItem={item} />
-                          )
+                      {loading ? (
+                        Array.from({ length: 7 }, (_, index) => (
+                          <Skeleton
+                            key={index}
+                            className="h-[150px] w-[150px] bg-gray-300 rounded-md"
+                          />
+                        ))
+                      ) : (
+                        <>
+                          {newAudio?.map(
+                            (item, index) =>
+                              index < 20 && (
+                                <NewReleases key={item.id} audioItem={item} />
+                              )
+                          )}
+                        </>
                       )}
                     </div>
                     <ScrollBar orientation="horizontal" />
@@ -107,7 +134,7 @@ const Trending = ({
                   <>
                     <div className="flex items-center justify-between">
                       <h2 className="text-2xl font-semibold tracking-tight">
-                        Live Podcast sessions
+                        Live Sessions
                       </h2>
                       <Link href="/live">
                         <h6 className="text-sm hover:underline-offset-2 hover:underline hover:text-white/50 text-muted-foreground">
@@ -119,11 +146,25 @@ const Trending = ({
                     <div className="relative">
                       <ScrollArea>
                         <div className="flex space-x-4 pb-4">
-                          {liveTalks?.map(
-                            (item, index) =>
-                              index < 20 && (
-                                <TrendingLive key={item.id} liveItem={item} />
-                              )
+                          {loading ? (
+                            Array.from({ length: 7 }, (_, index) => (
+                              <Skeleton
+                                key={index}
+                                className="h-[150px] w-[150px] bg-gray-300 rounded-full"
+                              />
+                            ))
+                          ) : (
+                            <>
+                              {liveTalks?.map(
+                                (item, index) =>
+                                  index < 20 && (
+                                    <TrendingLive
+                                      key={item.id}
+                                      liveItem={item}
+                                    />
+                                  )
+                              )}
+                            </>
                           )}
                         </div>
                         <ScrollBar orientation="horizontal" />
@@ -142,9 +183,23 @@ const Trending = ({
                     <div className="relative">
                       <ScrollArea>
                         <div className="flex space-x-4 pb-4">
-                          {madeForYouData?.map((item) => (
-                            <AudioMadeForYou key={item.id} audioItem={item} />
-                          ))}
+                          {loading ? (
+                            Array.from({ length: 7 }, (_, index) => (
+                              <Skeleton
+                                key={index}
+                                className="h-[150px] w-[150px] bg-gray-300 rounded-md"
+                              />
+                            ))
+                          ) : (
+                            <>
+                              {madeForYouData?.map((item) => (
+                                <AudioMadeForYou
+                                  key={item.id}
+                                  audioItem={item}
+                                />
+                              ))}
+                            </>
+                          )}
                         </div>
                         <ScrollBar orientation="horizontal" />
                       </ScrollArea>

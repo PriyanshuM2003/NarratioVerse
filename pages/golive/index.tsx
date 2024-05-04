@@ -16,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import LiveHistory from "./liveHistory";
 
 interface Field {
   id: number;
@@ -209,9 +210,7 @@ const GoLive: React.FC = () => {
   return (
     <>
       <div className="p-8 min-h-screen text-white">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-semibold tracking-tight">Go Live</h2>
-        </div>
+        <h2 className="text-2xl font-semibold tracking-tight">Go Live</h2>
         <Separator className="my-4" />
         <div className="mb-5 flex justify-center">
           <div className="w-full px-4">
@@ -277,7 +276,9 @@ const GoLive: React.FC = () => {
                       onOpenChange={(val) => setOpen(val)}
                     >
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="text-black">Select Genre</Button>
+                        <Button variant="outline" className="text-black">
+                          Select Genre
+                        </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="overflow-y-auto scrollbar-none h-56">
                         {genres.map((genre) => (
@@ -361,6 +362,7 @@ const GoLive: React.FC = () => {
             </form>
           </div>
         </div>
+        <LiveHistory />
       </div>
     </>
   );

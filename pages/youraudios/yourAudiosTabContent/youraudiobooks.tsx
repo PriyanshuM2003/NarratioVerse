@@ -89,7 +89,7 @@ const YourAudiobooks: React.FC = () => {
 
   return (
     <>
-      <div className="space-y-1">
+      <div>
         <h2 className="text-2xl font-semibold tracking-tight">
           Your Audio Books
         </h2>

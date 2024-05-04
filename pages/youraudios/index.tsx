@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import YourPodcasts from "./yourpodcasts";
-import YourAudiobooks from "./youraudiobooks";
+import YourPodcasts from "./yourAudiosTabContent/yourpodcasts";
+import YourAudiobooks from "./yourAudiosTabContent/youraudiobooks";
 
 const YourAudios: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<string>("podcast");
