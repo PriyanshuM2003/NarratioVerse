@@ -115,7 +115,6 @@ const YourPodcasts: React.FC = () => {
                   <Image
                     width={10}
                     height={10}
-                    unoptimized
                     src={podcast.coverImage}
                     alt={podcast.title}
                     className="w-10 mr-4"

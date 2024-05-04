@@ -117,7 +117,6 @@ const YourAudiobooks: React.FC = () => {
                   <Image
                     width={10}
                     height={10}
-                    unoptimized
                     src={audiobook.coverImage}
                     alt={audiobook.title}
                     className="w-10 mr-4"

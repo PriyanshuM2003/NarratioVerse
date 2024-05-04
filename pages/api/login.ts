@@ -26,9 +26,7 @@ export default async function handler(
       const { email, password } = req.body;
 
       if (!email || !password) {
-        return res
-          .status(400)
-          .json({ error: "Please provide email and password." });
+        return res.status(400).json({ error: "Please provide email and password." });
       }
 
       const user = await prisma.user.findUnique({
@@ -37,18 +35,14 @@ export default async function handler(
         },
       });
 
-      if (!user) {
-        return res.status(401).json({ error: "Invalid credentials." });
+      if (!user || !user.isVerified) {
+        return res.status(401).json({ error: "Invalid credentials or user not verified." });
       }
 
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (!passwordMatch) {
         return res.status(401).json({ error: "Invalid credentials." });
-      }
-
-      if (!user.isVerified) {
-        return res.status(401).json({ error: "User not verified." });
       }
 
       const accessToken = jwt.sign(
@@ -112,8 +106,6 @@ export default async function handler(
     }
   } catch (error) {
     console.error("Error authenticating user:", error);
-    return res
-      .status(500)
-      .json({ error: "Something went wrong while authenticating the user." });
+    return res.status(500).json({ error: "Something went wrong while authenticating the user." });
   }
 }

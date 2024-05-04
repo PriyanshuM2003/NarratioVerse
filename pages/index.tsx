@@ -8,9 +8,11 @@ export default function Home({
   audio,
   liveTalks,
   isLoggedIn,
+  newAudio,
 }: {
-  isLoggedIn:boolean;
+  isLoggedIn: boolean;
   audio: Audio[];
+  newAudio: Audio[];
   liveTalks: LiveTalk[];
 }) {
   return (
@@ -21,7 +23,12 @@ export default function Home({
         <link rel="icon" href="/logo.png" />
       </Head>
       <main>
-        <Trending audio={audio} liveTalks={liveTalks} isLoggedIn={isLoggedIn} />
+        <Trending
+          audio={audio}
+          liveTalks={liveTalks}
+          isLoggedIn={isLoggedIn}
+          newAudio={newAudio}
+        />
       </main>
     </>
   );
@@ -40,6 +47,22 @@ export async function getServerSideProps(context: any) {
         user: true,
       },
     });
+
+    const currentDate = new Date();
+    const threeDaysAgo = new Date(currentDate);
+    threeDaysAgo.setDate(currentDate.getDate() - 3);
+
+    const newAudio = await prisma.audio.findMany({
+      where: {
+        createdAt: {
+          gte: threeDaysAgo,
+        },
+      },
+      include: {
+        user: true,
+      },
+    });
+
     const formattedLiveTalks = liveTalks.map((liveTalkItem) => {
       const formattedUser = {
         ...liveTalkItem.user,
@@ -65,10 +88,21 @@ export async function getServerSideProps(context: any) {
         updatedAt: audioItem.user.updatedAt.toISOString(),
       },
     }));
-    
+    const formattedNewAudio = newAudio.map((audioItem) => ({
+      ...audioItem,
+      createdAt: audioItem.createdAt.toISOString(),
+      updatedAt: audioItem.updatedAt.toISOString(),
+      user: {
+        ...audioItem.user,
+        createdAt: audioItem.user.createdAt.toISOString(),
+        updatedAt: audioItem.user.updatedAt.toISOString(),
+      },
+    }));
+
     return {
       props: {
         audio: formattedAudio,
+        newAudio: formattedNewAudio,
         liveTalks: formattedLiveTalks,
       },
     };
@@ -78,6 +112,7 @@ export async function getServerSideProps(context: any) {
       props: {
         liveTalks: [],
         audio: [],
+        newAudio: [],
       },
     };
   }

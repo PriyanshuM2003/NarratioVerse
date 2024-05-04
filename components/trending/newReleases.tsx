@@ -1,7 +1,5 @@
 "use client";
 import React from "react";
-import { PlusCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -28,7 +26,7 @@ interface Props {
   audioItem: Audio;
 }
 
-const TrendingAudio: React.FC<Props> = ({ audioItem }) => {
+const NewReleases: React.FC<Props> = ({ audioItem }) => {
   if (!audioItem) {
     return null;
   }
@@ -95,4 +93,4 @@ const TrendingAudio: React.FC<Props> = ({ audioItem }) => {
   );
 };
 
-export default TrendingAudio;
+export default NewReleases;

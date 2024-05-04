@@ -17,36 +17,23 @@ interface LiveTalk {
 
 interface Props {
   liveItem: LiveTalk;
-  aspectRatio?: "portrait" | "square";
-  width: number;
-  height: number;
-  className?: string;
 }
 
-const TrendingLive: React.FC<Props> = ({
-  liveItem,
-  aspectRatio = "portrait",
-  width,
-  height,
-  className,
-  ...props
-}) => {
+const TrendingLive: React.FC<Props> = ({ liveItem }) => {
   if (!liveItem.status) {
     return null;
   }
   return (
-    <div className={cn("space-y-3", className)} {...props}>
+    <div className="space-y-3">
       <Link href={`/live/${liveItem.roomId}`}>
         <div className="relative">
           <Image
             src={liveItem.user.profileImage || ""}
             alt={liveItem.title}
-            width={width}
-            height={height}
-            className={cn(
-              "h-auto w-auto object-cover rounded-full relative border-4 border-red-600",
-              aspectRatio === "portrait" ? "aspect-[3/4]" : "aspect-square"
-            )}
+            width={150}
+            height={150}
+            objectFit="contain"
+            className="rounded-full aspect-square relative border-4 border-red-600"
           />
           <div className="bg-white absolute -bottom-2 left-1/2 px-1 rounded-3xl transform -translate-x-1/2">
             <Radio className="animate-pulse text-red-600" />

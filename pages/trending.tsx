@@ -6,13 +6,17 @@ import TrendingAudio from "@/components/trending/trendingAudio";
 import { Audio, LiveTalk } from "@/types/trendingTypes";
 import TrendingLive from "@/components/trending/trendingLive";
 import AudioMadeForYou from "@/components/trending/foryou";
+import NewReleases from "@/components/trending/newReleases";
+import Link from "next/link";
 
 const Trending = ({
   audio,
+  newAudio,
   liveTalks,
   isLoggedIn,
 }: {
   audio: Audio[];
+  newAudio: Audio[];
   isLoggedIn: boolean;
   liveTalks: LiveTalk[];
 }) => {
@@ -53,15 +57,12 @@ const Trending = ({
         <div className="grid grid-cols-3 lg:grid-cols-4">
           <div className="col-span-3 lg:col-span-4">
             <div className="h-full px-4 py-6 lg:px-8">
-              <div className="border-none p-0 outline-none">
+              <div className="border-none p-0 space-y-4 outline-none">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <h2 className="text-2xl font-semibold tracking-tight">
                       Listen Now
                     </h2>
-                    <p className="text-sm text-muted-foreground">
-                      Top trends today. Updated daily.
-                    </p>
                   </div>
                 </div>
                 <Separator className="my-4" />
@@ -71,14 +72,31 @@ const Trending = ({
                       {audio?.map(
                         (item, index) =>
                           index < 20 && (
-                            <TrendingAudio
-                              key={item.id}
-                              audioItem={item}
-                              className="w-[150px]"
-                              aspectRatio="portrait"
-                              width={150}
-                              height={230}
-                            />
+                            <TrendingAudio key={item.id} audioItem={item} />
+                          )
+                      )}
+                    </div>
+                    <ScrollBar orientation="horizontal" />
+                  </ScrollArea>
+                </div>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-semibold tracking-tight">
+                    New Releases
+                  </h2>
+                  <Link href="/new">
+                    <h6 className="text-sm hover:underline-offset-2 hover:underline hover:text-white/50 text-muted-foreground">
+                      Show all
+                    </h6>
+                  </Link>
+                </div>
+                <Separator className="my-4" />
+                <div className="relative">
+                  <ScrollArea>
+                    <div className="flex space-x-4 pb-4">
+                      {newAudio?.map(
+                        (item, index) =>
+                          index < 20 && (
+                            <NewReleases key={item.id} audioItem={item} />
                           )
                       )}
                     </div>
@@ -87,10 +105,15 @@ const Trending = ({
                 </div>
                 {liveTalks?.length > 0 && liveTalks[0]?.status && (
                   <>
-                    <div className="mt-6 space-y-1">
+                    <div className="flex items-center justify-between">
                       <h2 className="text-2xl font-semibold tracking-tight">
                         Live Podcast sessions
                       </h2>
+                      <Link href="/live">
+                        <h6 className="text-sm hover:underline-offset-2 hover:underline hover:text-white/50 text-muted-foreground">
+                          Show all
+                        </h6>
+                      </Link>
                     </div>
                     <Separator className="my-4" />
                     <div className="relative">
@@ -99,14 +122,7 @@ const Trending = ({
                           {liveTalks?.map(
                             (item, index) =>
                               index < 20 && (
-                                <TrendingLive
-                                  key={item.id}
-                                  liveItem={item}
-                                  className="w-[150px]"
-                                  aspectRatio="square"
-                                  width={150}
-                                  height={150}
-                                />
+                                <TrendingLive key={item.id} liveItem={item} />
                               )
                           )}
                         </div>
@@ -117,27 +133,17 @@ const Trending = ({
                 )}
                 {isLoggedIn && (
                   <>
-                    <div className="mt-6 space-y-1">
+                    <div>
                       <h2 className="text-2xl font-semibold tracking-tight">
                         Made for You
                       </h2>
-                      <p className="text-sm text-muted-foreground">
-                        Your personal playlists. Updated daily.
-                      </p>
                     </div>
                     <Separator className="my-4" />
                     <div className="relative">
                       <ScrollArea>
                         <div className="flex space-x-4 pb-4">
                           {madeForYouData?.map((item) => (
-                            <AudioMadeForYou
-                              key={item.id}
-                              audioItem={item}
-                              className="w-[150px]"
-                              aspectRatio="square"
-                              width={150}
-                              height={150}
-                            />
+                            <AudioMadeForYou key={item.id} audioItem={item} />
                           ))}
                         </div>
                         <ScrollBar orientation="horizontal" />

@@ -44,7 +44,6 @@ const Player: React.FC<PlayerProps> = ({
           {user && (
             <>
               <Image
-                unoptimized
                 width={156}
                 height={156}
                 src={user.profileImage}

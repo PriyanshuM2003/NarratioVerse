@@ -26,38 +26,25 @@ interface AudioForYou {
 
 interface Props {
   audioItem: AudioForYou;
-  aspectRatio?: "portrait" | "square";
-  width: number;
-  height: number;
-  className?: string;
 }
 
-const AudioMadeForYou: React.FC<Props> = ({
-  audioItem,
-  aspectRatio = "portrait",
-  width,
-  height,
-  className,
-  ...props
-}) => {
+const AudioMadeForYou: React.FC<Props> = ({ audioItem }) => {
   if (!audioItem) {
     return null;
   }
 
   return (
-    <div className={cn("space-y-3", className)} {...props}>
+    <div className="space-y-3">
       <ContextMenu>
         <ContextMenuTrigger>
           <div className="overflow-hidden rounded-md">
             <Image
               src={audioItem.coverImage}
               alt={audioItem.title}
-              width={width}
-              height={height}
-              className={cn(
-                "h-auto w-auto object-cover transition-all hover:scale-105",
-                aspectRatio === "portrait" ? "aspect-[3/4]" : "aspect-square"
-              )}
+              width={150}
+              height={150}
+              objectFit="contain"
+              className="transition-all aspect-square hover:scale-105"
             />
           </div>
         </ContextMenuTrigger>

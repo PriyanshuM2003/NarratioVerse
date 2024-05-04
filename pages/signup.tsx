@@ -328,7 +328,6 @@ const Signup = () => {
             <Image
               src="./narratioverse1.jpg"
               alt="1"
-              unoptimized
               width={347}
               height={347}
             />
@@ -337,7 +336,6 @@ const Signup = () => {
             <Image
               src="./narratioverse2.jpg"
               alt="2"
-              unoptimized
               width={347}
               height={347}
             />
@@ -346,7 +344,6 @@ const Signup = () => {
             <Image
               src="./narratioverse3.jpg"
               alt="3"
-              unoptimized
               width={347}
               height={347}
             />
@@ -355,7 +352,6 @@ const Signup = () => {
             <Image
               src="./narratioverse4.jpg"
               alt="4"
-              unoptimized
               width={347}
               height={347}
             />

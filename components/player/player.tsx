@@ -190,7 +190,6 @@ const Player: React.FC = () => {
               <Image
                 width={16}
                 height={16}
-                unoptimized
                 src={audioData.coverImage}
                 alt={audioData.title}
                 className="w-16 h-16"

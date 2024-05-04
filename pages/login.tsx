@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader } from "lucide-react";
+import jwt, { Secret } from "jsonwebtoken";
 import {
   Card,
   CardContent,
@@ -18,20 +19,59 @@ import {
 
 interface Props {
   setIsLoggedIn: React.Dispatch<boolean>;
-  isLoggedIn: boolean;
 }
 
-const Login: React.FC<Props> = ({ setIsLoggedIn, isLoggedIn }) => {
+const Login: React.FC<Props> = ({ setIsLoggedIn }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
+  const refreshAccessTokenIfNeeded = async () => {
+    try {
+      const accessToken = localStorage.getItem("token");
+      const refreshToken = localStorage.getItem("refreshToken");
+
+      if (!accessToken || !refreshToken) {
+        throw new Error("Tokens not found");
+      }
+
+      const { exp } = jwt.decode(accessToken) as { exp: number };
+
+      const currentTime = Math.floor(Date.now() / 1000);
+      const threshold = 300;
+      if (exp - currentTime < threshold) {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_HOST}/api/login`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${refreshToken}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const { accessToken: newAccessToken } = await response.json();
+          localStorage.setItem("token", newAccessToken);
+          setIsLoggedIn(true);
+        } else {
+          throw new Error("Token refresh failed");
+        }
+      }
+    } catch (error) {
+      console.error("Token refresh failed:", error);
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       router.replace("/");
+    } else {
+      refreshAccessTokenIfNeeded();
     }
   }, [router]);
 
@@ -87,61 +127,6 @@ const Login: React.FC<Props> = ({ setIsLoggedIn, isLoggedIn }) => {
       setPassword("");
     } finally {
       setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      const { exp } = JSON.parse(atob(token.split(".")[1]));
-      const expirationTime = exp * 1000;
-
-      const refreshTimer = setTimeout(
-        refreshAccessToken,
-        expirationTime - Date.now() - 5 * 60 * 1000
-      );
-      if (Date.now() >= expirationTime) {
-        localStorage.removeItem("token");
-        toast({
-          variant: "destructive",
-          description: "Session expired. Please log in again.",
-        });
-        router.push("/login");
-      }
-
-      return () => clearTimeout(refreshTimer);
-    } else {
-      router.push("/login");
-    }
-  }, [setIsLoggedIn]);
-
-  const refreshAccessToken = async () => {
-    try {
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (!refreshToken) {
-        throw new Error("Refresh token not found");
-      }
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_HOST}/api/login`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${refreshToken}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const { accessToken } = await response.json();
-        localStorage.setItem("token", accessToken);
-        setIsLoggedIn(true);
-      } else {
-        throw new Error("Token refresh failed");
-      }
-    } catch (error) {
-      console.error("Token refresh failed:", error);
     }
   };
 
