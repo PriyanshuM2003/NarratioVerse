@@ -88,7 +88,7 @@ export default async function handler(
           line_items: [
             {
               price_data: {
-                currency: "inr",
+                currency: "usd",
                 product_data: {
                   name: title,
                   description: `Narratioverse ${category} ${title} Plan`,
