@@ -1,8 +1,9 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import jwt, { Secret } from "jsonwebtoken";
+import { addMonths, addQuarters, addYears } from "date-fns";
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 import prisma from "@/lib/prisma";
-import jwt, { Secret } from "jsonwebtoken";
-import { NextApiRequest, NextApiResponse } from "next";
-import { addMonths, addQuarters, addYears } from "date-fns";
+
 
 interface PlanData {
   price: number;
@@ -63,18 +64,22 @@ export default async function handler(
         },
       });
 
+      const prod = await stripe.products.create({
+        name: title,
+        type: 'service',
+      });
+
+      const priceObject = await stripe.prices.create({
+        unit_amount: price * 100,
+        currency: "inr",
+        product: prod.id,
+      });
+
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: [
           {
-            price_data: {
-              currency: "inr",
-              product_data: {
-                name: title,
-                description: `Narratioverse ${category} ${title} Plan`,
-              },
-              unit_amount: price * 100,
-            },
+            price: priceObject.id,
             quantity: 1,
           },
         ],
