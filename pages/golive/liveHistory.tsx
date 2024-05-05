@@ -1,55 +1,18 @@
 "use client";
 import { Separator } from "@/components/ui/separator";
 import { useEffect, useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { useRouter } from "next/router";
 import { Skeleton } from "@/components/ui/skeleton";
+import GetLiveTalkData from "@/routes/getLiveTalkData";
 
 const LiveHistory = () => {
-  const router = useRouter();
-  const { toast } = useToast();
-  const [loading, setLoading] = useState<boolean>(true);
   const [liveHistory, setLiveHistory] = useState<any[]>([]);
+  const { liveTalkData, loadingLiveTalkData } = GetLiveTalkData();
 
   useEffect(() => {
-    const fetchLiveHistory = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          router.push("/");
-          return;
-        }
-        setLoading(true);
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_HOST}/api/getlivehistory`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch live history");
-        }
-
-        const data = await response.json();
-        setLiveHistory(data.userLiveHistory);
-      } catch (error) {
-        console.error("Error fetching live history:", error);
-        toast({
-          variant: "destructive",
-          description: "Failed to fetch Live History",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLiveHistory();
-  }, [toast, router]);
+    if (liveTalkData) {
+      setLiveHistory(liveTalkData);
+    }
+  }, [liveTalkData]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -89,7 +52,7 @@ const LiveHistory = () => {
           <div className="flex justify-center">Date</div>
         </div>
         <Separator className="my-4" />
-        {loading ? (
+        {loadingLiveTalkData ? (
           Array.from({ length: 10 }, (_, index) => (
             <Skeleton
               key={index}
@@ -98,10 +61,10 @@ const LiveHistory = () => {
           ))
         ) : (
           <>
-            {liveHistory?.length === 0 && (
+            {liveHistory.length === 0 && (
               <div className="my-4">No live history found!</div>
             )}
-            {liveHistory?.map((history, index) => (
+            {liveHistory.map((history, index) => (
               <>
                 <div
                   key={history.id}

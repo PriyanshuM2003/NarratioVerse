@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label";
 import { language, genres } from "@/data/preferences";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "./ui/use-toast";
+import GetUserPreferences from "@/routes/getUserPreferences";
+import { Loader } from "lucide-react";
 
 interface Language {
   id: string;
@@ -37,10 +39,8 @@ const Preferences = ({
   setDialogOpen,
   SavePreferences,
 }: PreferencesProps) => {
-  const [preferenceData, setPreferenceData] = useState<{ id: string } | null>(
-    null
-  );
-
+  const [preferenceData, setPreferenceData] = useState<any>();
+  const { userPreferenceData, loadingPreferencesData } = GetUserPreferences();
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
 
@@ -70,38 +70,12 @@ const Preferences = ({
   };
 
   useEffect(() => {
-    const fetchPreferenceData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_HOST}/api/getpreferences`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Unauthorized");
-        }
-
-        const data = await response.json();
-        if (data.preferences) {
-          setPreferenceData(data.preferences);
-          setSelectedLanguages(data.preferences.languages);
-          setSelectedGenres(data.preferences.genres);
-        }
-      } catch (error) {
-        console.error("Error fetching preferences:", error);
-      }
-    };
-
-    fetchPreferenceData();
-  }, []);
+    if (userPreferenceData) {
+      setPreferenceData(userPreferenceData);
+      setSelectedLanguages(userPreferenceData.languages);
+      setSelectedGenres(userPreferenceData.genres);
+    }
+  }, [userPreferenceData]);
 
   const handleUpdatePreferences = async () => {
     try {
@@ -117,7 +91,7 @@ const Preferences = ({
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            id: preferenceData?.id,
+            id: preferenceData.id,
             languages: selectedLanguages,
             genres: selectedGenres,
           }),
@@ -147,49 +121,55 @@ const Preferences = ({
             Choose Language and genre of your interest.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2">
-          <ScrollArea className="h-[300px] pr-4">
-            <div className="flex items-start flex-col space-y-2">
-              {language.map((lang: Language) => (
-                <div key={lang.id} className="space-x-2">
-                  <Checkbox
-                    id={lang.id}
-                    checked={selectedLanguages.includes(lang.label)}
-                    onClick={() => toggleLanguageSelection(lang.label)}
-                  />
-                  <Label
-                    htmlFor={lang.id}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {lang.label}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
-          <ScrollArea className="h-[300px] pr-4">
-            <div className="flex items-start flex-col space-y-2">
-              {genres.map((gen: Genre) => (
-                <div key={gen.id} className="space-x-2">
-                  <Checkbox
-                    id={gen.id}
-                    checked={selectedGenres.includes(gen.label)}
-                    onClick={() => toggleGenreSelection(gen.label)}
-                  />
-                  <Label
-                    htmlFor={gen.id}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {gen.label}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
-        </div>
+        {loadingPreferencesData ? (
+          <Loader className="flex animate-spin mt-8 mx-auto" />
+        ) : (
+          <div className="grid grid-cols-2">
+            <ScrollArea className="h-[300px] pr-4">
+              <div className="flex items-start flex-col space-y-2">
+                {language.map((lang: Language) => (
+                  <div key={lang.id} className="space-x-2">
+                    <Checkbox
+                      id={lang.id}
+                      checked={selectedLanguages.includes(lang.label)}
+                      onClick={() => toggleLanguageSelection(lang.label)}
+                    />
+                    <Label
+                      htmlFor={lang.id}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      {lang.label}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+            <ScrollArea className="h-[300px] pr-4">
+              <div className="flex items-start flex-col space-y-2">
+                {genres.map((gen: Genre) => (
+                  <div key={gen.id} className="space-x-2">
+                    <Checkbox
+                      id={gen.id}
+                      checked={selectedGenres.includes(gen.label)}
+                      onClick={() => toggleGenreSelection(gen.label)}
+                    />
+                    <Label
+                      htmlFor={gen.id}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      {gen.label}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        )}
+
         <DialogFooter>
           <Button
             variant={"ghost"}
+            disabled={loadingPreferencesData}
             onClick={
               localStorage.getItem("token")
                 ? handleUpdatePreferences

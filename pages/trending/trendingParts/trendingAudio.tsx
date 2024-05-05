@@ -15,7 +15,7 @@ import {
 
 import Image from "next/image";
 import { playlists } from "@/data/playlists";
-import { User } from "@/types/trendingTypes";
+import { User } from "@/types/types";
 
 interface Audio {
   user: User;

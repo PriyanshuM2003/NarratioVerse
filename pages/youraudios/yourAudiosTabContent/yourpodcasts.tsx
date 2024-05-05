@@ -7,18 +7,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useToast } from "@/components/ui/use-toast";
-import { useRouter } from "next/router";
 import Link from "next/link";
 import { AudioLines, ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import Image from "next/image";
+import GetUserAudioData from "@/routes/getUserAudioData";
 
-const YourPodcasts: React.FC = () => {
-  const router = useRouter();
-  const { toast } = useToast();
-  const [loading, setLoading] = useState<boolean>(true);
+const YourPodcasts = () => {
+  const { UserPodcastData, loadingAudioData } = GetUserAudioData();
   const [podcasts, setPodcasts] = useState<any[]>([]);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const {
@@ -29,7 +26,6 @@ const YourPodcasts: React.FC = () => {
     currentIndex,
     isPlaying,
   } = useAudioPlayer();
-
   const toggleAccordionItem = (value: string) => {
     setExpandedItem((prevItem) => (prevItem === value ? null : value));
   };
@@ -45,47 +41,10 @@ const YourPodcasts: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchPodcasts = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          router.push("/");
-          return;
-        }
-        setLoading(true);
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_HOST}/api/getuseraudios`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch podcasts");
-        }
-
-        const data = await response.json();
-        const filteredAudioCategory = data.userAudio.filter(
-          (podcast: any) => podcast.category === "Podcast"
-        );
-        setPodcasts(filteredAudioCategory);
-      } catch (error) {
-        console.error("Error fetching podcasts:", error);
-        toast({
-          variant: "destructive",
-          description: "Failed to fetch podcasts",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPodcasts();
-  }, [toast, router, setAudioData]);
+    if (UserPodcastData) {
+      setPodcasts(UserPodcastData);
+    }
+  }, [UserPodcastData]);
 
   return (
     <>
@@ -93,7 +52,7 @@ const YourPodcasts: React.FC = () => {
         <h2 className="text-2xl font-semibold tracking-tight">Your Podcasts</h2>
       </div>
       <Separator className="my-4" />
-      {loading ? (
+      {loadingAudioData ? (
         Array.from({ length: 10 }, (_, index) => (
           <Skeleton
             key={index}

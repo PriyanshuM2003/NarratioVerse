@@ -23,10 +23,12 @@ import {
 } from "@/components/ui/tooltip";
 import Link from "next/link";
 import supabase from "@/lib/supabase";
+import GetLoggedUserData from "@/routes/getLoggedUserData";
 
 const Profile = () => {
   const router = useRouter();
   const { toast } = useToast();
+  const { loggedUserData, loadingUserData } = GetLoggedUserData();
   const [loading, setLoading] = useState<boolean>(true);
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [selectedCountry, setSelectedCountry] = useState("");
@@ -43,46 +45,17 @@ const Profile = () => {
   });
 
   useEffect(() => {
+    if (loggedUserData) {
+      setUserData(loggedUserData);
+    }
+  }, [loggedUserData]);
+
+  useEffect(() => {
     setUserData((prevData: any) => ({
       ...prevData,
       country: selectedCountry,
     }));
   }, [selectedCountry]);
-
-  useEffect(() => {
-    fetchUserData().finally(() => setLoading(false));
-  }, []);
-
-  const fetchUserData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/");
-        return;
-      }
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_HOST}/api/getuser`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Unauthorized");
-      }
-
-      const data = await response.json();
-      setUserData(data.user);
-    } catch (error) {
-      console.error("Token verification failed:", error);
-      router.push("/");
-    }
-  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -229,7 +202,7 @@ const Profile = () => {
   return (
     <>
       <div className="min-h-screen mx-auto p-12">
-        {loading ? (
+        {loadingUserData ? (
           <>
             <div className="mx-auto flex items-center justify-center flex-col">
               <Skeleton className="md:w-52 md:h-52 w-32 h-32 mx-auto mb-5 rounded-full" />
@@ -427,7 +400,7 @@ const Profile = () => {
                   handleUpdateProfile();
                 }}
               >
-                {loading ? (
+                {loadingUserData ? (
                   <Loader className="animate-spin" />
                 ) : (
                   <>Update Profile</>
@@ -491,7 +464,11 @@ const Profile = () => {
                 handleChangePassword();
               }}
             >
-              {loading ? <Loader className="animate-spin" /> : <>Change</>}
+              {loadingUserData ? (
+                <Loader className="animate-spin" />
+              ) : (
+                <>Change</>
+              )}
             </Button>
           </div>
         </div>

@@ -2,7 +2,7 @@
 import Head from "next/head";
 import Trending from "./trending";
 import prisma from "@/lib/prisma";
-import { Audio, LiveTalk } from "@/types/trendingTypes";
+import { Audio, LiveTalk } from "@/types/types";
 
 export default function Home({
   audio,

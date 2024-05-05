@@ -1,7 +1,7 @@
 "use client";
 import { Separator } from "@/components/ui/separator";
 import prisma from "@/lib/prisma";
-import { LiveTalk } from "@/types/trendingTypes";
+import { LiveTalk } from "@/types/types";
 import { Radio } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";

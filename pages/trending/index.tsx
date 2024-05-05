@@ -3,12 +3,13 @@ import React, { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import TrendingAudio from "@/pages/trending/trendingParts/trendingAudio";
-import { Audio, LiveTalk } from "@/types/trendingTypes";
+import { Audio, LiveTalk } from "@/types/types";
 import TrendingLive from "@/pages/trending/trendingParts/trendingLive";
 import AudioMadeForYou from "@/pages/trending/trendingParts/foryou";
 import NewReleases from "@/pages/trending/trendingParts/newReleases";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
+import GetUserPreferences from "@/routes/getUserPreferences";
 
 const Trending = ({
   audio,
@@ -21,40 +22,14 @@ const Trending = ({
   isLoggedIn: boolean;
   liveTalks: LiveTalk[];
 }) => {
-  const [madeForYouData, setMadeForYouData] = useState<Audio[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [madeForYou, setMadeForYou] = useState<any[]>([]);
+  const { madeForYouData, loadingPreferencesData } = GetUserPreferences();
+
   useEffect(() => {
-    const fetchPreferenceData = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("token");
-        if (!token) return;
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_HOST}/api/madeforyou`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Unauthorized");
-        }
-
-        const data = await response.json();
-        setMadeForYouData(data);
-      } catch (error) {
-        console.error("Error fetching preferences:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPreferenceData();
-  }, []);
+    if (madeForYouData) {
+      setMadeForYou(madeForYouData);
+    }
+  }, [madeForYouData]);
 
   return (
     <>
@@ -74,7 +49,7 @@ const Trending = ({
                 <div className="relative">
                   <ScrollArea>
                     <div className="flex space-x-4 pb-4">
-                      {loading ? (
+                      {loadingPreferencesData ? (
                         Array.from({ length: 7 }, (_, index) => (
                           <Skeleton
                             key={index}
@@ -109,7 +84,7 @@ const Trending = ({
                 <div className="relative">
                   <ScrollArea>
                     <div className="flex space-x-4 pb-4">
-                      {loading ? (
+                      {loadingPreferencesData ? (
                         Array.from({ length: 7 }, (_, index) => (
                           <Skeleton
                             key={index}
@@ -146,7 +121,7 @@ const Trending = ({
                     <div className="relative">
                       <ScrollArea>
                         <div className="flex space-x-4 pb-4">
-                          {loading ? (
+                          {loadingPreferencesData ? (
                             Array.from({ length: 7 }, (_, index) => (
                               <Skeleton
                                 key={index}
@@ -183,7 +158,7 @@ const Trending = ({
                     <div className="relative">
                       <ScrollArea>
                         <div className="flex space-x-4 pb-4">
-                          {loading ? (
+                          {loadingPreferencesData ? (
                             Array.from({ length: 7 }, (_, index) => (
                               <Skeleton
                                 key={index}
@@ -192,7 +167,7 @@ const Trending = ({
                             ))
                           ) : (
                             <>
-                              {madeForYouData?.map((item) => (
+                              {madeForYou?.map((item) => (
                                 <AudioMadeForYou
                                   key={item.id}
                                   audioItem={item}

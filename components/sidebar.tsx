@@ -18,13 +18,16 @@ import { Separator } from "./ui/separator";
 import { playlists } from "@/data/playlists";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import GetLoggedUserData from "@/routes/getLoggedUserData";
+import JoinLiveRoom from "./liveRoom/joinLiveRoom";
+
 interface LinkData {
   href: string;
   icon: JSX.Element;
   text: string;
 }
 
-const links: LinkData[] = [
+const commonLinks: LinkData[] = [
   { href: "/", text: "Trending", icon: <PlayCircle className="w-5 h-5" /> },
   { href: "#", icon: <Search className="w-5 h-5" />, text: "Search" },
   {
@@ -40,31 +43,30 @@ const links: LinkData[] = [
   { href: "/live", text: "Live", icon: <Radio className="w-5 h-5" /> },
   { href: "/new", text: "New", icon: <BadgePlus className="w-5 h-5" /> },
   { href: "/creators", icon: <Mic2 className="w-5 h-5" />, text: "Creators" },
+];
+
+const creatorLinks: LinkData[] = [
   { href: "/golive", icon: <Radio className="w-5 h-5" />, text: "Go Live" },
   {
     href: "/addaudio",
-    icon: (
-      <>
-        <PlusCircle className="w-5 h-5" />
-      </>
-    ),
+    icon: <PlusCircle className="w-5 h-5" />,
     text: "Add Audio",
   },
   {
     href: "/youraudios",
-    icon: (
-      <>
-        <FolderTree className="w-5 h-5" />
-      </>
-    ),
+    icon: <FolderTree className="w-5 h-5" />,
     text: "Your Audios",
   },
 ];
+
 interface SidebarProps {
   toggleSidebar: () => void;
+  isLoggedIn: boolean;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar }) => {
+const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar, isLoggedIn }) => {
+  const { loggedUserData } = GetLoggedUserData();
+
   const router = useRouter();
 
   const isActiveLink = (href: string) => {
@@ -83,7 +85,7 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar }) => {
             Discover
           </h2>
           <div className="flex-nowrap flex-col space-y-2 text-white">
-            {links.map(({ href, icon, text }, index) => (
+            {commonLinks.map(({ href, icon, text }, index) => (
               <Link
                 key={index}
                 href={href}
@@ -96,6 +98,28 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar }) => {
                 {text}
               </Link>
             ))}
+            {isLoggedIn && loggedUserData && loggedUserData.premium && (
+              <>
+                <JoinLiveRoom />
+              </>
+            )}
+            {isLoggedIn && loggedUserData && loggedUserData.creator && (
+              <>
+                {creatorLinks.map(({ href, icon, text }, index) => (
+                  <Link
+                    key={index}
+                    href={href}
+                    className={`w-full flex items-center gap-1 justify-start hover:text-pink-600 ${
+                      isActiveLink(href) &&
+                      "rounded-sm px-2 py-1.5 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
+                    }`}
+                  >
+                    {icon}
+                    {text}
+                  </Link>
+                ))}
+              </>
+            )}
           </div>
         </div>
         <Separator />

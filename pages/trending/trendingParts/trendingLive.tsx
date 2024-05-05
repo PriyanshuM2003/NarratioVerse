@@ -2,7 +2,7 @@
 import React from "react";
 import { Radio } from "lucide-react";
 import Image from "next/image";
-import { User } from "@/types/trendingTypes";
+import { User } from "@/types/types";
 import Link from "next/link";
 
 interface LiveTalk {

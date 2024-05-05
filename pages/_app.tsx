@@ -94,13 +94,22 @@ export default function App(props: AppProps) {
           isSidebarVisible={isSidebarVisible}
         />
         <div style={{ display: "flex" }}>
-          {isSidebarVisible && <Sidebar toggleSidebar={handleToggleSidebar} />}
+          {isSidebarVisible && (
+            <Sidebar
+              isLoggedIn={isLoggedIn}
+              toggleSidebar={handleToggleSidebar}
+            />
+          )}
           <div style={{ flex: 1 }}>
             <AudioPlayerProvider>
               <ScrollArea className="h-[calc(100vh-10px)]">
                 <Layout>
                   <SocketProvider>
-                    <Component {...pageProps} setIsLoggedIn={setIsLoggedIn} isLoggedIn={isLoggedIn} />
+                    <Component
+                      {...pageProps}
+                      setIsLoggedIn={setIsLoggedIn}
+                      isLoggedIn={isLoggedIn}
+                    />
                   </SocketProvider>
                 </Layout>
               </ScrollArea>

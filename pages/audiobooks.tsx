@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/context-menu";
 import React from "react";
 import prisma from "@/lib/prisma";
-import { Audio } from "@/types/trendingTypes";
+import { Audio } from "@/types/types";
 import Image from "next/image";
 
 const AudioBooks = ({ audio }: { audio: Audio[] }) => {

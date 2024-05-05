@@ -1,7 +1,6 @@
 import prisma from "@/lib/prisma";
 import jwt, { Secret } from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
-import { subDays } from "date-fns";
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,40 +22,26 @@ export default async function handler(
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const userPreferences = await prisma.preferences.findFirst({
+      const userLiveTalk = await prisma.liveTalk.findMany({
         where: {
           userId: decoded.id,
         },
-      });
-
-      if (!userPreferences) {
-        return res.status(404).json({ error: "User preferences not found" });
-      }
-
-      const { genres } = userPreferences;
-
-      const fiveDaysAgo = subDays(new Date(), 5);
-
-      const matchingMadeForYouData = await prisma.audio.findMany({
-        where: {
-          genres: {
-            hasSome: genres,
-          },
-          createdAt: {
-            gte: fiveDaysAgo,
-          },
-        },
         include: {
+          participants: {
+            include: {
+              participant: true,
+            },
+          },
           user: true,
         },
       });
 
-      return res.status(200).json(matchingMadeForYouData);
+      return res.status(200).json({ userLiveTalk });
     } else {
       return res.status(405).json({ message: "Method Not Allowed" });
     }
   } catch (error) {
-    console.error("Error fetching preferences:", error);
+    console.error("Error getting live history data:", error);
     return res.status(500).json({ error: "Something went wrong" });
   }
 }
