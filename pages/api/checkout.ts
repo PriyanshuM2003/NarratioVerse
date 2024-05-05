@@ -91,6 +91,7 @@ export default async function handler(
         shipping_address_collection: {
           allowed_countries: ['IN'],
         },
+        billing_address_collection: "required",
         success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
         cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
       });
