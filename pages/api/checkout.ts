@@ -38,11 +38,9 @@ export default async function handler(
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Create a customer in Stripe
       const customer = await stripe.customers.create({
         name: user.name,
         email: user.email,
-        // Optionally, you can add address data here if needed
       });
 
       const { price, category, title }: PlanData = req.body;
@@ -51,6 +49,22 @@ export default async function handler(
         return res
           .status(400)
           .json({ error: "Please provide all required fields." });
+      }
+
+      let expiryDate = null;
+
+      switch (title.toLowerCase()) {
+        case "monthly":
+          expiryDate = addMonths(new Date(), 1);
+          break;
+        case "quarterly":
+          expiryDate = addQuarters(new Date(), 1);
+          break;
+        case "yearly":
+          expiryDate = addYears(new Date(), 1);
+          break;
+        default:
+          return res.status(400).json({ error: "Invalid title" });
       }
 
       const prod = await stripe.products.create({
@@ -74,27 +88,13 @@ export default async function handler(
           },
         ],
         mode: "payment",
-        // shipping_address_collection: {
-        //   allowed_countries: ['IND'],
-        // },
+        shipping_address_collection: {
+          allowed_countries: ['IN'],
+        },
         success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
         cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
       });
-      let expiryDate = null;
-
-      switch (title.toLowerCase()) {
-        case "monthly":
-          expiryDate = addMonths(new Date(), 1);
-          break;
-        case "quarterly":
-          expiryDate = addQuarters(new Date(), 1);
-          break;
-        case "yearly":
-          expiryDate = addYears(new Date(), 1);
-          break;
-        default:
-          return res.status(400).json({ error: "Invalid title" });
-      }
+     
 
       await prisma.user.update({
         where: { id: decoded.id },
