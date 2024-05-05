@@ -38,6 +38,29 @@ export default async function handler(
           .json({ error: "Please provide all required fields." });
       }
 
+      const prod = await stripe.products.create({
+        name: title,
+        type: "service",
+      });
+
+      const priceObject = await stripe.prices.create({
+        unit_amount: price * 100,
+        currency: "inr",
+        product: prod.id,
+      });
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price: priceObject.id,
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
+        cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
+      });
       let expiryDate = null;
 
       switch (title.toLowerCase()) {
@@ -61,26 +84,6 @@ export default async function handler(
           creator: category === "creator" ? true : false,
           expiryDate: expiryDate,
         },
-      });
-
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
-        line_items: [
-          {
-            default_price_data: {
-              currency: "inr",
-              product_data: {
-                name: title,
-                description: `Narratioverse ${category} ${title} Plan`,
-              },
-              unit_amount: price * 100,
-            },
-            quantity: 1,
-          },
-        ],
-        mode: "payment",
-        success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
-        cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
       });
 
       return res.status(200).json({
