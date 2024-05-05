@@ -29,6 +29,21 @@ export default async function handler(
       if (!decoded || !decoded.id) {
         return res.status(401).json({ error: "Unauthorized" });
       }
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.id },
+        select: { name: true, email: true },
+      });
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Create a customer in Stripe
+      const customer = await stripe.customers.create({
+        name: user.name,
+        email: user.email,
+        // Optionally, you can add address data here if needed
+      });
 
       const { price, category, title }: PlanData = req.body;
 
@@ -50,6 +65,7 @@ export default async function handler(
       });
 
       const session = await stripe.checkout.sessions.create({
+        customer: customer.id,
         payment_method_types: ["card"],
         line_items: [
           {
@@ -58,13 +74,11 @@ export default async function handler(
           },
         ],
         mode: "payment",
+        shipping_address_collection: {
+          allowed_countries: ['IND'],
+        },
         success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
         cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
-        name,
-        billing_address_collection: "required", 
-        shipping_address_collection: {
-          allowed_countries: ["IN"],
-        },
       });
       let expiryDate = null;
 
