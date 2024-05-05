@@ -51,7 +51,7 @@ const Plans: React.FC = () => {
       const responseData = await response.json();
       console.log(responseData);
       if (response.url) {
-        window.location.href = response.url;
+        window.location.href = responseData.url;
       }
     } catch (error) {
       console.error("Error initiating checkout:", error);
