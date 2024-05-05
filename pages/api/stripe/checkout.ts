@@ -99,8 +99,8 @@ export default async function handler(
             },
           ],
           mode: "payment",
-          success_url: "http://localhost:3000/plans/checkout/success",
-          cancel_url: "http://localhost:3000/plans/checkout/cancel",
+          success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
+          cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
         });
 
         return res.status(200).json({
