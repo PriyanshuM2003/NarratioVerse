@@ -57,7 +57,12 @@ export default async function handler(
       let event: Stripe.Event;
 
       try {
-        event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+        const payload = req.body;
+        event = stripe.webhooks.constructEvent(
+          JSON.stringify(payload),
+          sig,
+          endpointSecret
+        );
       } catch (err: any) {
         return res.status(400).json({ error: `Webhook Error: ${err.message}` });
       }
