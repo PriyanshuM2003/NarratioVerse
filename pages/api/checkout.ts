@@ -1,4 +1,4 @@
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+import Stripe from "stripe";
 import prisma from "@/lib/prisma";
 import jwt, { Secret } from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -9,6 +9,7 @@ interface PlanData {
   category: string;
   title: string;
 }
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export default async function handler(
   req: NextApiRequest,
@@ -49,6 +50,25 @@ export default async function handler(
         return res
           .status(400)
           .json({ error: "Please provide all required fields." });
+      }
+
+      const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
+      const sig = req.headers["stripe-signature"] as string;
+      let event: Stripe.Event;
+
+      try {
+        event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+      } catch (err: any) {
+        return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+      }
+
+      const eventType = event.type;
+
+      if (
+        eventType !== "checkout.session.completed" &&
+        eventType !== "checkout.session.async_payment_succeeded"
+      ) {
+        return res.status(500).json({ error: "Invalid event type" });
       }
 
       let expiryDate = null;
