@@ -38,33 +38,24 @@ export default async function handler(
           .json({ error: "Please provide all required fields." });
       }
 
-      const prod = await stripe.products.create({
-        name: title,
-        type: "service",
-      });
-
-      const priceObject = await stripe.prices.create({
-        unit_amount: price * 100,
-        currency: "inr",
-        product: prod.id,
-      });
-
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
-        line_items: [
-          {
-            price: priceObject.id,
-            quantity: 1,
+      const paymentIntent = await stripe.paymentIntents.create({
+        name: "Narratioverse",
+        description: `Narratioverse ${category} ${title} plan.`,
+        shipping: {
+          name: null,
+          address: {
+            line1: null,
+            postal_code: null,
+            city: null,
+            state: null,
+            country: null,
           },
-        ],
-        mode: "payment",
+        },
+        amount: price,
+        currency: "inr",
+        payment_method_types: ["card"],
         success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
         cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
-        customer_email: name,
-        billing_address_collection: "required", 
-        shipping_address_collection: {
-          allowed_countries: ["IN"],
-        },
       });
       let expiryDate = null;
 
@@ -93,7 +84,7 @@ export default async function handler(
 
       return res.status(200).json({
         message: "Subscription status updated successfully",
-        url: session.url,
+        url: paymentIntent.url,
       });
     } else {
       return res.status(405).json({ error: "Method Not Allowed" });
