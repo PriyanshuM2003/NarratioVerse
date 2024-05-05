@@ -52,29 +52,29 @@ export default async function handler(
           .json({ error: "Please provide all required fields." });
       }
 
-      const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
-      const sig = req.headers["stripe-signature"] as string;
-      let event: Stripe.Event;
+      // const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
+      // const sig = req.headers["stripe-signature"] as string;
+      // let event: Stripe.Event;
 
-      try {
-        const payload = req.body;
-        event = stripe.webhooks.constructEvent(
-          JSON.stringify(payload),
-          sig,
-          endpointSecret
-        );
-      } catch (err: any) {
-        return res.status(400).json({ error: `Webhook Error: ${err.message}` });
-      }
+      // try {
+      //   const payload = req.body;
+      //   event = stripe.webhooks.constructEvent(
+      //     JSON.stringify(payload),
+      //     sig,
+      //     endpointSecret
+      //   );
+      // } catch (err: any) {
+      //   return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+      // }
 
-      const eventType = event.type;
+      // const eventType = event.type;
 
-      if (
-        eventType !== "checkout.session.completed" &&
-        eventType !== "checkout.session.async_payment_succeeded"
-      ) {
-        return res.status(500).json({ error: "Invalid event type" });
-      }
+      // if (
+      //   eventType !== "checkout.session.completed" &&
+      //   eventType !== "checkout.session.async_payment_succeeded"
+      // ) {
+      //   return res.status(500).json({ error: "Invalid event type" });
+      // }
 
       let expiryDate = null;
 
