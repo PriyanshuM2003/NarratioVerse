@@ -1,42 +1,36 @@
 export const plans = {
-    normal: [
-      {
-        title: "Free",
-        price: "₹0",
-        features: [],
-      },
-      {
-        title: "Monthly",
-        price: "₹",
-        features: [],
-      },
-      {
-        title: "Quarterly",
-        price: "₹",
-        features: [],
-      },
-      {
-        title: "Yearly",
-        price: "₹",
-        features: [],
-      },
-    ],
-    creator: [
-      {
-        title: "Monthly",
-        price: "₹",
-        features: [],
-      },
-      {
-        title: "Quarterly",
-        price: "₹",
-        features: [],
-      },
-      {
-        title: "Yearly",
-        price: "₹",
-        features: [],
-      },
-    ],
-  };
-  
+  premium: [
+    {
+      title: "Monthly",
+      price: 99,
+      features: [],
+    },
+    {
+      title: "Quarterly",
+      price: 289,
+      features: [],
+    },
+    {
+      title: "Yearly",
+      price: 1149,
+      features: [],
+    },
+  ],
+  creator: [
+    {
+      title: "Monthly",
+      price: 299,
+      features: [],
+    },
+    {
+      title: "Quarterly",
+      price: 889,
+      features: [],
+    },
+    {
+      title: "Yearly",
+      price: 3579,
+      features: [],
+    },
+  ],
+};
