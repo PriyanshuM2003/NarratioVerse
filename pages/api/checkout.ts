@@ -74,9 +74,9 @@ export default async function handler(
           },
         ],
         mode: "payment",
-        shipping_address_collection: {
-          allowed_countries: ['IND'],
-        },
+        // shipping_address_collection: {
+        //   allowed_countries: ['IND'],
+        // },
         success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
         cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
       });
