@@ -5,12 +5,16 @@ import { LiveTalk } from "@/types/types";
 
 export default function GetLiveTalkData(): {
   liveTalkData: LiveTalk | null;
+  liveTalkHistoryData: LiveTalk[] | null;
   loadingLiveTalkData: boolean;
 } {
   const router = useRouter();
   const { toast } = useToast();
   const [loadingLiveTalkData, setLoadingLiveTalkData] = useState<boolean>(true);
   const [liveTalkData, setLiveTalkData] = useState<LiveTalk | null>(null);
+  const [liveTalkHistoryData, setLiveTalkHistoryData] = useState<
+    LiveTalk[] | null
+  >(null);
 
   useEffect(() => {
     const fetchLiveTalkData = async () => {
@@ -38,6 +42,7 @@ export default function GetLiveTalkData(): {
 
         const data = await response.json();
         setLiveTalkData(data.userLiveTalk);
+        setLiveTalkHistoryData(data.userLiveTalk);
       } catch (error) {
         console.error("Error fetching live talk data:", error);
         toast({
@@ -52,5 +57,5 @@ export default function GetLiveTalkData(): {
     fetchLiveTalkData();
   }, [toast, router]);
 
-  return { liveTalkData, loadingLiveTalkData };
+  return { liveTalkData, liveTalkHistoryData, loadingLiveTalkData };
 }

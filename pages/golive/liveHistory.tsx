@@ -6,13 +6,13 @@ import GetLiveTalkData from "@/routes/getLiveTalkData";
 
 const LiveHistory = () => {
   const [liveHistory, setLiveHistory] = useState<any[]>([]);
-  const { liveTalkData, loadingLiveTalkData } = GetLiveTalkData();
+  const { liveTalkHistoryData, loadingLiveTalkData } = GetLiveTalkData();
 
   useEffect(() => {
-    if (liveTalkData) {
-      setLiveHistory(liveTalkData);
+    if (liveTalkHistoryData) {
+      setLiveHistory(liveTalkHistoryData);
     }
-  }, [liveTalkData]);
+  }, [liveTalkHistoryData]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
