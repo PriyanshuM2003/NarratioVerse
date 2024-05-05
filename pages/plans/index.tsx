@@ -32,14 +32,17 @@ const Plans: React.FC = () => {
         throw new Error("Unauthorized");
       }
 
-      const response = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ price, category, title }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_HOST}/api/checkout`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ price, category, title }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -110,7 +113,7 @@ const Plans: React.FC = () => {
                         {plan.title}
                       </h2>
                       <h1 className="text-5xl text-white pb-4 mb-4 border-b border-gray-200 leading-none">
-                        {plan.price}
+                        ₹{plan.price}
                       </h1>
                       {plan.features.map((feature, featIndex) => (
                         <p
@@ -166,7 +169,7 @@ const Plans: React.FC = () => {
                         {plan.title}
                       </h2>
                       <h1 className="text-5xl text-white pb-4 mb-4 border-b border-gray-200 leading-none">
-                        {plan.price}
+                        ₹{plan.price}
                       </h1>
                       {plan.features.map((feature, featIndex) => (
                         <p
