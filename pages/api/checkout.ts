@@ -60,6 +60,11 @@ export default async function handler(
         mode: "payment",
         success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
         cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
+        customer_email: name,
+        billing_address_collection: "required", 
+        shipping_address_collection: {
+          allowed_countries: ["IN"],
+        },
       });
       let expiryDate = null;
 
