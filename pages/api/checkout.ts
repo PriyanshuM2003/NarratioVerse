@@ -69,20 +69,6 @@ export default async function handler(
 
       const eventType = event.type;
 
-      if (
-        eventType !== "checkout.session.completed" &&
-        eventType !== "charge.updated" &&
-        eventType !== "charge.succeeded" &&
-        eventType !== "payment_intent.succeeded" &&
-        eventType !== "payment_intent.requires_action" &&
-        eventType !== "price.created" &&
-        eventType !== "product.created" &&
-        eventType !== "customer.created" &&
-        eventType !== "checkout.session.async_payment_succeeded"
-      ) {
-        return res.status(500).json({ error: "Invalid event type" });
-      }
-
       let expiryDate = null;
 
       switch (title.toLowerCase()) {
@@ -121,23 +107,27 @@ export default async function handler(
         ],
         mode: "payment",
         shipping_address_collection: {
-          allowed_countries: ['IN'],
+          allowed_countries: ["IN"],
         },
         billing_address_collection: "required",
         success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
         cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
       });
-     
 
-      await prisma.user.update({
-        where: { id: decoded.id },
-        data: {
-          premium: category === "premium" ? true : false,
-          creator: category === "creator" ? true : false,
-          expiryDate: expiryDate,
-        },
-      });
-
+      switch (eventType) {
+        case "checkout.session.completed":
+          await prisma.user.update({
+            where: { id: decoded.id },
+            data: {
+              premium: category === "premium" ? true : false,
+              creator: category === "creator" ? true : false,
+              expiryDate: expiryDate,
+            },
+          });
+          break;
+        default:
+          return res.status(500).json({ error: "Invalid event type" });
+      }
       return res.status(200).json({
         message: "Subscription status updated successfully",
         url: session.url,
