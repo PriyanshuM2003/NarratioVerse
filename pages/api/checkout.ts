@@ -31,7 +31,7 @@ export default async function handler(
       if (!decoded || !decoded.id) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      
+
       const user = await prisma.user.findUnique({
         where: { id: decoded.id },
         select: { name: true, email: true },
@@ -53,12 +53,12 @@ export default async function handler(
           .status(400)
           .json({ error: "Please provide all required fields." });
       }
-
+      const payload = req.body;
       const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
       const sig = req.headers["stripe-signature"] as string;
 
       const event = stripe.webhooks.constructEvent(
-        req.body,
+        JSON.stringify(payload),
         sig,
         endpointSecret
       );
