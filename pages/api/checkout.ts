@@ -52,23 +52,6 @@ export default async function handler(
           .json({ error: "Please provide all required fields." });
       }
 
-      const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
-      const sig = req.headers["stripe-signature"] as string;
-      let event: Stripe.Event;
-
-      try {
-        const payload = req.body;
-        event = stripe.webhooks.constructEvent(
-          JSON.stringify(payload),
-          sig,
-          endpointSecret
-        );
-      } catch (err: any) {
-        return res.status(400).json({ error: `Webhook Error: ${err.message}` });
-      }
-
-      const eventType = event.type;
-
       let expiryDate = null;
 
       switch (title.toLowerCase()) {
@@ -113,7 +96,23 @@ export default async function handler(
         success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
         cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
       });
+      
+      const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
+      const sig = req.headers["stripe-signature"] as string;
+      let event: Stripe.Event;
 
+      try {
+        const payload = req.body;
+        event = stripe.webhooks.constructEvent(
+          JSON.stringify(payload),
+          sig,
+          endpointSecret
+        );
+      } catch (err: any) {
+        return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+      }
+
+      const eventType = event.type;
       switch (eventType) {
         case "checkout.session.completed":
           await prisma.user.update({
