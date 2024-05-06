@@ -9,6 +9,7 @@ interface PlanData {
   category: string;
   title: string;
 }
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export default async function handler(
@@ -30,6 +31,7 @@ export default async function handler(
       if (!decoded || !decoded.id) {
         return res.status(401).json({ error: "Unauthorized" });
       }
+      
       const user = await prisma.user.findUnique({
         where: { id: decoded.id },
         select: { name: true, email: true },
@@ -51,86 +53,80 @@ export default async function handler(
           .status(400)
           .json({ error: "Please provide all required fields." });
       }
+
       const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
       const sig = req.headers["stripe-signature"] as string;
 
-      try {
-        const payload = req.body;
+      const event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        endpointSecret
+      );
 
-        const event = stripe.webhooks.constructEvent(
-          JSON.stringify(payload),
-          sig,
-          endpointSecret
-        );
+      switch (event.type) {
+        case "checkout.session.completed":
+        case "checkout.session.async_payment_succeeded":
+          let expiryDate = null;
 
-        if (
-          event.type !== "checkout.session.completed" &&
-          event.type !== "checkout.session.async_payment_succeeded"
-        ) {
-          return res.status(500).json({ error: "Invalid event type" });
-        }
-      } catch (err: any) {
-        return res.status(400).json({ error: `Webhook Error: ${err.message}` });
-      }
+          switch (title.toLowerCase()) {
+            case "monthly":
+              expiryDate = addMonths(new Date(), 1);
+              break;
+            case "quarterly":
+              expiryDate = addQuarters(new Date(), 1);
+              break;
+            case "yearly":
+              expiryDate = addYears(new Date(), 1);
+              break;
+            default:
+              return res.status(400).json({ error: "Invalid title" });
+          }
 
-      let expiryDate = null;
+          const prod = await stripe.products.create({
+            name: title,
+            type: "service",
+          });
 
-      switch (title.toLowerCase()) {
-        case "monthly":
-          expiryDate = addMonths(new Date(), 1);
-          break;
-        case "quarterly":
-          expiryDate = addQuarters(new Date(), 1);
-          break;
-        case "yearly":
-          expiryDate = addYears(new Date(), 1);
-          break;
+          const priceObject = await stripe.prices.create({
+            unit_amount: price * 100,
+            currency: "inr",
+            product: prod.id,
+          });
+
+          const session = await stripe.checkout.sessions.create({
+            customer: customer.id,
+            payment_method_types: ["card"],
+            line_items: [
+              {
+                price: priceObject.id,
+                quantity: 1,
+              },
+            ],
+            mode: "payment",
+            shipping_address_collection: {
+              allowed_countries: ["IN"],
+            },
+            billing_address_collection: "required",
+            success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
+            cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
+          });
+
+          await prisma.user.update({
+            where: { id: decoded.id },
+            data: {
+              premium: category === "premium" ? true : false,
+              creator: category === "creator" ? true : false,
+              expiryDate: expiryDate,
+            },
+          });
+
+          return res.status(200).json({
+            message: "Subscription status updated successfully",
+            url: session.url,
+          });
         default:
-          return res.status(400).json({ error: "Invalid title" });
+          return res.status(500).json({ error: "Invalid event type" });
       }
-
-      const prod = await stripe.products.create({
-        name: title,
-        type: "service",
-      });
-
-      const priceObject = await stripe.prices.create({
-        unit_amount: price * 100,
-        currency: "inr",
-        product: prod.id,
-      });
-
-      const session = await stripe.checkout.sessions.create({
-        customer: customer.id,
-        payment_method_types: ["card"],
-        line_items: [
-          {
-            price: priceObject.id,
-            quantity: 1,
-          },
-        ],
-        mode: "payment",
-        shipping_address_collection: {
-          allowed_countries: ["IN"],
-        },
-        billing_address_collection: "required",
-        success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
-        cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
-      });
-
-      await prisma.user.update({
-        where: { id: decoded.id },
-        data: {
-          premium: category === "premium" ? true : false,
-          creator: category === "creator" ? true : false,
-          expiryDate: expiryDate,
-        },
-      });
-
-      return res.status(200).json({
-        message: "Subscription status updated successfully",
-        url: session.url,
-      });
     } else {
       return res.status(405).json({ error: "Method Not Allowed" });
     }
