@@ -85,51 +85,46 @@ export default async function handler(
         cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
       });
 
-      const payload = req.body;
+      return res.status(200).json({ url: session.url });
+    } else if (req.method === "POST" && req.body.type === "stripe_event") {
       const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
       const sig = req.headers["stripe-signature"] as string;
 
-      const event = stripe.webhooks.constructEvent(
-        JSON.stringify(payload),
-        sig,
-        endpointSecret
-      );
+      let event;
+      try {
+        event = stripe.webhooks.constructEvent(
+          JSON.stringify(req.body),
+          sig,
+          endpointSecret
+        );
+      } catch (err: any) {
+        console.error(err);
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+      }
 
       switch (event.type) {
         case "charge.succeeded":
           const data = event.data.object;
+          console.log("PaymentIntent was successful!");
 
-          let expiryDate = null;
-
-          switch (title.toLowerCase()) {
-            case "monthly":
-              expiryDate = addMonths(new Date(), 1);
-              break;
-            case "quarterly":
-              expiryDate = addQuarters(new Date(), 1);
-              break;
-            case "yearly":
-              expiryDate = addYears(new Date(), 1);
-              break;
-            default:
-              return res.status(400).json({ error: "Invalid title" });
-          }
+          const expiryDate = calculateExpiryDate(
+            event.data.object.metadata.title
+          );
 
           await prisma.user.update({
             where: { id: data.metadata.userId },
             data: {
-              premium: data.metadata.category === "premium" ? true : false,
-              creator: data.metadata.category === "creator" ? true : false,
+              premium: data.metadata.category === "premium",
+              creator: data.metadata.category === "creator",
               expiryDate: expiryDate,
             },
           });
 
           return res.status(200).json({
             message: "Subscription status updated successfully",
-            url: session.url,
           });
         default:
-          return res.status(500).json({ error: "Invalid event type" });
+          return res.status(200).json({ received: true });
       }
     } else {
       return res.status(405).json({ error: "Method Not Allowed" });
@@ -138,4 +133,22 @@ export default async function handler(
     console.error("Error handling request:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
+}
+
+function calculateExpiryDate(title: string): Date | null {
+  let expiryDate = null;
+
+  switch (title.toLowerCase()) {
+    case "monthly":
+      expiryDate = addMonths(new Date(), 1);
+      break;
+    case "quarterly":
+      expiryDate = addQuarters(new Date(), 1);
+      break;
+    case "yearly":
+      expiryDate = addYears(new Date(), 1);
+      break;
+  }
+
+  return expiryDate;
 }
