@@ -55,7 +55,7 @@ export default async function handler(
       }
       const payload = req.body;
       const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
-      const sig = req.headers["stripe-signature"] as string;
+      const sig = req.headers["Stripe-Signature"] as string;
 
       const event = stripe.webhooks.constructEvent(
         JSON.stringify(payload),
