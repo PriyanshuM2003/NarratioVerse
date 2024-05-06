@@ -85,39 +85,41 @@ export default async function handler(
         cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
       });
 
-      return res.status(200).json({ url: session.url });
-    } else if (req.method === "POST" && req.body.type === "stripe_event") {
+      const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
+      const sig = req.headers["stripe-signature"] as string;
+      let event;
+
       try {
-        const event = req.body;
+        event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+      } catch (err: any) {
+        res.status(400).send(`Webhook Error: ${err.message}`);
+        return;
+      }
 
-        switch (event.type) {
-          case "charge.succeeded":
-            const chargeData = event.data.object;
+      switch (event?.type) {
+        case "checkout.session.completed":
+          const chargeData = event.data.object;
 
-            const { customer, metadata } = chargeData;
-            const { title, userId, category } = metadata;
+          const expiryDate = calculateExpiryDate(title);
 
-            const expiryDate = calculateExpiryDate(title);
+          await prisma.user.update({
+            where: { id: decoded.id },
+            data: {
+              premium: category === "premium",
+              creator: category === "creator",
+              expiryDate: expiryDate,
+            },
+          });
 
-            await prisma.user.update({
-              where: {id: userId },
-              data: {
-                premium: category === "premium",
-                creator: category === "creator",
-                expiryDate: expiryDate,
-              },
-            });
+          console.log("Subscription status updated successfully");
+          return res.status(200).json({
+            message: "Subscription status updated successfully",
+            url: session.url,
+          });
 
-            console.log("Subscription status updated successfully");
-            return res.status(200).json({ message: "Subscription status updated successfully" });
-
-          default:
-            console.log(`Unhandled event type: ${event.type}`);
-            return res.status(200).json({ received: true });
-        }
-      } catch (error) {
-        console.error("Error handling webhook event:", error);
-        return res.status(500).json({ error: "Internal server error" });
+        default:
+          console.log(`Unhandled event type: ${event?.type}`);
+          return res.status(200).json({ received: true });
       }
     } else {
       return res.status(405).json({ error: "Method Not Allowed" });
