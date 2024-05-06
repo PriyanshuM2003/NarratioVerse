@@ -66,7 +66,7 @@ export default async function handler(
       );
 
       switch (event.type) {
-        case "payment_intent.succeeded":
+        case "charge.succeeded":
           let expiryDate = null;
 
           switch (title.toLowerCase()) {
