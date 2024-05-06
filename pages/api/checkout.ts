@@ -69,7 +69,10 @@ export default async function handler(
 
       const eventType = event.type;
 
-      if (eventType !== "charge.succeeded") {
+      if (
+        eventType !== "checkout.session.completed" &&
+        eventType !== "checkout.session.async_payment_succeeded"
+      ) {
         return res.status(500).json({ error: "Invalid event type" });
       }
 
@@ -111,12 +114,13 @@ export default async function handler(
         ],
         mode: "payment",
         shipping_address_collection: {
-          allowed_countries: ["IN"],
+          allowed_countries: ['IN'],
         },
         billing_address_collection: "required",
         success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
         cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
       });
+     
 
       await prisma.user.update({
         where: { id: decoded.id },
