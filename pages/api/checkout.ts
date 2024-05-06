@@ -51,30 +51,27 @@ export default async function handler(
           .status(400)
           .json({ error: "Please provide all required fields." });
       }
+      const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
+      const sig = req.headers["stripe-signature"] as string;
 
-      // const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
-      // const sig = req.headers["stripe-signature"] as string;
-      // let event: Stripe.Event;
+      try {
+        const payload = req.body;
 
-      // try {
-      //   const payload = req.body;
-      //   event = stripe.webhooks.constructEvent(
-      //     JSON.stringify(payload),
-      //     sig,
-      //     endpointSecret
-      //   );
-      // } catch (err: any) {
-      //   return res.status(400).json({ error: `Webhook Error: ${err.message}` });
-      // }
+        const event = stripe.webhooks.constructEvent(
+          JSON.stringify(payload),
+          sig,
+          endpointSecret
+        );
 
-      // const eventType = event.type;
-
-      // if (
-      //   eventType !== "checkout.session.completed" &&
-      //   eventType !== "checkout.session.async_payment_succeeded"
-      // ) {
-      //   return res.status(500).json({ error: "Invalid event type" });
-      // }
+        if (
+          event.type !== "checkout.session.completed" &&
+          event.type !== "checkout.session.async_payment_succeeded"
+        ) {
+          return res.status(500).json({ error: "Invalid event type" });
+        }
+      } catch (err: any) {
+        return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+      }
 
       let expiryDate = null;
 
@@ -114,13 +111,12 @@ export default async function handler(
         ],
         mode: "payment",
         shipping_address_collection: {
-          allowed_countries: ['IN'],
+          allowed_countries: ["IN"],
         },
         billing_address_collection: "required",
         success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
         cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
       });
-     
 
       await prisma.user.update({
         where: { id: decoded.id },
