@@ -96,37 +96,37 @@ export default async function handler(
         success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
         cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
       });
-      
-      const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
-      const sig = req.headers["stripe-signature"] as string;
-      let event: Stripe.Event;
 
-      try {
-        const payload = req.body;
-        event = stripe.webhooks.constructEvent(
-          JSON.stringify(payload),
-          sig,
-          endpointSecret
-        );
-      } catch (err: any) {
-        return res.status(400).json({ error: `Webhook Error: ${err.message}` });
-      }
+      // const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
+      // const sig = req.headers["stripe-signature"] as string;
+      // let event: Stripe.Event;
 
-      const eventType = event.type;
-      switch (eventType) {
-        case "checkout.session.completed":
-          await prisma.user.update({
-            where: { id: decoded.id },
-            data: {
-              premium: category === "premium" ? true : false,
-              creator: category === "creator" ? true : false,
-              expiryDate: expiryDate,
-            },
-          });
-          break;
-        default:
-          return res.status(500).json({ error: "Invalid event type" });
-      }
+      // try {
+      //   const payload = req.body;
+      //   event = stripe.webhooks.constructEvent(
+      //     JSON.stringify(payload),
+      //     sig,
+      //     endpointSecret
+      //   );
+      // } catch (err: any) {
+      //   return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+      // }
+
+      // const eventType = event.type;
+      // switch (eventType) {
+      //   case "checkout.session.completed":
+      await prisma.user.update({
+        where: { id: decoded.id },
+        data: {
+          premium: category === "premium" ? true : false,
+          creator: category === "creator" ? true : false,
+          expiryDate: expiryDate,
+        },
+      });
+      //     break;
+      //   default:
+      //     return res.status(500).json({ error: "Invalid event type" });
+      // }
       return res.status(200).json({
         message: "Subscription status updated successfully",
         url: session.url,
