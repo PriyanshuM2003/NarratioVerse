@@ -8,6 +8,7 @@ export interface User {
   creator: boolean;
   premium: boolean;
   isVerified: boolean;
+  planType?: String;
   expiryDate?: Date;
   verificationToken?: string | null;
   password: string;

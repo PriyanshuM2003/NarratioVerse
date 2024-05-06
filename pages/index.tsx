@@ -68,12 +68,18 @@ export async function getServerSideProps(context: any) {
         ...liveTalkItem.user,
         createdAt: liveTalkItem.user.createdAt.toISOString(),
         updatedAt: liveTalkItem.user.updatedAt.toISOString(),
+        expiryDate: liveTalkItem.user.expiryDate
+          ? liveTalkItem.user.expiryDate.toISOString()
+          : null,
       };
 
       return {
         ...liveTalkItem,
         createdAt: liveTalkItem.createdAt.toISOString(),
         updatedAt: liveTalkItem.updatedAt.toISOString(),
+        expiryDate: liveTalkItem.user.expiryDate
+          ? liveTalkItem.user.expiryDate.toISOString()
+          : null,
         user: formattedUser,
       };
     });
@@ -82,20 +88,32 @@ export async function getServerSideProps(context: any) {
       ...audioItem,
       createdAt: audioItem.createdAt.toISOString(),
       updatedAt: audioItem.updatedAt.toISOString(),
+      expiryDate: audioItem.user.expiryDate
+        ? audioItem.user.expiryDate.toISOString()
+        : null,
       user: {
         ...audioItem.user,
         createdAt: audioItem.user.createdAt.toISOString(),
         updatedAt: audioItem.user.updatedAt.toISOString(),
+        expiryDate: audioItem.user.expiryDate
+          ? audioItem.user.expiryDate.toISOString()
+          : null,
       },
     }));
     const formattedNewAudio = newAudio.map((audioItem) => ({
       ...audioItem,
       createdAt: audioItem.createdAt.toISOString(),
       updatedAt: audioItem.updatedAt.toISOString(),
+      expiryDate: audioItem.user.expiryDate
+        ? audioItem.user.expiryDate.toISOString()
+        : null,
       user: {
         ...audioItem.user,
         createdAt: audioItem.user.createdAt.toISOString(),
         updatedAt: audioItem.user.updatedAt.toISOString(),
+        expiryDate: audioItem.user.expiryDate
+          ? audioItem.user.expiryDate.toISOString()
+          : null,
       },
     }));
 

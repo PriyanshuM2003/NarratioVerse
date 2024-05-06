@@ -26,18 +26,6 @@ export default async function handler(
         where: {
           id: decoded.id,
         },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          phone: true,
-          country: true,
-          bio: true,
-          isVerified: true,
-          creator: true,
-          premium: true,
-          profileImage: true,
-        },
       });
 
       if (!user) {

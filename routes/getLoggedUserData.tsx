@@ -24,6 +24,7 @@ export default function GetLoggedUserData(): {
         return;
       }
 
+      setLoadingUserData(true);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_HOST}/api/getuser`,
         {

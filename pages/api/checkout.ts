@@ -120,6 +120,7 @@ export default async function handler(
         data: {
           premium: category === "premium" ? true : false,
           creator: category === "creator" ? true : false,
+          planType: title,
           expiryDate: expiryDate,
         },
       });

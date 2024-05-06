@@ -18,6 +18,7 @@ model User {
   creator              Boolean               @default(false)
   premium              Boolean               @default(false)
   isVerified           Boolean               @default(false)
+  planType             String?
   expiryDate           DateTime?
   verificationToken    String?
   password             String
