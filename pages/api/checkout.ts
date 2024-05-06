@@ -71,6 +71,13 @@ export default async function handler(
 
       if (
         eventType !== "checkout.session.completed" &&
+        eventType !== "charge.updated" &&
+        eventType !== "charge.succeeded" &&
+        eventType !== "payment_intent.succeeded" &&
+        eventType !== "payment_intent.requires_action" &&
+        eventType !== "price.created" &&
+        eventType !== "product.created" &&
+        eventType !== "customer.created" &&
         eventType !== "checkout.session.async_payment_succeeded"
       ) {
         return res.status(500).json({ error: "Invalid event type" });
