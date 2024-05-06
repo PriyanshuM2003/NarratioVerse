@@ -115,16 +115,14 @@ export default async function handler(
       // const eventType = event.type;
       // switch (eventType) {
       //   case "checkout.session.completed":
-      if (req.body.success_url) {
-        await prisma.user.update({
-          where: { id: decoded.id },
-          data: {
-            premium: category === "premium" ? true : false,
-            creator: category === "creator" ? true : false,
-            expiryDate: expiryDate,
-          },
-        });
-      }
+      await prisma.user.update({
+        where: { id: decoded.id },
+        data: {
+          premium: category === "premium" ? true : false,
+          creator: category === "creator" ? true : false,
+          expiryDate: expiryDate,
+        },
+      });
       //     break;
       //   default:
       //     return res.status(500).json({ error: "Invalid event type" });
