@@ -10,7 +10,9 @@ interface PlanData {
   title: string;
 }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2024-04-10",
+});
 
 export default async function handler(
   req: NextApiRequest,
@@ -55,7 +57,7 @@ export default async function handler(
       }
       const payload = req.body;
       const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
-      const sig = req.headers["Stripe-Signature"] as string;
+      const sig = req.headers["stripe-signature"] as string;
 
       const event = stripe.webhooks.constructEvent(
         JSON.stringify(payload),
@@ -64,8 +66,7 @@ export default async function handler(
       );
 
       switch (event.type) {
-        case "checkout.session.completed":
-        case "checkout.session.async_payment_succeeded":
+        case "payment_intent.succeeded":
           let expiryDate = null;
 
           switch (title.toLowerCase()) {
