@@ -55,6 +55,36 @@ export default async function handler(
           .status(400)
           .json({ error: "Please provide all required fields." });
       }
+
+      const prod = await stripe.products.create({
+        name: title,
+        type: "service",
+      });
+
+      const priceObject = await stripe.prices.create({
+        unit_amount: price * 100,
+        currency: "inr",
+        product: prod.id,
+      });
+
+      const session = await stripe.checkout.sessions.create({
+        customer: customer.id,
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price: priceObject.id,
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        shipping_address_collection: {
+          allowed_countries: ["IN"],
+        },
+        billing_address_collection: "required",
+        success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
+        cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
+      });
+
       const payload = req.body;
       const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
       const sig = req.headers["stripe-signature"] as string;
@@ -67,6 +97,8 @@ export default async function handler(
 
       switch (event.type) {
         case "charge.succeeded":
+          const data = event.data.object;
+
           let expiryDate = null;
 
           switch (title.toLowerCase()) {
@@ -83,40 +115,11 @@ export default async function handler(
               return res.status(400).json({ error: "Invalid title" });
           }
 
-          const prod = await stripe.products.create({
-            name: title,
-            type: "service",
-          });
-
-          const priceObject = await stripe.prices.create({
-            unit_amount: price * 100,
-            currency: "inr",
-            product: prod.id,
-          });
-
-          const session = await stripe.checkout.sessions.create({
-            customer: customer.id,
-            payment_method_types: ["card"],
-            line_items: [
-              {
-                price: priceObject.id,
-                quantity: 1,
-              },
-            ],
-            mode: "payment",
-            shipping_address_collection: {
-              allowed_countries: ["IN"],
-            },
-            billing_address_collection: "required",
-            success_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/success`,
-            cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
-          });
-
           await prisma.user.update({
-            where: { id: decoded.id },
+            where: { id: data.metadata.userId },
             data: {
-              premium: category === "premium" ? true : false,
-              creator: category === "creator" ? true : false,
+              premium: data.metadata.category === "premium" ? true : false,
+              creator: data.metadata.category === "creator" ? true : false,
               expiryDate: expiryDate,
             },
           });
