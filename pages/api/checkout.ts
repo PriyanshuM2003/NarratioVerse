@@ -97,7 +97,7 @@ export default async function handler(
       }
 
       switch (event?.type) {
-        case "checkout.session.completed":
+        case "charge.succeeded":
           const chargeData = event.data.object;
 
           const expiryDate = calculateExpiryDate(title);
