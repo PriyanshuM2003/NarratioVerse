@@ -69,7 +69,7 @@ export default async function handler(
       }
 
       const prod = await stripe.products.create({
-        name: title,
+        name: `Narratioverse ${category} ${title} plan.`,
         type: "service",
       });
 
