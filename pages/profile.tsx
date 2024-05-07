@@ -24,6 +24,7 @@ import {
 import Link from "next/link";
 import supabase from "@/lib/supabase";
 import GetLoggedUserData from "@/routes/getLoggedUserData";
+import Image from "next/image";
 
 const Profile = () => {
   const router = useRouter();
@@ -219,10 +220,12 @@ const Profile = () => {
             {userData.creator ? (
               <div className="mx-auto flex items-center mb-10 justify-center md:flex-row flex-col">
                 <div className="flex items-center justify-center md:mb-5 md:mr-5 flex-col">
-                  <img
+                  <Image
                     className="md:w-52 md:h-52 w-32 h-32 mx-auto object-cover object-center rounded-full"
                     alt={userData.name}
                     src={userData.profileImage}
+                    width={208}
+                    height={208}
                   />
                   <Music2 className="text-yellow-400 mt-2" />
                 </div>
@@ -245,10 +248,12 @@ const Profile = () => {
               </div>
             ) : (
               <div className="mx-auto flex items-center mb-10 justify-center flex-col">
-                <img
-                  className="md:w-52 md:h-52 w-32 h-32 mx-auto mb-2 object-cover object-center rounded-full"
-                  alt="hero"
+                <Image
+                  className="md:w-52 md:h-52 w-32 h-32 mx-auto object-cover object-center rounded-full"
+                  alt={userData.name}
                   src={userData.profileImage}
+                  width={208}
+                  height={208}
                 />
                 {userData.premium ? (
                   <Award className="text-yellow-400" />
