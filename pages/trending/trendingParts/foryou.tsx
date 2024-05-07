@@ -37,10 +37,6 @@ interface Props {
 }
 
 const AudioMadeForYou: React.FC<Props> = ({ audioItem }) => {
-  if (!audioItem) {
-    return null;
-  }
-
   const {
     setAudioData,
     setCurrentIndex,
@@ -59,6 +55,10 @@ const AudioMadeForYou: React.FC<Props> = ({ audioItem }) => {
       playPauseHandler();
     }
   };
+
+  if (!audioItem) {
+    return null;
+  }
 
   return (
     <div className="space-y-3">
