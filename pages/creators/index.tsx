@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 const Creators = ({ creators }: { creators: User[] }) => {
   return (
     <>
-      <div className="h-full px-4 py-6 lg:px-8 text-white">
+      <div className="min-h-screen px-4 py-6 lg:px-8 text-white">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <h2 className="text-2xl font-semibold tracking-tight">Creators</h2>

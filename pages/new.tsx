@@ -20,13 +20,51 @@ import {
 } from "@/components/ui/context-menu";
 import React from "react";
 import prisma from "@/lib/prisma";
-import { Audio } from "@/types/types";
+import { User } from "@/types/types";
 import Image from "next/image";
+import { useRouter } from "next/router";
+import { useAudioPlayer } from "@/context/AudioPlayerContext";
+import Link from "next/link";
+
+interface Audio {
+  user: User;
+  id: string;
+  parts: AudioPart[];
+  coverImage: string;
+  title: string;
+  category: string;
+}
+
+interface AudioPart {
+  audioUrl: string;
+  partName: string;
+}
 
 const New = ({ audio }: { audio: Audio[] }) => {
+  const router = useRouter();
+  const {
+    setAudioData,
+    setCurrentIndex,
+    playPauseHandler,
+    audioRef,
+    currentIndex,
+    isPlaying,
+  } = useAudioPlayer();
+
+  const handleAudioSelect = (audio: Audio, startIndex: number = 0) => {
+    setAudioData(audio);
+    setCurrentIndex(startIndex);
+    if (audioRef.current) {
+      const audioItem = audio.parts[startIndex];
+      audioRef.current.src = audioItem.audioUrl;
+      audioRef.current.load();
+      playPauseHandler();
+    }
+  };
+
   return (
     <>
-      <div className="h-full px-4 py-6 lg:px-8 text-white">
+      <div className="min-h-screen px-4 py-6 lg:px-8 text-white">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <h2 className="text-2xl font-semibold tracking-tight">
@@ -78,7 +116,10 @@ const New = ({ audio }: { audio: Audio[] }) => {
             <div className="space-y-3 gap-4" key={newAudio.id}>
               <ContextMenu>
                 <ContextMenuTrigger>
-                  <div className="overflow-hidden rounded-md">
+                  <div
+                    onClick={() => handleAudioSelect(newAudio)}
+                    className="overflow-hidden cursor-pointer rounded-md"
+                  >
                     <Image
                       src={newAudio.coverImage}
                       alt={newAudio.title}
@@ -130,13 +171,23 @@ const New = ({ audio }: { audio: Audio[] }) => {
         </ContextMenuContent> */}
               </ContextMenu>
               <div className="space-y-1 text-sm">
-                <h3 className="font-medium leading-none">{newAudio.title}</h3>
-                <p className="text-xs text-muted-foreground">
+                <h3
+                  onClick={() => handleAudioSelect(newAudio)}
+                  className="font-medium leading-none cursor-pointer hover:text-white/80"
+                >
+                  {newAudio.title}
+                </h3>
+                <p
+                  onClick={() => handleAudioSelect(newAudio)}
+                  className="text-xs cursor-pointer text-muted-foreground hover:text-white/50"
+                >
                   {newAudio.category}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {newAudio.user.name}
-                </p>
+                <Link href={`/creators/${newAudio.user.id}`}>
+                  <p className="text-xs cursor-pointer text-muted-foreground hover:text-white/50">
+                    {newAudio.user.name}
+                  </p>
+                </Link>
               </div>
             </div>
           ))}
@@ -166,10 +217,16 @@ export async function getServerSideProps(context: any) {
       ...audioItem,
       createdAt: audioItem.createdAt.toISOString(),
       updatedAt: audioItem.updatedAt.toISOString(),
+      expiryDate: audioItem.user.expiryDate
+        ? audioItem.user.expiryDate.toISOString()
+        : null,
       user: {
         ...audioItem.user,
         createdAt: audioItem.user.createdAt.toISOString(),
         updatedAt: audioItem.user.updatedAt.toISOString(),
+        expiryDate: audioItem.user.expiryDate
+          ? audioItem.user.expiryDate.toISOString()
+          : null,
       },
     }));
 

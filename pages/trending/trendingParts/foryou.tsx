@@ -16,12 +16,20 @@ import {
 import Image from "next/image";
 import { playlists } from "@/data/playlists";
 import { User } from "@/types/types";
+import { useAudioPlayer } from "@/context/AudioPlayerContext";
+import Link from "next/link";
 
 interface AudioForYou {
   user: User;
   title: string;
   category: string;
   coverImage: string;
+  parts: AudioPart[];
+}
+
+interface AudioPart {
+  audioUrl: string;
+  partName: string;
 }
 
 interface Props {
@@ -33,11 +41,33 @@ const AudioMadeForYou: React.FC<Props> = ({ audioItem }) => {
     return null;
   }
 
+  const {
+    setAudioData,
+    setCurrentIndex,
+    playPauseHandler,
+    audioRef,
+    currentIndex,
+    isPlaying,
+  } = useAudioPlayer();
+
+  const handleAudioSelect = () => {
+    setAudioData(audioItem);
+    setCurrentIndex(0);
+    if (audioRef.current) {
+      audioRef.current.src = audioItem.parts[0].audioUrl;
+      audioRef.current.load();
+      playPauseHandler();
+    }
+  };
+
   return (
     <div className="space-y-3">
       <ContextMenu>
         <ContextMenuTrigger>
-          <div className="overflow-hidden rounded-md">
+          <div
+            onClick={handleAudioSelect}
+            className="overflow-hidden rounded-md cursor-pointer"
+          >
             <Image
               src={audioItem.coverImage}
               alt={audioItem.title}
@@ -87,9 +117,22 @@ const AudioMadeForYou: React.FC<Props> = ({ audioItem }) => {
         </ContextMenuContent> */}
       </ContextMenu>
       <div className="space-y-1 text-sm">
-        <h3 className="font-medium leading-none">{audioItem.title}</h3>
-        <p className="text-xs text-muted-foreground">{audioItem.category}</p>
-        <p className="text-xs text-muted-foreground">{audioItem.user.name}</p>
+        <h3
+          onClick={handleAudioSelect}
+          className="font-medium cursor-pointer hover:text-white/80 leading-none"
+        >
+          {audioItem.title}
+        </h3>
+        <Link href={`/${audioItem.category.toLowerCase()}s`}>
+          <p className="text-xs text-muted-foreground hover:text-white/50">
+            {audioItem.category}
+          </p>
+        </Link>
+        <Link href={`/creators/${audioItem.user.id}`}>
+          <p className="text-xs text-muted-foreground hover:text-white/50">
+            {audioItem.user.name}
+          </p>
+        </Link>
       </div>
     </div>
   );

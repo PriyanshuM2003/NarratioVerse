@@ -30,7 +30,7 @@ const YourPodcasts = () => {
     setExpandedItem((prevItem) => (prevItem === value ? null : value));
   };
 
-  const handlePodcastSelect = (podcast: any, startIndex = 0) => {
+  const handleAudioSelect = (podcast: any, startIndex = 0) => {
     setAudioData(podcast);
     setCurrentIndex(startIndex);
     if (audioRef.current) {
@@ -68,7 +68,7 @@ const YourPodcasts = () => {
                 onClick={() => toggleAccordionItem(`item-${podcast.id}`)}
               >
                 <div
-                  onClick={() => handlePodcastSelect(podcast)}
+                  onClick={() => handleAudioSelect(podcast)}
                   className="flex items-center"
                 >
                   <Image
@@ -97,13 +97,13 @@ const YourPodcasts = () => {
                     <li
                       className="flex items-center justify-between text-base"
                       key={part.partName}
-                      onClick={() => handlePodcastSelect(podcast, index)}
+                      onClick={() => handleAudioSelect(podcast, index)}
                     >
                       <div className="flex items-center">
                         <span className="mr-2">{index + 1}.</span>
                         <div
                           className={`hover:underline cursor-pointer ${
-                            index === currentIndex && isPlaying
+                            index === currentIndex && part.partName && isPlaying
                               ? "text-pink-500 font-semibold"
                               : ""
                           }`}
@@ -111,7 +111,7 @@ const YourPodcasts = () => {
                           {part.partName}
                         </div>
                       </div>
-                      {index === currentIndex && isPlaying && (
+                      {index === currentIndex && part.partName && isPlaying && (
                         <AudioLines className="animate-pulse text-pink-500" />
                       )}
                     </li>

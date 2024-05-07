@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import prisma from "@/lib/prisma";
-import { Audio, LiveTalk, User } from "@/types/types";
+import { LiveTalk, User } from "@/types/types";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import {
@@ -23,13 +23,46 @@ import {
 } from "@/components/ui/select";
 import Link from "next/link";
 import { Radio } from "lucide-react";
+import { useAudioPlayer } from "@/context/AudioPlayerContext";
+
+interface Audio {
+  id: string;
+  parts: AudioPart[];
+  coverImage: string;
+  title: string;
+  category: string;
+}
+
+interface AudioPart {
+  audioUrl: string;
+  partName: string;
+}
 
 const Creator = ({ creator }: { creator: User }) => {
   const router = useRouter();
+  const {
+    setAudioData,
+    setCurrentIndex,
+    playPauseHandler,
+    audioRef,
+    currentIndex,
+    isPlaying,
+  } = useAudioPlayer();
+
+  const handleAudioSelect = (audio: Audio, startIndex: number = 0) => {
+    setAudioData(audio);
+    setCurrentIndex(startIndex);
+    if (audioRef.current) {
+      const audioItem = audio.parts[startIndex];
+      audioRef.current.src = audioItem.audioUrl;
+      audioRef.current.load();
+      playPauseHandler();
+    }
+  };
 
   return (
     <>
-      <div className="h-full px-4 py-6 lg:px-8 text-white">
+      <div className="min-h-screen px-4 py-6 lg:px-8 text-white">
         <div className="flex items-center gap-6">
           <div className="space-y-1 w-full">
             <Image
@@ -95,11 +128,14 @@ const Creator = ({ creator }: { creator: User }) => {
           <Separator />
         </div>
         <div className="flex items-center gap-4 flex-wrap">
-          {creator.Audio.map((audio: Audio) => (
+          {creator.Audio.map((audio) => (
             <div key={audio.id} className="space-y-3">
               <ContextMenu>
                 <ContextMenuTrigger>
-                  <div className="overflow-hidden rounded-md">
+                  <div
+                    onClick={() => handleAudioSelect(audio)}
+                    className="overflow-hidden cursor-pointer rounded-md"
+                  >
                     <Image
                       src={audio.coverImage}
                       alt={audio.title}
@@ -149,7 +185,12 @@ const Creator = ({ creator }: { creator: User }) => {
               </ContextMenuContent> */}
               </ContextMenu>
               <div className="space-y-1 text-sm">
-                <h3 className="font-medium leading-none">{audio.title}</h3>
+                <h3
+                  onClick={() => handleAudioSelect(audio)}
+                  className="font-medium leading-none"
+                >
+                  {audio.title}
+                </h3>
                 <p className="text-xs text-muted-foreground">
                   {audio.category}
                 </p>
