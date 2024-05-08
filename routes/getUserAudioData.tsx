@@ -19,11 +19,6 @@ export default function GetUserAudioData(): {
   useEffect(() => {
     const fetchUserAudioData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          router.push("/");
-          return;
-        }
         setLoadingAudioData(true);
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_HOST}/api/getuseraudios`,
@@ -59,9 +54,11 @@ export default function GetUserAudioData(): {
         setLoadingAudioData(false);
       }
     };
-
-    fetchUserAudioData();
-  }, [toast, router]);
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetchUserAudioData();
+    }
+  }, [router, toast]);
 
   return { UserAudioBookData, UserPodcastData, loadingAudioData };
 }

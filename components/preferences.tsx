@@ -121,55 +121,53 @@ const Preferences = ({
             Choose Language and genre of your interest.
           </DialogDescription>
         </DialogHeader>
-        {loadingPreferencesData ? (
-          <Loader className="flex animate-spin mt-8 mx-auto" />
-        ) : (
-          <div className="grid grid-cols-2">
-            <ScrollArea className="h-[300px] pr-4">
-              <div className="flex items-start flex-col space-y-2">
-                {language.map((lang: Language) => (
-                  <div key={lang.id} className="space-x-2">
-                    <Checkbox
-                      id={lang.id}
-                      checked={selectedLanguages.includes(lang.label)}
-                      onClick={() => toggleLanguageSelection(lang.label)}
-                    />
-                    <Label
-                      htmlFor={lang.id}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      {lang.label}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-            <ScrollArea className="h-[300px] pr-4">
-              <div className="flex items-start flex-col space-y-2">
-                {genres.map((gen: Genre) => (
-                  <div key={gen.id} className="space-x-2">
-                    <Checkbox
-                      id={gen.id}
-                      checked={selectedGenres.includes(gen.label)}
-                      onClick={() => toggleGenreSelection(gen.label)}
-                    />
-                    <Label
-                      htmlFor={gen.id}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      {gen.label}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
+        {localStorage.getItem("token") && loadingPreferencesData && (
+          <Loader className="absolute top-0 left-0 flex animate-spin mt-8 mx-auto" />
         )}
+        <div className="grid grid-cols-2">
+          <ScrollArea className="h-[300px] pr-4">
+            <div className="flex items-start flex-col space-y-2">
+              {language.map((lang: Language) => (
+                <div key={lang.id} className="space-x-2">
+                  <Checkbox
+                    id={lang.id}
+                    checked={selectedLanguages.includes(lang.label)}
+                    onClick={() => toggleLanguageSelection(lang.label)}
+                  />
+                  <Label
+                    htmlFor={lang.id}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {lang.label}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+          <ScrollArea className="h-[300px] pr-4">
+            <div className="flex items-start flex-col space-y-2">
+              {genres.map((gen: Genre) => (
+                <div key={gen.id} className="space-x-2">
+                  <Checkbox
+                    id={gen.id}
+                    checked={selectedGenres.includes(gen.label)}
+                    onClick={() => toggleGenreSelection(gen.label)}
+                  />
+                  <Label
+                    htmlFor={gen.id}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {gen.label}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
 
         <DialogFooter>
           <Button
             variant={"ghost"}
-            disabled={loadingPreferencesData}
             onClick={
               localStorage.getItem("token")
                 ? handleUpdatePreferences

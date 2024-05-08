@@ -79,6 +79,7 @@ const YourPodcasts = () => {
                     className="w-10 mr-4"
                   />
                   <p className="text-2xl hover:underline">{podcast.title}</p>
+                  <p>{podcast.streams}</p>
                 </div>
                 <div className="flex items-center space-x-4">
                   <Link href="#" className="text-sm hover:underline">

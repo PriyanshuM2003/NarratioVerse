@@ -19,11 +19,6 @@ export default function GetLiveTalkData(): {
   useEffect(() => {
     const fetchLiveTalkData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          router.push("/");
-          return;
-        }
         setLoadingLiveTalkData(true);
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_HOST}/api/getlivetalk`,
@@ -54,8 +49,11 @@ export default function GetLiveTalkData(): {
       }
     };
 
-    fetchLiveTalkData();
-  }, [toast, router]);
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetchLiveTalkData();
+    }
+  }, [router, toast]);
 
   return { liveTalkData, liveTalkHistoryData, loadingLiveTalkData };
 }

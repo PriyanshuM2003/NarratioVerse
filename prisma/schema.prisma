@@ -49,7 +49,7 @@ model Audio {
   category   String
   genres     String[]
   parts      Json[]
-  streams    Int?
+  streams    Int                   @default(0)
   userId     String
   user       User     @relation(fields: [userId], references: [id])
 

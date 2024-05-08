@@ -13,14 +13,17 @@ export default function GetLoggedUserData(): {
   const [loggedUserData, setloggedUserData] = useState<User | null>(null);
 
   useEffect(() => {
-    fetchLoggedUserData().finally(() => setLoadingUserData(false));
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetchLoggedUserData().finally(() => setLoadingUserData(false));
+    }
   }, []);
 
   const fetchLoggedUserData = async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        router.push("/");
+        router.push("/login");
         return;
       }
 

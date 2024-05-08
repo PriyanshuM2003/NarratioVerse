@@ -39,7 +39,7 @@ export interface Audio {
   category: string;
   genres: string[];
   parts: any[];
-  streams?: number | null;
+  streams: number;
   userId: string;
   user: User;
   createdAt: Date;

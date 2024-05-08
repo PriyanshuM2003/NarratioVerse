@@ -21,11 +21,6 @@ export default function GetUserPreferences(): {
   useEffect(() => {
     const fetchUserPreferenceData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          router.push("/");
-          return;
-        }
         setLoadingPreferencesData(true);
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_HOST}/api/getuserpreferences`,
@@ -56,9 +51,11 @@ export default function GetUserPreferences(): {
         setLoadingPreferencesData(false);
       }
     };
-
-    fetchUserPreferenceData();
-  }, [toast, router]);
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetchUserPreferenceData();
+    }
+  }, [router, toast]);
 
   return { userPreferenceData, madeForYouData, loadingPreferencesData };
 }
