@@ -18,8 +18,12 @@ import { playlists } from "@/data/playlists";
 import { User } from "@/types/types";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useToast } from "@/components/ui/use-toast";
+import { updateStreamCount } from "@/routes/updateStreamCount";
 
 interface AudioForYou {
+  id: string;
   user: User;
   title: string;
   category: string;
@@ -37,6 +41,8 @@ interface Props {
 }
 
 const AudioMadeForYou: React.FC<Props> = ({ audioItem }) => {
+  const router = useRouter();
+  const { toast } = useToast();
   const {
     setAudioData,
     setCurrentIndex,
@@ -54,6 +60,7 @@ const AudioMadeForYou: React.FC<Props> = ({ audioItem }) => {
       audioRef.current.load();
       playPauseHandler();
     }
+    updateStreamCount(audioItem.id as string, router, toast);
   };
 
   if (!audioItem) {

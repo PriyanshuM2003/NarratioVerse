@@ -72,16 +72,16 @@ const YourPodcasts = () => {
                   className="flex items-center"
                 >
                   <Image
-                    width={10}
-                    height={10}
+                    width={16}
+                    height={16}
                     src={podcast.coverImage}
                     alt={podcast.title}
-                    className="w-10 mr-4"
+                    className="w-16 mr-4"
                   />
                   <p className="text-2xl hover:underline">{podcast.title}</p>
-                  <p>{podcast.streams}</p>
                 </div>
                 <div className="flex items-center space-x-4">
+                  <p>Total Streams:&nbsp;{podcast.streams}</p>
                   <Link href="#" className="text-sm hover:underline">
                     {podcast.genres.join(", ")}
                   </Link>

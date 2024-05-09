@@ -24,6 +24,8 @@ import {
 import Link from "next/link";
 import { Radio } from "lucide-react";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
+import { updateStreamCount } from "@/routes/updateStreamCount";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Audio {
   id: string;
@@ -40,6 +42,7 @@ interface AudioPart {
 
 const Creator = ({ creator }: { creator: User }) => {
   const router = useRouter();
+  const { toast } = useToast();
   const {
     setAudioData,
     setCurrentIndex,
@@ -58,6 +61,7 @@ const Creator = ({ creator }: { creator: User }) => {
       audioRef.current.load();
       playPauseHandler();
     }
+    updateStreamCount(audio.id as string, router, toast);
   };
 
   return (

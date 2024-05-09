@@ -25,6 +25,8 @@ import { User } from "@/types/types";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { updateStreamCount } from "@/routes/updateStreamCount";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Audio {
   user: User;
@@ -42,6 +44,7 @@ interface AudioPart {
 
 const AudioBooks = ({ audio }: { audio: Audio[] }) => {
   const router = useRouter();
+  const { toast } = useToast();
   const {
     setAudioData,
     setCurrentIndex,
@@ -60,6 +63,7 @@ const AudioBooks = ({ audio }: { audio: Audio[] }) => {
       audioRef.current.load();
       playPauseHandler();
     }
+    updateStreamCount(audio.id as string, router, toast);
   };
 
   return (

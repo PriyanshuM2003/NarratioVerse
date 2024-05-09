@@ -25,6 +25,8 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import Link from "next/link";
+import { useToast } from "@/components/ui/use-toast";
+import { updateStreamCount } from "@/routes/updateStreamCount";
 
 interface Audio {
   user: User;
@@ -42,6 +44,7 @@ interface AudioPart {
 
 const New = ({ audio }: { audio: Audio[] }) => {
   const router = useRouter();
+  const { toast } = useToast();
   const {
     setAudioData,
     setCurrentIndex,
@@ -60,6 +63,7 @@ const New = ({ audio }: { audio: Audio[] }) => {
       audioRef.current.load();
       playPauseHandler();
     }
+    updateStreamCount(audio.id as string, router, toast);
   };
 
   return (
