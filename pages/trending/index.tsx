@@ -49,22 +49,11 @@ const Trending = ({
                 <div className="relative">
                   <ScrollArea>
                     <div className="flex space-x-4 pb-4">
-                      {loadingPreferencesData ? (
-                        Array.from({ length: 7 }, (_, index) => (
-                          <Skeleton
-                            key={index}
-                            className="h-[150px] w-[150px] bg-gray-300 rounded-md"
-                          />
-                        ))
-                      ) : (
-                        <>
-                          {audio?.map(
-                            (item, index) =>
-                              index < 20 && (
-                                <TrendingAudio key={item.id} audioItem={item} />
-                              )
-                          )}
-                        </>
+                      {audio?.map(
+                        (item, index) =>
+                          index < 20 && (
+                            <TrendingAudio key={item.id} audioItem={item} />
+                          )
                       )}
                     </div>
                     <ScrollBar orientation="horizontal" />
@@ -84,22 +73,11 @@ const Trending = ({
                 <div className="relative">
                   <ScrollArea>
                     <div className="flex space-x-4 pb-4">
-                      {loadingPreferencesData ? (
-                        Array.from({ length: 7 }, (_, index) => (
-                          <Skeleton
-                            key={index}
-                            className="h-[150px] w-[150px] bg-gray-300 rounded-md"
-                          />
-                        ))
-                      ) : (
-                        <>
-                          {newAudio?.map(
-                            (item, index) =>
-                              index < 20 && (
-                                <NewReleases key={item.id} audioItem={item} />
-                              )
-                          )}
-                        </>
+                      {newAudio?.map(
+                        (item, index) =>
+                          index < 20 && (
+                            <NewReleases key={item.id} audioItem={item} />
+                          )
                       )}
                     </div>
                     <ScrollBar orientation="horizontal" />
@@ -121,25 +99,11 @@ const Trending = ({
                     <div className="relative">
                       <ScrollArea>
                         <div className="flex space-x-4 pb-4">
-                          {loadingPreferencesData ? (
-                            Array.from({ length: 7 }, (_, index) => (
-                              <Skeleton
-                                key={index}
-                                className="h-[150px] w-[150px] bg-gray-300 rounded-full"
-                              />
-                            ))
-                          ) : (
-                            <>
-                              {liveTalks?.map(
-                                (item, index) =>
-                                  index < 20 && (
-                                    <TrendingLive
-                                      key={item.id}
-                                      liveItem={item}
-                                    />
-                                  )
-                              )}
-                            </>
+                          {liveTalks?.map(
+                            (item, index) =>
+                              index < 20 && (
+                                <TrendingLive key={item.id} liveItem={item} />
+                              )
                           )}
                         </div>
                         <ScrollBar orientation="horizontal" />
