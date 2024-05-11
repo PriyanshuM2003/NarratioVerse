@@ -73,3 +73,23 @@ export interface LiveTalkParticipant {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface Follower {
+  find(arg0: (followedUser: any) => boolean): unknown;
+  id: string;
+  userId: string;
+  followedId: string[];
+  user: User;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Playlist {
+  id: string;
+  name: string;
+  userId: string;
+  user: User;
+  audios: Audio[];
+  createdAt: Date;
+  updatedAt: Date;
+}

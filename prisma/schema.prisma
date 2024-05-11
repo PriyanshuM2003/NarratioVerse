@@ -27,6 +27,8 @@ model User {
   Audio                Audio[]
   liveTalks            LiveTalk[]
   liveTalkParticipants LiveTalkParticipant[]
+  following            Follower[]
+  playlists            Playlist[]
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
 }
@@ -42,19 +44,20 @@ model Preferences {
 }
 
 model Audio {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   title      String
-  slug       String   @unique
+  slug       String    @unique
   coverImage String
   category   String
   genres     String[]
   parts      Json[]
-  streams    Int                   @default(0)
+  streams    Int       @default(0)
   userId     String
-  user       User     @relation(fields: [userId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user       User      @relation(fields: [userId], references: [id])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  Playlist   Playlist? @relation(fields: [playlistId], references: [id])
+  playlistId String?
 }
 
 model LiveTalk {
@@ -83,6 +86,25 @@ model LiveTalkParticipant {
   liveTalk    LiveTalk @relation(fields: [liveTalkId], references: [id])
   participant User     @relation(fields: [userId], references: [id])
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Follower {
+  id         String   @id @default(uuid())
+  userId     String
+  followedId String[]
+  user       User     @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Playlist {
+  id        String   @id @default(uuid())
+  name      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  audios    Audio[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

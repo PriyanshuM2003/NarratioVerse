@@ -26,6 +26,11 @@ import { Radio } from "lucide-react";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import { updateStreamCount } from "@/routes/updateStreamCount";
 import { useToast } from "@/components/ui/use-toast";
+import { addFollow } from "@/routes/addFollow";
+import { removeFollowing } from "@/routes/removeFollowing";
+import { Skeleton } from "@/components/ui/skeleton";
+import GetFollowingData from "@/routes/getFollowingData";
+import { useEffect, useState } from "react";
 
 interface Audio {
   id: string;
@@ -64,6 +69,48 @@ const Creator = ({ creator }: { creator: User }) => {
     updateStreamCount(audio.id as string, router, toast);
   };
 
+  const [isFollowing, setIsFollowing] = useState<any | null>(null);
+  const { followingData, loadingFollowingData, setLoadingFollowingData } =
+    GetFollowingData();
+
+  useEffect(() => {
+    if (followingData) {
+      setIsFollowing(followingData);
+    }
+  }, [followingData]);
+
+  const handleFollow = async (creatorId: string) => {
+    try {
+      setLoadingFollowingData(true);
+      await addFollow(creatorId, router, toast);
+      setIsFollowing((prevFollowingData: any) => ({
+        ...prevFollowingData,
+        followedId: [...prevFollowingData.followedId, creatorId],
+      }));
+    } catch (error) {
+      console.error("Error following creator:", error);
+    } finally {
+      setLoadingFollowingData(false);
+    }
+  };
+
+  const handleUnfollow = async (creatorId: string) => {
+    try {
+      setLoadingFollowingData(true);
+      await removeFollowing(creatorId, router, toast);
+      setIsFollowing((prevFollowingData: any) => ({
+        ...prevFollowingData,
+        followedId: prevFollowingData.followedId.filter(
+          (id: string) => id !== creatorId
+        ),
+      }));
+    } catch (error) {
+      console.error("Error unfollowing creator:", error);
+    } finally {
+      setLoadingFollowingData(false);
+    }
+  };
+
   return (
     <>
       <div className="min-h-screen px-4 py-6 lg:px-8 text-white">
@@ -83,9 +130,30 @@ const Creator = ({ creator }: { creator: User }) => {
                 <span className="font-medium text-white">Creator</span>&nbsp;
                 {creator.name}
               </h3>
-              <Button size="sm" variant="ghost">
-                Follow
-              </Button>
+              {loadingFollowingData ? (
+                <Skeleton className="h-5 w-full" />
+              ) : (
+                <>
+                  {isFollowing &&
+                  isFollowing.followedId.includes(creator.id) ? (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleUnfollow(creator.id)}
+                    >
+                      Following
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleFollow(creator.id)}
+                    >
+                      Follow
+                    </Button>
+                  )}
+                </>
+              )}
             </div>
             <p>{creator.bio}</p>
           </div>

@@ -116,14 +116,17 @@ const Preferences = ({
       <DialogTrigger asChild></DialogTrigger>
       <DialogContent className="sm:max-w-[375px]">
         <DialogHeader>
-          <DialogTitle>Preferences</DialogTitle>
+          <div className="flex items-center gap-2">
+            <DialogTitle>Preferences</DialogTitle>
+            {localStorage.getItem("token") && loadingPreferencesData && (
+              <Loader className="animate-spin" />
+            )}
+          </div>
           <DialogDescription>
             Choose Language and genre of your interest.
           </DialogDescription>
         </DialogHeader>
-        {localStorage.getItem("token") && loadingPreferencesData && (
-          <Loader className="absolute top-0 left-0 flex animate-spin mt-8 mx-auto" />
-        )}
+
         <div className="grid grid-cols-2">
           <ScrollArea className="h-[300px] pr-4">
             <div className="flex items-start flex-col space-y-2">
