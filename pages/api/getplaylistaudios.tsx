@@ -21,21 +21,29 @@ export default async function handler(
       if (!decoded || !decoded.id) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      const followingData = await prisma.follower.findFirst({
+      const { name } = req.query;
+
+      const playlistAudios = await prisma.playlist.findFirst({
         where: {
           userId: decoded.id,
+          name: name as string,
         },
         include: {
           user: true,
+          audios: {
+            include: {
+              user: true,
+            },
+          },
         },
       });
 
-      return res.status(200).json({ followingData });
+      return res.status(200).json({ playlistAudios });
     } else {
       return res.status(405).json({ message: "Method Not Allowed" });
     }
   } catch (error) {
-    console.error("Error fetching following data:", error);
+    console.error("Error fetching playlists data:", error);
     return res.status(500).json({ error: "Something went wrong" });
   }
 }

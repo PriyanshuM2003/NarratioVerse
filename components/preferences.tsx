@@ -40,7 +40,8 @@ const Preferences = ({
   SavePreferences,
 }: PreferencesProps) => {
   const [preferenceData, setPreferenceData] = useState<any>();
-  const { userPreferenceData, loadingPreferencesData } = GetUserPreferences();
+  const { userPreferenceData, loadingPreferencesData, refreshPreferences } =
+    GetUserPreferences();
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
 
@@ -104,8 +105,8 @@ const Preferences = ({
       toast({
         description: "Preferences saved successfully",
       });
+      refreshPreferences();
       setDialogOpen(false);
-      window.location.reload();
     } catch (error) {
       console.error("Error saving preferences:", error);
     }

@@ -15,11 +15,13 @@ import {
 } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
-import { playlists } from "@/data/playlists";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import GetLoggedUserData from "@/routes/getLoggedUserData";
 import JoinLiveRoom from "./liveRoom/joinLiveRoom";
+import GetPlaylistsData from "@/routes/getPlaylistsData";
+import { Skeleton } from "./ui/skeleton";
+import PlaylistDeleteAlert from "./playlist/playlistDeleteAlert";
 
 interface LinkData {
   href: string;
@@ -67,6 +69,9 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar, isLoggedIn }) => {
   const { loggedUserData } = GetLoggedUserData();
 
+  const { playlistsData, loadingPlaylistsData } =
+    GetPlaylistsData();
+
   const router = useRouter();
 
   const isActiveLink = (href: string) => {
@@ -89,7 +94,7 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar, isLoggedIn }) => {
               <Link
                 key={index}
                 href={href}
-                className={`w-full flex items-center gap-1 justify-start hover:text-pink-600 ${
+                className={`w-full flex items-center gap-1 hover:text-pink-600 ${
                   isActiveLink(href) &&
                   "rounded-sm px-2 py-1.5 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
                 }`}
@@ -109,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar, isLoggedIn }) => {
                   <Link
                     key={index}
                     href={href}
-                    className={`w-full flex items-center gap-1 justify-start hover:text-pink-600 ${
+                    className={`w-full flex items-center gap-1 hover:text-pink-600 ${
                       isActiveLink(href) &&
                       "rounded-sm px-2 py-1.5 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
                     }`}
@@ -122,30 +127,40 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar, isLoggedIn }) => {
             )}
           </div>
         </div>
-        <Separator />
-        <div className="py-2">
-          <h2 className="relative px-7 text-lg font-semibold tracking-tight">
-            Playlists
-          </h2>
-          <ScrollArea className="h-[250px] px-1">
-            <div className="flex-nowrap flex-col space-y-1 p-2 text-white">
-              {playlists?.map((playlist, i) => (
-                <Link
-                  href={`/${playlist}`}
-                  key={`${playlist}-${i}`}
-                  // value={playlist}
-                  className={`w-full flex items-center justify-start gap-1 hover:text-pink-600 ${
-                    isActiveLink(`/${playlist}`) &&
-                    "rounded-sm px-2 py-1.5 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
-                  }`}
-                >
-                  <ListMusic className="w-5 h-5" />
-                  {playlist}
-                </Link>
-              ))}
+        {isLoggedIn && (
+          <>
+            <Separator />
+            <div className="py-2">
+              <h2 className="relative px-7 text-lg font-semibold tracking-tight">
+                Playlists
+              </h2>
+              <ScrollArea className="h-[250px] px-1">
+                <div className="flex-nowrap flex-col space-y-2 p-2 text-white">
+                  {loadingPlaylistsData
+                    ? Array.from({ length: 7 }, (_, index) => (
+                        <Skeleton key={index} className="h-6" />
+                      ))
+                    : playlistsData?.map((playlist) => (
+                        <div className="flex items-center justify-between">
+                          <Link
+                            key={playlist.id}
+                            href={`/playlist/${playlist.name}`}
+                            className={`w-full flex items-center gap-1 hover:text-pink-600 ${
+                              isActiveLink(`/playlist/${playlist.name}`) &&
+                              "rounded-sm px-2 py-1.5 font-semibold focus:bg-accent focus:text-accent-foreground overflow-hidden bg-popover text-popover-foreground shadow-lg"
+                            }`}
+                          >
+                            <ListMusic className="w-5 h-5" />
+                            {playlist.name}
+                          </Link>
+                          <PlaylistDeleteAlert playlistId={playlist.id} />
+                        </div>
+                      ))}
+                </div>
+              </ScrollArea>
             </div>
-          </ScrollArea>
-        </div>
+          </>
+        )}
         <Separator />
         <div className="py-2 px-3">
           <Link href="/about" className="gap-1 font-semibold flex items-center">

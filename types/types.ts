@@ -75,7 +75,6 @@ export interface LiveTalkParticipant {
 }
 
 export interface Follower {
-  find(arg0: (followedUser: any) => boolean): unknown;
   id: string;
   userId: string;
   followedId: string[];

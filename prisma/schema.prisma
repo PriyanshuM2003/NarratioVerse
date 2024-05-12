@@ -44,20 +44,19 @@ model Preferences {
 }
 
 model Audio {
-  id         String    @id @default(uuid())
+  id         String     @id @default(uuid())
   title      String
-  slug       String    @unique
+  slug       String     @unique
   coverImage String
   category   String
   genres     String[]
   parts      Json[]
-  streams    Int       @default(0)
+  streams    Int        @default(0)
+  playlists  Playlist[] @relation("PlaylistAudio")
   userId     String
-  user       User      @relation(fields: [userId], references: [id])
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  Playlist   Playlist? @relation(fields: [playlistId], references: [id])
-  playlistId String?
+  user       User       @relation(fields: [userId], references: [id])
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }
 
 model LiveTalk {
@@ -104,7 +103,7 @@ model Playlist {
   name      String
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  audios    Audio[]
+  audios    Audio[]  @relation("PlaylistAudio")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

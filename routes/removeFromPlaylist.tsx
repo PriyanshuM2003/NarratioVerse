@@ -1,5 +1,6 @@
-export async function removeFollowing(
-  creatorId: string,
+export async function removeFromPlaylist(
+  audioId: string,
+  name: string,
   router: any,
   toast: any
 ) {
@@ -10,23 +11,23 @@ export async function removeFollowing(
       return;
     }
 
-    await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/removefollowing`, {
+    await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/removefromplaylist`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ creatorId }),
+      body: JSON.stringify({ audioId, name }),
     });
     toast({
-      description: "Successfully removed from following",
+      description: "Removed from playlist successfully",
     });
     return true;
   } catch (error) {
-    console.error("Error removing following:", error);
+    console.error("Error removing from playlist:", error);
     toast({
       variant: "destructive",
-      description: "Failed to remove following",
+      description: "Failed to remove from playlist",
     });
     return false;
   }

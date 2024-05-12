@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
-import { Radio } from "lucide-react";
+import { Loader, PlusCircle, Radio } from "lucide-react";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import { updateStreamCount } from "@/routes/updateStreamCount";
 import { useToast } from "@/components/ui/use-toast";
@@ -31,6 +31,10 @@ import { removeFollowing } from "@/routes/removeFollowing";
 import { Skeleton } from "@/components/ui/skeleton";
 import GetFollowingData from "@/routes/getFollowingData";
 import { useEffect, useState } from "react";
+import { removeFromPlaylist } from "@/routes/removeFromPlaylist";
+import GetPlaylistsData from "@/routes/getPlaylistsData";
+import PlaylistDialog from "@/components/playlist/playlistDialog";
+import { createPlaylist } from "@/routes/createPlaylist";
 
 interface Audio {
   id: string;
@@ -56,6 +60,13 @@ const Creator = ({ creator }: { creator: User }) => {
     currentIndex,
     isPlaying,
   } = useAudioPlayer();
+  const [isFollowing, setIsFollowing] = useState<any | null>(null);
+  const { followingData, loadingFollowingData, setLoadingFollowingData } =
+    GetFollowingData();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedAudioId, setSelectedAudioId] = useState<string | null>(null);
+  const { playlistsData, loadingPlaylistsData, refreshPlaylists } =
+    GetPlaylistsData();
 
   const handleAudioSelect = (audio: Audio, startIndex: number = 0) => {
     setAudioData(audio);
@@ -69,9 +80,20 @@ const Creator = ({ creator }: { creator: User }) => {
     updateStreamCount(audio.id as string, router, toast);
   };
 
-  const [isFollowing, setIsFollowing] = useState<any | null>(null);
-  const { followingData, loadingFollowingData, setLoadingFollowingData } =
-    GetFollowingData();
+  const handleRemoveFromPlaylist = async (
+    playlistName: string,
+    audioId: string
+  ) => {
+    const removed = await removeFromPlaylist(
+      audioId,
+      playlistName,
+      router,
+      toast
+    );
+    if (removed) {
+      refreshPlaylists();
+    }
+  };
 
   useEffect(() => {
     if (followingData) {
@@ -110,6 +132,10 @@ const Creator = ({ creator }: { creator: User }) => {
       setLoadingFollowingData(false);
     }
   };
+
+  if (!creator) {
+    return null;
+  }
 
   return (
     <>
@@ -200,17 +226,17 @@ const Creator = ({ creator }: { creator: User }) => {
           <Separator />
         </div>
         <div className="flex items-center gap-4 flex-wrap">
-          {creator.Audio.map((audio) => (
-            <div key={audio.id} className="space-y-3">
+          {creator.Audio.map((creatorAudio) => (
+            <div key={creatorAudio.id} className="space-y-3">
               <ContextMenu>
                 <ContextMenuTrigger>
                   <div
-                    onClick={() => handleAudioSelect(audio)}
+                    onClick={() => handleAudioSelect(creatorAudio)}
                     className="overflow-hidden cursor-pointer rounded-md"
                   >
                     <Image
-                      src={audio.coverImage}
-                      alt={audio.title}
+                      src={creatorAudio.coverImage}
+                      alt={creatorAudio.title}
                       width={150}
                       height={150}
                       objectFit="contain"
@@ -218,64 +244,106 @@ const Creator = ({ creator }: { creator: User }) => {
                     />
                   </div>
                 </ContextMenuTrigger>
-                {/* <ContextMenuContent className="w-40">
-                <ContextMenuItem>Add to Library</ContextMenuItem>
-                <ContextMenuSub>
-                  <ContextMenuSubTrigger>Add to Playlist</ContextMenuSubTrigger>
-                  <ContextMenuSubContent className="w-48">
-                    <ContextMenuItem>
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      New Playlist
-                    </ContextMenuItem>
-                    <ContextMenuSeparator />
-                    {playlists.map((playlist) => (
-                      <ContextMenuItem key={playlist}>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          className="mr-2 h-4 w-4"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M21 15V6M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM12 12H3M16 6H3M12 18H3" />
-                        </svg>
-                        {playlist}
+                <ContextMenuContent className="w-40">
+                  <ContextMenuSub>
+                    <ContextMenuSubTrigger>
+                      Add to Playlist
+                    </ContextMenuSubTrigger>
+                    <ContextMenuSubContent className="w-48">
+                      <ContextMenuItem
+                        onClick={() => {
+                          setDialogOpen(true);
+                          setSelectedAudioId(creatorAudio.id);
+                        }}
+                      >
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        New Playlist
                       </ContextMenuItem>
-                    ))}
-                  </ContextMenuSubContent>
-                </ContextMenuSub>
-                <ContextMenuSeparator />
-                <ContextMenuItem>Play Next</ContextMenuItem>
-                <ContextMenuItem>Play Later</ContextMenuItem>
-                <ContextMenuItem>Create Station</ContextMenuItem>
-                <ContextMenuSeparator />
-                <ContextMenuItem>Like</ContextMenuItem>
-                <ContextMenuItem>Share</ContextMenuItem>
-              </ContextMenuContent> */}
+                      <ContextMenuSeparator />
+                      {loadingPlaylistsData ? (
+                        <Loader className="animate-spin flex mx-auto my-4" />
+                      ) : (
+                        playlistsData?.map((playlist) => (
+                          <ContextMenuItem
+                            key={playlist.id}
+                            onClick={async () => {
+                              await createPlaylist(
+                                creatorAudio.id,
+                                playlist.name,
+                                router,
+                                toast
+                              );
+
+                              refreshPlaylists();
+                            }}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              className="mr-2 h-4 w-4"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M21 15V6M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM12 12H3M16 6H3M12 18H3" />
+                            </svg>
+                            {playlist.name}
+                          </ContextMenuItem>
+                        ))
+                      )}
+                    </ContextMenuSubContent>
+                  </ContextMenuSub>
+                  <ContextMenuSeparator />
+                  {playlistsData?.map((playlist) => {
+                    const audioExistsInPlaylist = playlist.audios.some(
+                      (audio) => audio.id === creatorAudio.id
+                    );
+                    if (audioExistsInPlaylist) {
+                      return (
+                        <ContextMenuItem
+                          key={playlist.id}
+                          className="text-nowrap"
+                          onClick={() =>
+                            handleRemoveFromPlaylist(
+                              playlist.name,
+                              creatorAudio.id
+                            )
+                          }
+                        >
+                          Remove from {playlist.name}
+                        </ContextMenuItem>
+                      );
+                    }
+                    return null;
+                  })}
+
+                  {/* <ContextMenuSeparator />
+          <ContextMenuItem>Like</ContextMenuItem>
+          <ContextMenuItem>Share</ContextMenuItem> */}
+                </ContextMenuContent>
               </ContextMenu>
               <div className="space-y-1 text-sm">
                 <h3
-                  onClick={() => handleAudioSelect(audio)}
+                  onClick={() => handleAudioSelect(creatorAudio)}
                   className="font-medium leading-none"
                 >
-                  {audio.title}
+                  {creatorAudio.title}
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  {audio.category}
+                  {creatorAudio.category}
                 </p>
               </div>
             </div>
           ))}
-          {creator.liveTalks.map((live: LiveTalk) => (
-            <div key={live.id} className="space-y-3">
-              <Link href={`/live/${live.roomId}`}>
+          {creator.liveTalks.map((creatorLive: LiveTalk) => (
+            <div key={creatorLive.id} className="space-y-3">
+              <Link href={`/live/${creatorLive.roomId}`}>
                 <div className="relative">
                   <Image
-                    src={live.user.profileImage || ""}
-                    alt={live.title}
+                    src={creatorLive.user.profileImage || ""}
+                    alt={creatorLive.title}
                     width={150}
                     height={150}
                     objectFit="contain"
@@ -286,13 +354,22 @@ const Creator = ({ creator }: { creator: User }) => {
                   </div>
                 </div>
                 <div className="space-y-1 text-sm text-center">
-                  <p className="font-medium leading-none">{live.title}</p>
+                  <p className="font-medium leading-none">
+                    {creatorLive.title}
+                  </p>
                 </div>
               </Link>
             </div>
           ))}
         </div>
       </div>
+      {dialogOpen && (
+        <PlaylistDialog
+          audioId={selectedAudioId || ""}
+          setDialogOpen={setDialogOpen}
+          dialogOpen={dialogOpen}
+        />
+      )}
     </>
   );
 };

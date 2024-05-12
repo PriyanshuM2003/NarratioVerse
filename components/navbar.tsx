@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   DropdownMenu,
@@ -10,22 +10,18 @@ import {
 } from "./ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import Preferences from "@/components/preferences";
-import { useRouter } from "next/router";
 import {
   CreditCard,
   LogOut,
   User,
   UserPlus,
-  Radio,
-  BookAudio,
-  BadgePlus,
   LayoutDashboard,
-  PlayCircle,
-  Podcast,
   PanelLeftOpen,
   PanelLeftClose,
   Settings2,
 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import GetLoggedUserData from "@/routes/getLoggedUserData";
 
 interface NavbarProps {
   isLoggedIn: boolean;
@@ -40,11 +36,16 @@ const Navbar: React.FC<NavbarProps> = ({
   toggleSidebar,
   isSidebarVisible,
 }: NavbarProps) => {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [loggedUser, setLoggedUser] = useState<any>(null);
+  const { loggedUserData } = GetLoggedUserData();
 
-  const isActiveLink = (href: string) => router.pathname === href;
+  useEffect(() => {
+    if (isLoggedIn) {
+      setLoggedUser(loggedUserData);
+    }
+  }, [isLoggedIn, loggedUserData]);
 
   return (
     <>
@@ -73,9 +74,26 @@ const Navbar: React.FC<NavbarProps> = ({
           </Link>
         </div>
         <DropdownMenu open={open} onOpenChange={(val) => setOpen(val)}>
-          <DropdownMenuTrigger className="flex items-center pt-1 pr-6 hover:text-pink-600">
-            <User />
-            <span>{isLoggedIn ? "My Account" : "Account"}</span>
+          <DropdownMenuTrigger className="flex items-center gap-2 pt-1 pr-6 hover:text-pink-600">
+            {isLoggedIn ? (
+              <>
+                <Avatar>
+                  <AvatarImage
+                    src={loggedUser?.profileImage || ""}
+                    alt={loggedUser?.name}
+                  />
+                  <AvatarFallback>
+                    <User className="text-black" />
+                  </AvatarFallback>
+                </Avatar>
+                <span>My Account</span>
+              </>
+            ) : (
+              <>
+                <User />
+                <span>Account</span>
+              </>
+            )}
           </DropdownMenuTrigger>
           <DropdownMenuContent className="bg-gray-900 text-white" forceMount>
             {isLoggedIn ? (
