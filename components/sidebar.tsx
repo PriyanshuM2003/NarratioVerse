@@ -31,7 +31,7 @@ interface LinkData {
 
 const commonLinks: LinkData[] = [
   { href: "/", text: "Trending", icon: <PlayCircle className="w-5 h-5" /> },
-  { href: "#", icon: <Search className="w-5 h-5" />, text: "Search" },
+  { href: "/search", icon: <Search className="w-5 h-5" />, text: "Search" },
   {
     href: "/audiobooks",
     text: "Audio Books",

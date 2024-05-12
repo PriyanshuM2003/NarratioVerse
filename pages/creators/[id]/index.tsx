@@ -35,6 +35,7 @@ import { removeFromPlaylist } from "@/routes/removeFromPlaylist";
 import GetPlaylistsData from "@/routes/getPlaylistsData";
 import PlaylistDialog from "@/components/playlist/playlistDialog";
 import { createPlaylist } from "@/routes/createPlaylist";
+import GetLoggedUserData from "@/routes/getLoggedUserData";
 
 interface Audio {
   id: string;
@@ -67,6 +68,8 @@ const Creator = ({ creator }: { creator: User }) => {
   const [selectedAudioId, setSelectedAudioId] = useState<string | null>(null);
   const { playlistsData, loadingPlaylistsData, refreshPlaylists } =
     GetPlaylistsData();
+
+  const { loggedUserData } = GetLoggedUserData();
 
   const handleAudioSelect = (audio: Audio, startIndex: number = 0) => {
     setAudioData(audio);
@@ -154,31 +157,41 @@ const Creator = ({ creator }: { creator: User }) => {
             <div className="flex items-center gap-4">
               <h3 className="font-bold text-3xl text-yellow-500">
                 <span className="font-medium text-white">Creator</span>&nbsp;
-                {creator.name}
+                {creator.id !== loggedUserData?.id ? (
+                  <>{creator.name}</>
+                ) : (
+                  <>You</>
+                )}
               </h3>
-              {loadingFollowingData ? (
-                <Skeleton className="h-5 w-full" />
-              ) : (
+              {creator.id !== loggedUserData?.id ? (
                 <>
-                  {isFollowing &&
-                  isFollowing.followedId.includes(creator.id) ? (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleUnfollow(creator.id)}
-                    >
-                      Following
-                    </Button>
+                  {loadingFollowingData ? (
+                    <Skeleton className="h-5 w-full" />
                   ) : (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleFollow(creator.id)}
-                    >
-                      Follow
-                    </Button>
+                    <>
+                      {isFollowing &&
+                      isFollowing.followedId.includes(creator.id) ? (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleUnfollow(creator.id)}
+                        >
+                          Following
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleFollow(creator.id)}
+                        >
+                          Follow
+                        </Button>
+                      )}
+                    </>
                   )}
                 </>
+              ) : (
+                <></>
               )}
             </div>
             <p>{creator.bio}</p>

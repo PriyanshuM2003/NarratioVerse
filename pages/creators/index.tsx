@@ -19,6 +19,7 @@ import GetFollowingData from "@/routes/getFollowingData";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { removeFollowing } from "@/routes/removeFollowing";
+import GetLoggedUserData from "@/routes/getLoggedUserData";
 
 const Creators = ({ creators }: { creators: User[] }) => {
   const router = useRouter();
@@ -26,7 +27,7 @@ const Creators = ({ creators }: { creators: User[] }) => {
   const [isFollowing, setIsFollowing] = useState<any | null>(null);
   const { followingData, loadingFollowingData, setLoadingFollowingData } =
     GetFollowingData();
-
+  const { loggedUserData } = GetLoggedUserData();
   useEffect(() => {
     if (followingData) {
       setIsFollowing(followingData);
@@ -112,7 +113,7 @@ const Creators = ({ creators }: { creators: User[] }) => {
           </div>
         </div>
         <Separator className="my-4" />
-        <div className="flex items-center gap-6 flex-wrap">
+        <div className="flex gap-6 flex-wrap">
           {creators.map((creator) => (
             <div
               key={creator.id}
@@ -128,32 +129,44 @@ const Creators = ({ creators }: { creators: User[] }) => {
                     objectFit="contain"
                     className="rounded-full aspect-square border-4 border-yellow-500"
                   />
-                  <p className="font-semibold text-center">{creator.name}</p>
+                  <p className="font-semibold text-center">
+                    {creator.id !== loggedUserData?.id ? (
+                      <>{creator.name}</>
+                    ) : (
+                      <>You</>
+                    )}
+                  </p>
                 </div>
               </Link>
-              {loadingFollowingData ? (
-                <Skeleton className="h-5 w-full" />
-              ) : (
+              {creator.id !== loggedUserData?.id ? (
                 <>
-                  {isFollowing &&
-                  isFollowing.followedId.includes(creator.id) ? (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleUnfollow(creator.id)}
-                    >
-                      Following
-                    </Button>
+                  {loadingFollowingData ? (
+                    <Skeleton className="h-5 w-full" />
                   ) : (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleFollow(creator.id)}
-                    >
-                      Follow
-                    </Button>
+                    <>
+                      {isFollowing &&
+                      isFollowing.followedId.includes(creator.id) ? (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleUnfollow(creator.id)}
+                        >
+                          Following
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleFollow(creator.id)}
+                        >
+                          Follow
+                        </Button>
+                      )}
+                    </>
                   )}
                 </>
+              ) : (
+                <></>
               )}
             </div>
           ))}

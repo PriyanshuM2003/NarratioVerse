@@ -106,21 +106,23 @@ export async function getServerSideProps(context: any) {
       },
     });
 
-    const formattedLiveTalks = liveTalks.map((liveTalkItem) => {
-      const formattedUser = {
+    const formattedLiveTalks = liveTalks.map((liveTalkItem) => ({
+      ...liveTalkItem,
+      createdAt: liveTalkItem.createdAt.toISOString(),
+      updatedAt: liveTalkItem.updatedAt.toISOString(),
+      expiryDate: liveTalkItem.user.expiryDate
+        ? liveTalkItem.user.expiryDate.toISOString()
+        : null,
+      user: {
         ...liveTalkItem.user,
         createdAt: liveTalkItem.user.createdAt.toISOString(),
         updatedAt: liveTalkItem.user.updatedAt.toISOString(),
-      };
-
-      return {
-        ...liveTalkItem,
-        createdAt: liveTalkItem.createdAt.toISOString(),
-        updatedAt: liveTalkItem.updatedAt.toISOString(),
-        user: formattedUser,
-      };
-    });
-
+        expiryDate: liveTalkItem.user.expiryDate
+          ? liveTalkItem.user.expiryDate.toISOString()
+          : null,
+      },
+    }));
+    
     return {
       props: {
         liveTalks: formattedLiveTalks,
