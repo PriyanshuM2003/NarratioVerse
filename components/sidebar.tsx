@@ -69,8 +69,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar, isLoggedIn }) => {
   const { loggedUserData } = GetLoggedUserData();
 
-  const { playlistsData, loadingPlaylistsData } =
-    GetPlaylistsData();
+  const { playlistsData, loadingPlaylistsData } = GetPlaylistsData();
 
   const router = useRouter();
 
@@ -141,9 +140,11 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar, isLoggedIn }) => {
                         <Skeleton key={index} className="h-6" />
                       ))
                     : playlistsData?.map((playlist) => (
-                        <div className="flex items-center justify-between">
+                        <div
+                          key={playlist.id}
+                          className="flex items-center justify-between"
+                        >
                           <Link
-                            key={playlist.id}
                             href={`/playlist/${playlist.name}`}
                             className={`w-full flex items-center gap-1 hover:text-pink-600 ${
                               isActiveLink(`/playlist/${playlist.name}`) &&
