@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { CalendarDateRangePicker } from "@/components/dashboard/date-range-picker";
 import { Overview } from "@/components/dashboard/overview";
 import { TopAudios } from "@/components/dashboard/top-audios";
@@ -12,12 +13,11 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import GetDashboardData from "@/routes/getDashboardData";
-import React from "react";
+import GetDashboardCounts from "@/routes/getDashboardCounts";
 
 const Dashboard = () => {
-  const { followersCount, totalStreams, totalRevenue, loadingDashboardData } =
-    GetDashboardData();
+  const { followersCount, totalStreams, totalRevenue, loadingDashboardCounts } =
+    GetDashboardCounts();
 
   return (
     <>
@@ -63,7 +63,7 @@ const Dashboard = () => {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  {loadingDashboardData ? (
+                  {loadingDashboardCounts ? (
                     <>
                       <Skeleton className="h-8" />
                     </>
@@ -98,7 +98,7 @@ const Dashboard = () => {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  {loadingDashboardData ? (
+                  {loadingDashboardCounts ? (
                     <>
                       <Skeleton className="h-8" />
                     </>
@@ -131,7 +131,7 @@ const Dashboard = () => {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  {loadingDashboardData ? (
+                  {loadingDashboardCounts ? (
                     <>
                       <Skeleton className="h-8" />
                     </>

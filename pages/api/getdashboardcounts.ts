@@ -45,20 +45,10 @@ export default async function handler(
       );
 
       const totalRevenue = totalStreams * 0.003;
-
-      const topAudios = await prisma.audio.findMany({
-        where: {
-          userId: decoded.id,
-        },
-        orderBy: {
-          streams: "desc",
-        },
-        take: 5,
-      });
-
+      
       return res
         .status(200)
-        .json({ followersCount, totalStreams, totalRevenue, topAudios });
+        .json({ followersCount, totalStreams, totalRevenue });
     } else {
       return res.status(405).json({ message: "Method Not Allowed" });
     }

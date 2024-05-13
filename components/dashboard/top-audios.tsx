@@ -1,13 +1,13 @@
-import GetDashboardData from "@/routes/getDashboardData";
 import { Skeleton } from "../ui/skeleton";
 import Image from "next/image";
+import GetTopAudios from "@/routes/getTopAudios";
 
 export function TopAudios() {
-  const { topAudios, loadingDashboardData } = GetDashboardData();
+  const { topAudios, loadingTopAudios } = GetTopAudios();
 
   return (
     <div className="space-y-4">
-      {loadingDashboardData ? (
+      {loadingTopAudios ? (
         Array.from({ length: 5 }, (_, index) => (
           <div key={index} className="flex items-center justify-between gap-2">
             <div className="flex items-center w-full gap-2">

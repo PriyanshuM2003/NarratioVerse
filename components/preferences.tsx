@@ -17,6 +17,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "./ui/use-toast";
 import GetUserPreferences from "@/routes/getUserPreferences";
 import { Loader } from "lucide-react";
+import GetMadeForYou from "@/routes/getMadeForYou";
 
 interface Language {
   id: string;
@@ -40,8 +41,8 @@ const Preferences = ({
   SavePreferences,
 }: PreferencesProps) => {
   const [preferenceData, setPreferenceData] = useState<any>();
-  const { userPreferenceData, loadingPreferencesData, refreshPreferences } =
-    GetUserPreferences();
+  const { userPreferenceData, loadingUserPreferences } = GetUserPreferences();
+  const { refreshMadeForYou } = GetMadeForYou();
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
 
@@ -105,7 +106,7 @@ const Preferences = ({
       toast({
         description: "Preferences saved successfully",
       });
-      refreshPreferences();
+      refreshMadeForYou();
       setDialogOpen(false);
     } catch (error) {
       console.error("Error saving preferences:", error);
@@ -119,7 +120,7 @@ const Preferences = ({
         <DialogHeader>
           <div className="flex items-center gap-2">
             <DialogTitle>Preferences</DialogTitle>
-            {localStorage.getItem("token") && loadingPreferencesData && (
+            {localStorage.getItem("token") && loadingUserPreferences && (
               <Loader className="animate-spin" />
             )}
           </div>

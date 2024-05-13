@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import jwt, { Secret } from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
+import { subDays } from "date-fns";
 
 export default async function handler(
   req: NextApiRequest,
@@ -32,7 +33,25 @@ export default async function handler(
         return res.status(404).json({ error: "User preferences not found" });
       }
 
-      return res.status(200).json({ userPreferences });
+      const { genres } = userPreferences;
+
+      const fiveDaysAgo = subDays(new Date(), 5);
+
+      const madeForYouData = await prisma.audio.findMany({
+        where: {
+          genres: {
+            hasSome: genres,
+          },
+          createdAt: {
+            gte: fiveDaysAgo,
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      return res.status(200).json({ madeForYouData });
     } else {
       return res.status(405).json({ message: "Method Not Allowed" });
     }

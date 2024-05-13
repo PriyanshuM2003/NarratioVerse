@@ -22,22 +22,46 @@ export default async function handler(
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const userPreferences = await prisma.preferences.findFirst({
+      const followersCount = await prisma.follower.count({
         where: {
-          userId: decoded.id,
+          followedId: {
+            has: decoded.id,
+          },
         },
       });
 
-      if (!userPreferences) {
-        return res.status(404).json({ error: "User preferences not found" });
-      }
+      const userAudios = await prisma.audio.findMany({
+        where: {
+          userId: decoded.id,
+        },
+        select: {
+          streams: true,
+        },
+      });
 
-      return res.status(200).json({ userPreferences });
+      const totalStreams = userAudios.reduce(
+        (total, audio) => total + audio.streams,
+        0
+      );
+
+      const totalRevenue = totalStreams * 0.003;
+
+      const topAudios = await prisma.audio.findMany({
+        where: {
+          userId: decoded.id,
+        },
+        orderBy: {
+          streams: "desc",
+        },
+        take: 5,
+      });
+
+      return res.status(200).json({ topAudios });
     } else {
       return res.status(405).json({ message: "Method Not Allowed" });
     }
   } catch (error) {
-    console.error("Error fetching preferences:", error);
+    console.error("Error fetching following data:", error);
     return res.status(500).json({ error: "Something went wrong" });
   }
 }

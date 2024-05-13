@@ -1,30 +1,27 @@
 import { useToast } from "@/components/ui/use-toast";
-import { Audio } from "@/types/types";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-export default function GetDashboardData(): {
+export default function GetDashboardCounts(): {
   followersCount: number | null;
   totalStreams: number | null;
   totalRevenue: number | null;
-  topAudios: Audio[] | null;
-  loadingDashboardData: boolean;
+  loadingDashboardCounts: boolean;
 } {
   const router = useRouter();
   const { toast } = useToast();
-  const [loadingDashboardData, setLoadingDashboardData] =
+  const [loadingDashboardCounts, setLoadingDashboardCounts] =
     useState<boolean>(true);
   const [followersCount, setFollowersCount] = useState<number | null>(null);
   const [totalRevenue, setTotalRevenue] = useState<number | null>(null);
   const [totalStreams, setTotalStreams] = useState<number | null>(null);
-  const [topAudios, setTopAudios] = useState<Audio[] | null>(null);
 
   useEffect(() => {
-    const fetchFollowersCount = async () => {
+    const fetchDashboardCounts = async () => {
       try {
-        setLoadingDashboardData(true);
+        setLoadingDashboardCounts(true);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_HOST}/api/getdashboarddata`,
+          `${process.env.NEXT_PUBLIC_HOST}/api/getdashboardcounts`,
           {
             method: "GET",
             headers: {
@@ -43,28 +40,26 @@ export default function GetDashboardData(): {
         setFollowersCount(data.followersCount);
         setTotalRevenue(data.totalRevenue);
         setTotalStreams(data.totalStreams);
-        setTopAudios(data.topAudios);
       } catch (error) {
-        console.error("Error fetching dashboard data:", error);
+        console.error("Error fetching dashboard counts data:", error);
         toast({
           variant: "destructive",
-          description: "Failed to fetch dashboard data",
+          description: "Failed to fetch dashboard counts",
         });
       } finally {
-        setLoadingDashboardData(false);
+        setLoadingDashboardCounts(false);
       }
     };
     const token = localStorage.getItem("token");
     if (token) {
-      fetchFollowersCount();
+      fetchDashboardCounts();
     }
   }, [router, toast]);
 
   return {
     followersCount,
-    topAudios,
     totalStreams,
     totalRevenue,
-    loadingDashboardData,
+    loadingDashboardCounts,
   };
 }

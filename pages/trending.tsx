@@ -9,7 +9,7 @@ import AudioMadeForYou from "@/components/trending/foryou";
 import NewReleases from "@/components/trending/newReleases";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
-import GetUserPreferences from "@/routes/getUserPreferences";
+import GetMadeForYou from "@/routes/getMadeForYou";
 
 const Trending = ({
   audio,
@@ -23,7 +23,7 @@ const Trending = ({
   liveTalks: LiveTalk[];
 }) => {
   const [madeForYou, setMadeForYou] = useState<any[]>([]);
-  const { madeForYouData, loadingPreferencesData } = GetUserPreferences();
+  const { madeForYouData, loadingmadeforyou } = GetMadeForYou();
 
   useEffect(() => {
     if (madeForYouData) {
@@ -122,7 +122,7 @@ const Trending = ({
                     <div className="relative">
                       <ScrollArea>
                         <div className="flex space-x-4 pb-4">
-                          {loadingPreferencesData ? (
+                          {loadingmadeforyou ? (
                             Array.from({ length: 7 }, (_, index) => (
                               <Skeleton
                                 key={index}
