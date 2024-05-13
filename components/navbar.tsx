@@ -15,10 +15,10 @@ import {
   LogOut,
   User,
   UserPlus,
-  LayoutDashboard,
   PanelLeftOpen,
   PanelLeftClose,
   Settings2,
+  AudioLines,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import GetLoggedUserData from "@/routes/getLoggedUserData";
@@ -73,77 +73,81 @@ const Navbar: React.FC<NavbarProps> = ({
             </h1>
           </Link>
         </div>
-        <DropdownMenu open={open} onOpenChange={(val) => setOpen(val)}>
-          <DropdownMenuTrigger className="flex items-center gap-2 pt-1 pr-6 hover:text-pink-600">
-            {isLoggedIn ? (
-              <>
-                <Avatar>
-                  <AvatarImage
-                    src={loggedUser?.profileImage || ""}
-                    alt={loggedUser?.name}
-                  />
-                  <AvatarFallback>
-                    <User className="text-black" />
-                  </AvatarFallback>
-                </Avatar>
-                <span>My Account</span>
-              </>
-            ) : (
-              <>
-                <User />
-                <span>Account</span>
-              </>
-            )}
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-gray-900 text-white" forceMount>
-            {isLoggedIn ? (
-              <>
-                <Link href="/profile">
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
+        <div className="flex items-center gap-4">
+          {isLoggedIn && loggedUser?.creator ? (
+            <Link href="/audiophilealley">
+              <div className="flex font-medium items-center gap-2 pt-1 hover:text-pink-600">
+                <AudioLines className="h-5 w-5 animate-pulse" />
+                <span>Audiophile Alley</span>
+              </div>
+            </Link>
+          ) : null}
+          <DropdownMenu open={open} onOpenChange={(val) => setOpen(val)}>
+            <DropdownMenuTrigger className="flex items-center font-medium gap-2 pt-1 pr-6 hover:text-pink-600">
+              {isLoggedIn ? (
+                <>
+                  <Avatar>
+                    <AvatarImage
+                      src={loggedUser?.profileImage || ""}
+                      alt={loggedUser?.name}
+                    />
+                    <AvatarFallback>
+                      <User className="text-black" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <span>My Account</span>
+                </>
+              ) : (
+                <>
+                  <User />
+                  <span>Account</span>
+                </>
+              )}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-gray-900 text-white" forceMount>
+              {isLoggedIn ? (
+                <>
+                  <Link href="/profile">
+                    <DropdownMenuItem>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuItem onClick={() => setDialogOpen(true)}>
+                    <Settings2 className="mr-2 h-4 w-4" />
+                    <span>Preferences</span>
                   </DropdownMenuItem>
-                </Link>
-                <DropdownMenuItem onClick={() => setDialogOpen(true)}>
-                  <Settings2 className="mr-2 h-4 w-4" />
-                  <span>Preferences</span>
-                </DropdownMenuItem>
-                <Link href="/dashboard">
-                  <DropdownMenuItem>
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    <span>Dashboard</span>
+                  <Link href="/plans">
+                    <DropdownMenuItem>
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      <span>Billing</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
                   </DropdownMenuItem>
-                </Link>
-                <Link href="/plans">
-                  <DropdownMenuItem>
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    <span>Billing</span>
-                  </DropdownMenuItem>
-                </Link>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </>
-            ) : (
-              <>
-                <Link href="/login">
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Login</span>
-                  </DropdownMenuItem>
-                </Link>
-                <Link href="/signup">
-                  <DropdownMenuItem>
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    <span>Create Account</span>
-                  </DropdownMenuItem>
-                </Link>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+                </>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <DropdownMenuItem>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Login</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/signup">
+                    <DropdownMenuItem>
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      <span>Create Account</span>
+                    </DropdownMenuItem>
+                  </Link>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       {dialogOpen && (
         <Preferences

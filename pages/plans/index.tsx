@@ -5,11 +5,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { loadStripe } from "@stripe/stripe-js";
 import GetLoggedUserData from "@/routes/getLoggedUserData";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/router";
 
 const Plans: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<string>("premium");
   const [planData, setPlanData] = useState<any>("");
   const { loadingUserData, loggedUserData } = GetLoggedUserData();
+  const router = useRouter();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.replace("/");
+    }
+  }, [router]);
 
   useEffect(() => {
     if (loggedUserData) {

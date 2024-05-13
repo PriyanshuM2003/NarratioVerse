@@ -39,8 +39,7 @@ const LiveHistory = () => {
 
   return (
     <>
-      <Separator className="my-4" />
-      <div className="pb-8">
+      <div className="px-8 pb-4 text-white min-h-screen">
         <h2 className="text-2xl font-semibold tracking-tight">Live History</h2>
         <Separator className="my-4" />
         <div className="grid grid-cols-6 items-center px-4 text-md font-medium">

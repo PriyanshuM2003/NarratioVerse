@@ -46,6 +46,13 @@ const Profile = () => {
   });
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.replace("/");
+    }
+  }, [router]);
+
+  useEffect(() => {
     if (loggedUserData) {
       setUserData(loggedUserData);
     }

@@ -44,8 +44,8 @@ export default async function handler(
         0
       );
 
-      const totalRevenue = totalStreams * 0.003;
-      
+      const totalRevenue = (totalStreams * 0.003).toFixed(3);
+
       return res
         .status(200)
         .json({ followersCount, totalStreams, totalRevenue });

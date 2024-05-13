@@ -110,6 +110,10 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar, isLoggedIn }) => {
             {isLoggedIn && loggedUserData && loggedUserData.creator && (
               <>
                 <JoinLiveRoom />
+              </>
+            )}
+            {/* {isLoggedIn && loggedUserData && loggedUserData.creator && (
+              <>
                 {creatorLinks.map(({ href, icon, text }, index) => (
                   <Link
                     key={index}
@@ -124,7 +128,7 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar, isLoggedIn }) => {
                   </Link>
                 ))}
               </>
-            )}
+            )} */}
           </div>
         </div>
         {isLoggedIn && (
@@ -163,7 +167,7 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar, isLoggedIn }) => {
             </div>
           </>
         )}
-        <Separator />
+        {isLoggedIn && <Separator />}
         <div className="py-2 px-3">
           <Link href="/about" className="gap-1 font-semibold flex items-center">
             <Info className="w-5 h-5" />

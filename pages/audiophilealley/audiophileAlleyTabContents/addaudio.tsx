@@ -313,7 +313,7 @@ const AddAudio: React.FC = () => {
 
   return (
     <>
-      <div className="p-8 text-white">
+      <div className="px-8 pb-4 min-h-screen text-white">
         <div className="space-y-1">
           <h2 className="text-2xl font-semibold tracking-tight">
             Add {String(category)}
@@ -380,7 +380,9 @@ const AddAudio: React.FC = () => {
                   <div className="flex items-center space-x-1">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="text-black">Select Genres</Button>
+                        <Button variant="outline" className="text-black">
+                          Select Genres
+                        </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                         <ScrollArea className="h-72">

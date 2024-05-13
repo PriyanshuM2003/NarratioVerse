@@ -29,7 +29,6 @@ import { updateStreamCount } from "@/routes/updateStreamCount";
 import { useToast } from "@/components/ui/use-toast";
 import GetPlaylistsData from "@/routes/getPlaylistsData";
 import { removeFromPlaylist } from "@/routes/removeFromPlaylist";
-import { Skeleton } from "@/components/ui/skeleton";
 import { createPlaylist } from "@/routes/createPlaylist";
 import { Loader, PlusCircle } from "lucide-react";
 import PlaylistDialog from "@/components/playlist/playlistDialog";

@@ -16,7 +16,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import LiveHistory from "./liveHistory";
 
 interface Field {
   id: number;
@@ -209,7 +208,7 @@ const GoLive: React.FC = () => {
 
   return (
     <>
-      <div className="p-8 min-h-screen text-white">
+      <div className="px-8 pb-4 min-h-screen text-white">
         <h2 className="text-2xl font-semibold tracking-tight">Go Live</h2>
         <Separator className="my-4" />
         <div className="mb-5 flex justify-center">
@@ -362,7 +361,6 @@ const GoLive: React.FC = () => {
             </form>
           </div>
         </div>
-        <LiveHistory />
       </div>
     </>
   );
