@@ -44,7 +44,6 @@ const AddAudio: React.FC = () => {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("Podcast");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [currentKeyword, setCurrentKeyword] = useState("");
   const [fields, setFields] = useState<Field[]>([
     {
       id: 1,

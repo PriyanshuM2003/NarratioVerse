@@ -58,12 +58,12 @@ const Navbar: React.FC<NavbarProps> = ({
         >
           {isSidebarVisible ? (
             <PanelLeftClose
-              className="hover:text-pink-500"
+              className="hover:text-pink-600"
               onClick={toggleSidebar}
             />
           ) : (
             <PanelLeftOpen
-              className="hover:text-pink-500"
+              className="hover:text-pink-600"
               onClick={toggleSidebar}
             />
           )}
@@ -75,10 +75,10 @@ const Navbar: React.FC<NavbarProps> = ({
         </div>
         <div className="flex items-center gap-4">
           {isLoggedIn && loggedUser?.creator ? (
-            <Link href="/audiophilealley">
+            <Link href="/audiophilehub">
               <div className="flex font-medium items-center gap-2 pt-1 hover:text-pink-600">
                 <AudioLines className="h-5 w-5 animate-pulse" />
-                <span>Audiophile Alley</span>
+                <span>Audiophile Hub</span>
               </div>
             </Link>
           ) : null}

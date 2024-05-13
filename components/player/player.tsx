@@ -300,7 +300,7 @@ const Player: React.FC = () => {
                         <div
                           className={`hover:underline cursor-pointer ${
                             index === selectedPartIndex
-                              ? "text-pink-500 font-semibold"
+                              ? "text-pink-600 font-semibold"
                               : ""
                           }`}
                         >
@@ -308,7 +308,7 @@ const Player: React.FC = () => {
                         </div>
                       </div>
                       {index === selectedPartIndex && (
-                        <AudioLines className="animate-pulse text-pink-500" />
+                        <AudioLines className="animate-pulse text-pink-600" />
                       )}
                     </li>
                   ))}

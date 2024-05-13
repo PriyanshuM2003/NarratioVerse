@@ -14,9 +14,9 @@ import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import Image from "next/image";
 import GetUserAudioData from "@/routes/getUserAudioData";
 
-const YourPodcasts = () => {
-  const { UserPodcastData, loadingAudioData } = GetUserAudioData();
-  const [podcasts, setPodcasts] = useState<any[]>([]);
+const YourAudiobooks = () => {
+  const [audiobooks, setAudiobooks] = useState<any[]>([]);
+  const { loadingAudioData, UserAudioBookData } = GetUserAudioData();
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const {
     setAudioData,
@@ -26,32 +26,33 @@ const YourPodcasts = () => {
     currentIndex,
     isPlaying,
   } = useAudioPlayer();
+
   const toggleAccordionItem = (value: string) => {
     setExpandedItem((prevItem) => (prevItem === value ? null : value));
   };
 
-  const handleAudioSelect = (podcast: any, startIndex = 0) => {
-    setAudioData(podcast);
+  const handleAudioSelect = (audiobook: any, startIndex = 0) => {
+    setAudioData(audiobook);
     setCurrentIndex(startIndex);
     if (audioRef.current) {
-      audioRef.current.src = podcast.parts[startIndex].audioUrl;
+      audioRef.current.src = audiobook.parts[startIndex].audioUrl;
       audioRef.current.load();
       playPauseHandler();
     }
   };
 
   useEffect(() => {
-    if (UserPodcastData) {
-      setPodcasts(UserPodcastData);
+    if (UserAudioBookData) {
+      setAudiobooks(UserAudioBookData);
     }
-  }, [UserPodcastData]);
+  }, [UserAudioBookData]);
 
   return (
     <>
       <div className="min-h-screen px-8 pb-4 text-white">
-        <div className="space-y-1">
+        <div>
           <h2 className="text-2xl font-semibold tracking-tight">
-            Your Podcasts
+            Your Audio Books
           </h2>
         </div>
         <Separator className="my-4" />
@@ -64,33 +65,35 @@ const YourPodcasts = () => {
           ))
         ) : (
           <Accordion type="single" collapsible className="w-full">
-            {podcasts.map((podcast) => (
-              <AccordionItem key={podcast.id} value={`item-${podcast.id}`}>
+            {audiobooks.map((audiobook) => (
+              <AccordionItem key={audiobook.id} value={`item-${audiobook.id}`}>
                 <AccordionTrigger
-                  className="flex justify-between items-center"
-                  onClick={() => toggleAccordionItem(`item-${podcast.id}`)}
+                  className="flex justify-between"
+                  onClick={() => toggleAccordionItem(`item-${audiobook.id}`)}
                 >
                   <div
-                    onClick={() => handleAudioSelect(podcast)}
+                    onClick={() => handleAudioSelect(audiobook)}
                     className="flex items-center"
                   >
                     <Image
                       width={16}
                       height={16}
-                      src={podcast.coverImage}
-                      alt={podcast.title}
+                      src={audiobook.coverImage}
+                      alt={audiobook.title}
                       className="w-16 mr-4"
                     />
-                    <p className="text-2xl hover:underline">{podcast.title}</p>
+                    <p className="text-2xl hover:underline">
+                      {audiobook.title}
+                    </p>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <p>Total Streams:&nbsp;{podcast.streams}</p>
+                    <p>Total Streams:&nbsp;{audiobook.streams}</p>
                     <Link href="#" className="text-sm hover:underline">
-                      {podcast.genres.join(", ")}
+                      {audiobook.genres.join(", ")}
                     </Link>
                     <ChevronDown
                       className={`h-4 w-4 shrink-0 transition-transform duration-200 transform ${
-                        expandedItem === `item-${podcast.id}`
+                        expandedItem === `item-${audiobook.id}`
                           ? "rotate-180"
                           : ""
                       }`}
@@ -99,11 +102,11 @@ const YourPodcasts = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <ul>
-                    {podcast.parts.map((part: any, index: number) => (
+                    {audiobook.parts.map((part: any, index: number) => (
                       <li
                         className="flex items-center justify-between text-base"
                         key={part.partName}
-                        onClick={() => handleAudioSelect(podcast, index)}
+                        onClick={() => handleAudioSelect(audiobook, index)}
                       >
                         <div className="flex items-center">
                           <span className="mr-2">{index + 1}.</span>
@@ -112,7 +115,7 @@ const YourPodcasts = () => {
                               index === currentIndex &&
                               part.partName &&
                               isPlaying
-                                ? "text-pink-500 font-semibold"
+                                ? "text-pink-600 font-semibold"
                                 : ""
                             }`}
                           >
@@ -122,7 +125,7 @@ const YourPodcasts = () => {
                         {index === currentIndex &&
                           part.partName &&
                           isPlaying && (
-                            <AudioLines className="animate-pulse text-pink-500" />
+                            <AudioLines className="animate-pulse text-pink-600" />
                           )}
                       </li>
                     ))}
@@ -137,4 +140,4 @@ const YourPodcasts = () => {
   );
 };
 
-export default YourPodcasts;
+export default YourAudiobooks;
