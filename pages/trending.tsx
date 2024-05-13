@@ -2,11 +2,11 @@
 import React, { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import TrendingAudio from "@/pages/trending/trendingParts/trendingAudio";
+import TrendingAudio from "@/components/trending/trendingAudio";
 import { Audio, LiveTalk } from "@/types/types";
-import TrendingLive from "@/pages/trending/trendingParts/trendingLive";
-import AudioMadeForYou from "@/pages/trending/trendingParts/foryou";
-import NewReleases from "@/pages/trending/trendingParts/newReleases";
+import TrendingLive from "@/components/trending/trendingLive";
+import AudioMadeForYou from "@/components/trending/foryou";
+import NewReleases from "@/components/trending/newReleases";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import GetUserPreferences from "@/routes/getUserPreferences";

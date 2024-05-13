@@ -109,6 +109,7 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar, isLoggedIn }) => {
             )}
             {isLoggedIn && loggedUserData && loggedUserData.creator && (
               <>
+                <JoinLiveRoom />
                 {creatorLinks.map(({ href, icon, text }, index) => (
                   <Link
                     key={index}
