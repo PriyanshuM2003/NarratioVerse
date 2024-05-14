@@ -37,12 +37,14 @@ const Plans: React.FC = () => {
     category: string,
     title: string
   ) => {
+    console.log("Price:", price);
     const stripe = await loadStripe(
       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
     );
     if (!stripe) {
       return;
     }
+    const stripeSignature = "stripe-signature";
 
     try {
       const token = localStorage.getItem("token");
@@ -57,13 +59,15 @@ const Plans: React.FC = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "stripe-signature": stripeSignature,
           },
           body: JSON.stringify({ price, category, title }),
         }
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        const errorMessage = await response.text();
+        throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorMessage}`);
       }
 
       const responseData = await response.json();

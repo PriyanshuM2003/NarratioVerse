@@ -1,7 +1,6 @@
 import Stripe from "stripe";
 import prisma from "@/lib/prisma";
 import jwt, { Secret } from "jsonwebtoken";
-import getRawBody from "raw-body";
 import { NextApiRequest, NextApiResponse } from "next";
 import { addMonths, addQuarters, addYears } from "date-fns";
 
@@ -10,16 +9,7 @@ interface PlanData {
   category: string;
   title: string;
 }
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: "2024-04-10",
-});
-const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY as string;
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export default async function handler(
   req: NextApiRequest,
@@ -49,22 +39,12 @@ export default async function handler(
         return res.status(404).json({ error: "User not found" });
       }
 
-      const sig: any = req.headers["stripe-signature"];
-      const { price, category, title }: PlanData = req.body;
-      const rawBody = await getRawBody(req);
-      let event;
-
-      try {
-        event = stripe.webhooks.constructEvent(rawBody, sig, endpointSecret);
-      } catch (err: any) {
-        console.error("Webhook signature verification failed:", err);
-        return res.status(403).json({ error: `Webhook Error: ${err.message}` });
-      }
-
       const customer = await stripe.customers.create({
         name: user.name,
         email: user.email,
       });
+
+      const { price, category, title }: PlanData = req.body;
 
       if (!price || !category || !title) {
         return res
@@ -117,19 +97,37 @@ export default async function handler(
         cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
       });
 
-      if (event.type === "checkout.session.completed") {
-        const session = event.data.object;
-        await prisma.user.update({
-          where: { id: decoded.id },
-          data: {
-            premium: category === "premium" ? true : false,
-            creator: category === "creator" ? true : false,
-            planType: title,
-            expiryDate: expiryDate,
-          },
-        });
-        return res.status(500).json({ error: "Invalid event type" });
-      }
+      // const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
+      // const sig = req.headers["stripe-signature"] as string;
+      // let event: Stripe.Event;
+
+      // try {
+      //   const payload = req.body;
+      //   event = stripe.webhooks.constructEvent(
+      //     JSON.stringify(payload),
+      //     sig,
+      //     endpointSecret
+      //   );
+      // } catch (err: any) {
+      //   return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+      // }
+
+      // const eventType = event.type;
+      // switch (eventType) {
+      //   case "checkout.session.completed":
+      await prisma.user.update({
+        where: { id: decoded.id },
+        data: {
+          premium: category === "premium" ? true : false,
+          creator: category === "creator" ? true : false,
+          planType: title,
+          expiryDate: expiryDate,
+        },
+      });
+      //     break;
+      //   default:
+      //     return res.status(500).json({ error: "Invalid event type" });
+      // }
       return res.status(200).json({
         message: "Subscription status updated successfully",
         url: session.url,
