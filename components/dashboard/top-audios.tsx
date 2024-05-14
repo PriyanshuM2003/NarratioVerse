@@ -24,7 +24,7 @@ export function TopAudios() {
         <>
           {topAudios?.map((audio) => (
             <>
-              <div className="flex items-center">
+              <div key={audio?.id} className="flex items-center">
                 <Image
                   src={audio?.coverImage || ""}
                   alt={audio?.title}

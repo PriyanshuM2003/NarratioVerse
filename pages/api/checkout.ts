@@ -97,24 +97,24 @@ export default async function handler(
         cancel_url: `${process.env.NEXT_PUBLIC_HOST}/plans/checkout/cancel`,
       });
 
-      // const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
-      // const sig = req.headers["stripe-signature"] as string;
-      // let event: Stripe.Event;
+      const endpointSecret = process.env.STRIPE_SECRET_WEBHOOK_KEY!;
+      const sig = req.headers["stripe-signature"] as string;
+      let event: Stripe.Event;
 
-      // try {
-      //   const payload = req.body;
-      //   event = stripe.webhooks.constructEvent(
-      //     JSON.stringify(payload),
-      //     sig,
-      //     endpointSecret
-      //   );
-      // } catch (err: any) {
-      //   return res.status(400).json({ error: `Webhook Error: ${err.message}` });
-      // }
+      try {
+        const payload = req.body;
+        event = stripe.webhooks.constructEvent(
+          JSON.stringify(payload),
+          sig,
+          endpointSecret
+        );
+      } catch (err: any) {
+        return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+      }
 
-      // const eventType = event.type;
-      // switch (eventType) {
-      //   case "checkout.session.completed":
+      const eventType = event.type;
+      switch (eventType) {
+        case "checkout.session.completed":
       await prisma.user.update({
         where: { id: decoded.id },
         data: {
@@ -124,10 +124,10 @@ export default async function handler(
           expiryDate: expiryDate,
         },
       });
-      //     break;
-      //   default:
-      //     return res.status(500).json({ error: "Invalid event type" });
-      // }
+          break;
+        default:
+          return res.status(500).json({ error: "Invalid event type" });
+      }
       return res.status(200).json({
         message: "Subscription status updated successfully",
         url: session.url,
