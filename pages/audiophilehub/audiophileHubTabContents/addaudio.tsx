@@ -200,6 +200,8 @@ const AddAudio: React.FC = () => {
       try {
         setLoading(true);
         const oldcoverImageFileName = audioData.coverImage.split("/").pop();
+        console.log("oldcoverImageFileName", oldcoverImageFileName);
+
         if (oldcoverImageFileName) {
           const { data: removeData, error: removeError } =
             await supabase.storage
@@ -246,6 +248,8 @@ const AddAudio: React.FC = () => {
     }
   };
 
+  console.log("imagedata", audioData.coverImage);
+
   const handleAudioParts = async (
     e: ChangeEvent<HTMLInputElement>,
     fieldId: number
@@ -258,6 +262,7 @@ const AddAudio: React.FC = () => {
 
         const oldAudioFileName = fields.find((field) => field.id === fieldId)
           ?.file?.name;
+        console.log("oldAudioFileName", oldAudioFileName);
 
         if (oldAudioFileName) {
           const { data: removeData, error: removeError } =

@@ -8,11 +8,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import Link from "next/link";
-import { AudioLines, ChevronDown } from "lucide-react";
+import { AudioLines, ChevronDown, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import Image from "next/image";
 import GetUserAudioData from "@/routes/getUserAudioData";
+import AudioDeleteAlert from "./audioDeleteAlert";
 
 const YourPodcasts = () => {
   const { UserPodcastData, loadingAudioData } = GetUserAudioData();
@@ -95,6 +96,7 @@ const YourPodcasts = () => {
                           : ""
                       }`}
                     />
+                    <AudioDeleteAlert audioId={podcast.id} />
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
