@@ -1,8 +1,8 @@
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import useSWR, { mutate } from "swr";
 import { Audio } from "@/types/types";
-import useSWR from "swr";
 
 export default function GetUserAudioData(): {
   UserAudioBookData: Audio[] | null;
@@ -12,60 +12,61 @@ export default function GetUserAudioData(): {
 } {
   const router = useRouter();
   const { toast } = useToast();
-  const [loadingAudioData, setLoadingAudioData] = useState<boolean>(true);
 
-  const token = localStorage.getItem("token");
-  const {
-    data: userData,
-    error: audioError,
-    mutate: mutateAudio,
-  } = useSWR(
-    token ? `${process.env.NEXT_PUBLIC_HOST}/api/getuseraudios` : null,
-    async (url) => {
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch audio data");
-      }
-      return response.json();
+  const fetcher = async (url: string) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Token not available");
     }
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch audio data");
+    }
+
+    const data = await response.json();
+    const audioBookCategory = data.userAudio.filter(
+      (audiobook: any) => audiobook.category === "Audiobook"
+    );
+    const podcastCategory = data.userAudio.filter(
+      (podcast: any) => podcast.category === "Podcast"
+    );
+    return { audioBookCategory, podcastCategory };
+  };
+
+  const { data, error } = useSWR(
+    `${process.env.NEXT_PUBLIC_HOST}/api/getuseraudios`,
+    fetcher
   );
 
   useEffect(() => {
-    if (audioError) {
-      console.error("Error fetching audio data:", audioError);
+    if (error) {
+      console.error("Error fetching audio data:", error);
       toast({
         variant: "destructive",
         description: "Failed to fetch audio data",
       });
     }
-    setLoadingAudioData(!userData && !audioError);
-  }, [audioError, toast, userData]);
+  }, [error, toast]);
 
-  const UserAudioBookData = userData
-    ? userData.userAudio.filter(
-        (audiobook: any) => audiobook.category === "Audiobook"
-      )
-    : null;
-  const UserPodcastData = userData
-    ? userData.userAudio.filter(
-        (podcast: any) => podcast.category === "Podcast"
-      )
-    : null;
+  const { audioBookCategory, podcastCategory } = data || {};
+  const loadingAudioData = !data && !error;
 
   const refreshAudioData = () => {
-    mutateAudio();
+    mutate(`${process.env.NEXT_PUBLIC_HOST}/api/getuseraudios`);
   };
 
   return {
-    UserAudioBookData,
-    refreshAudioData,
-    UserPodcastData,
+    UserAudioBookData: audioBookCategory,
+    UserPodcastData: podcastCategory,
     loadingAudioData,
+    refreshAudioData,
   };
 }
