@@ -52,9 +52,8 @@ const usePlayer = (
         body: JSON.stringify({ roomId }),
       });
     }
-    peer?.disconnect();
+    peer.disconnect();
     router.replace("/");
-    window.location.reload();
   };
 
   const toggleAudio = () => {

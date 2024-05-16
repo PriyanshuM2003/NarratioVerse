@@ -37,6 +37,7 @@ export default function Home({
 export async function getServerSideProps(context: any) {
   try {
     const liveTalks = await prisma.liveTalk.findMany({
+      where: { status: true },
       include: {
         user: true,
       },

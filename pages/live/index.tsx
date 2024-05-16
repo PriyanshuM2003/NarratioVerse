@@ -110,19 +110,13 @@ export async function getServerSideProps(context: any) {
       ...liveTalkItem,
       createdAt: liveTalkItem.createdAt.toISOString(),
       updatedAt: liveTalkItem.updatedAt.toISOString(),
-      expiryDate: liveTalkItem.user.expiryDate
-        ? liveTalkItem.user.expiryDate.toISOString()
-        : null,
       user: {
         ...liveTalkItem.user,
         createdAt: liveTalkItem.user.createdAt.toISOString(),
         updatedAt: liveTalkItem.user.updatedAt.toISOString(),
-        expiryDate: liveTalkItem.user.expiryDate
-          ? liveTalkItem.user.expiryDate.toISOString()
-          : null,
       },
     }));
-    
+
     return {
       props: {
         liveTalks: formattedLiveTalks,

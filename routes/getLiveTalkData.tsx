@@ -1,59 +1,56 @@
-import { useToast } from "@/components/ui/use-toast";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { LiveTalk } from "@/types/types";
+import { useToast } from "@/components/ui/use-toast";
+import useSWR, { mutate } from "swr";
 
 export default function GetLiveTalkData(): {
-  liveTalkData: LiveTalk | null;
-  liveTalkHistoryData: LiveTalk[] | null;
+  liveTalkData: LiveTalk[] | null;
   loadingLiveTalkData: boolean;
+  refreshLiveTalk: () => void;
 } {
-  const router = useRouter();
   const { toast } = useToast();
-  const [loadingLiveTalkData, setLoadingLiveTalkData] = useState<boolean>(true);
-  const [liveTalkData, setLiveTalkData] = useState<LiveTalk | null>(null);
-  const [liveTalkHistoryData, setLiveTalkHistoryData] = useState<
-    LiveTalk[] | null
-  >(null);
+
+  const fetcher = async (url: string) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("Token not available");
+    }
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch live talk data");
+    }
+
+    const data = await response.json();
+    return data.userLiveTalk;
+  };
+
+  const {
+    data: liveTalkData,
+    error,
+    isValidating: loadingLiveTalkData,
+  } = useSWR(`${process.env.NEXT_PUBLIC_HOST}/api/getlivetalk`, fetcher);
 
   useEffect(() => {
-    const fetchLiveTalkData = async () => {
-      try {
-        setLoadingLiveTalkData(true);
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_HOST}/api/getlivetalk`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch live talk data");
-        }
-
-        const data = await response.json();
-        setLiveTalkData(data.userLiveTalk);
-        setLiveTalkHistoryData(data.userLiveTalk);
-      } catch (error) {
-        console.error("Error fetching live talk data:", error);
-        toast({
-          variant: "destructive",
-          description: "Failed to fetch live talk data",
-        });
-      } finally {
-        setLoadingLiveTalkData(false);
-      }
-    };
-
-    const token = localStorage.getItem("token");
-    if (token) {
-      fetchLiveTalkData();
+    if (error) {
+      console.error("Error fetching live talk data:", error);
+      toast({
+        variant: "destructive",
+        description: "Failed to fetch live talk data",
+      });
     }
-  }, [router, toast]);
+  }, [error, toast]);
 
-  return { liveTalkData, liveTalkHistoryData, loadingLiveTalkData };
+  const refreshLiveTalk = () => {
+    mutate(`${process.env.NEXT_PUBLIC_HOST}/api/getlivetalk`);
+  };
+
+  return { liveTalkData, loadingLiveTalkData, refreshLiveTalk };
 }

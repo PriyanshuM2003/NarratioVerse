@@ -6,13 +6,13 @@ import GetLiveTalkData from "@/routes/getLiveTalkData";
 
 const LiveHistory = () => {
   const [liveHistory, setLiveHistory] = useState<any[]>([]);
-  const { liveTalkHistoryData, loadingLiveTalkData } = GetLiveTalkData();
+  const { liveTalkData, loadingLiveTalkData } = GetLiveTalkData();
 
   useEffect(() => {
-    if (liveTalkHistoryData) {
-      setLiveHistory(liveTalkHistoryData);
+    if (liveTalkData) {
+      setLiveHistory(liveTalkData);
     }
-  }, [liveTalkHistoryData]);
+  }, [liveTalkData]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -59,7 +59,7 @@ const LiveHistory = () => {
             />
           ))
         ) : (
-          <>
+          <div className="space-y-4">
             {liveHistory.length === 0 && (
               <div className="my-4">No live history found!</div>
             )}
@@ -67,7 +67,7 @@ const LiveHistory = () => {
               <>
                 <div
                   key={history.id}
-                  className="grid grid-cols-6 bg-gray-700 border-b-2 border-white px-4 py-2 rounded-md space-y-2 items-center"
+                  className="grid grid-cols-6 bg-gray-700 border-b-2 border-white px-4 rounded-md gap-4 items-center"
                 >
                   <div>
                     {index + 1}.&nbsp;{history.title}
@@ -93,7 +93,7 @@ const LiveHistory = () => {
                 </div>
               </>
             ))}
-          </>
+          </div>
         )}
       </div>
     </>

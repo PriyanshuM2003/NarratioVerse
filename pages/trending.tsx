@@ -83,7 +83,7 @@ const Trending = ({
                     <ScrollBar orientation="horizontal" />
                   </ScrollArea>
                 </div>
-                {liveTalks?.length > 0 && liveTalks[0]?.status && (
+                {liveTalks?.length > 0 && (
                   <>
                     <div className="flex items-center justify-between">
                       <h2 className="text-2xl font-semibold tracking-tight">

@@ -22,18 +22,7 @@ const JoinLiveRoom = () => {
   const { liveTalkData, loadingLiveTalkData } = GetLiveTalkData();
 
   const joinRoom = () => {
-    if (
-      liveTalkData &&
-      liveTalkData?.roomId === roomId &&
-      liveTalkData?.status
-    ) {
-      router.push(`live/${roomId}`);
-    } else {
-      toast({
-        variant: "destructive",
-        description: "Please provide a valid room id!",
-      });
-    }
+    router.push(`live/${roomId}`);
   };
 
   return (

@@ -132,7 +132,6 @@ const Room = ({
       delete playersCopy[userId];
       setPlayers(playersCopy);
       setViewerCount((prevCount) => Math.max(prevCount - 1, 0));
-      window.location.reload();
     };
 
     socket.on("user-toggle-audio", handleToggleAudio);
