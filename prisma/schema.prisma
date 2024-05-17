@@ -37,8 +37,8 @@ model Tokens {
   id                String   @id @default(uuid())
   userId            String   @unique
   user              User     @relation(fields: [userId], references: [id])
-  verificationToken String
-  refreshToken      String
+  verificationToken String?
+  refreshToken      String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }

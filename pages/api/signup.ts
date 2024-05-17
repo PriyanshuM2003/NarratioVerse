@@ -69,6 +69,14 @@ export default async function handler(
         process.env.JWT_SECRET_KEY as Secret,
         { expiresIn: "1d" }
       );
+
+      await prisma.tokens.create({
+        data: {
+          userId: user.id,
+          verificationToken,
+        },
+      });
+
       return res
         .status(200)
         .json({ message: "User created successfully", verificationToken });

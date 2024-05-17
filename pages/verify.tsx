@@ -13,7 +13,7 @@ const Verify: React.FC = () => {
       try {
         const { token } = router.query;
 
-        if (!token) {
+        if (!token || Array.isArray(token)) {
           setMessage("Invalid verification link.");
           return;
         }

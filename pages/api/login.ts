@@ -18,7 +18,6 @@ const generateRefreshToken = async (userId: string) => {
     create: {
       userId,
       refreshToken,
-      verificationToken: "",
     },
   });
 

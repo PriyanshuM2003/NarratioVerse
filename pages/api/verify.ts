@@ -19,11 +19,25 @@ export default async function handler(
       ) as { email: string };
       const user = await prisma.user.findUnique({
         where: { email: decodedToken.email },
+        include: { Tokens: true },
       });
 
       if (!user) {
-        return res.status(400).json({ error: "Invalid or expired token" });
+        return res.status(400).json({ error: "Invalid User" });
       }
+
+      const verificationToken = user.Tokens?.find(
+        (t) => t.verificationToken === token
+      );
+
+      if (!verificationToken) {
+        return res.status(400).json({ error: "Invalid Token" });
+      }
+
+      if (user.isVerified) {
+        return res.status(400).json({ error: "User is already verified" });
+      }
+
       if (user.isVerified) {
         return res.status(400).json({ error: "User is already verified" });
       }
