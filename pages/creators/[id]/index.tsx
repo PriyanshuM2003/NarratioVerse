@@ -417,37 +417,28 @@ export async function getServerSideProps(context: any) {
       ...creator,
       createdAt: creator.createdAt.toISOString(),
       updatedAt: creator.updatedAt.toISOString(),
-      expiryDate: creator.expiryDate ? creator.expiryDate.toISOString() : null,
       Audio: creator.Audio.map((audioItem: any) => ({
         ...audioItem,
         createdAt: audioItem.createdAt.toISOString(),
         updatedAt: audioItem.updatedAt.toISOString(),
-        expiryDate: audioItem.expiryDate
-          ? audioItem.expiryDate.toISOString()
-          : null,
+       
         user: {
           ...audioItem.user,
           createdAt: audioItem.user.createdAt.toISOString(),
           updatedAt: audioItem.user.updatedAt.toISOString(),
-          expiryDate: audioItem.user.expiryDate
-            ? audioItem.user.expiryDate.toISOString()
-            : null,
+         
         },
       })),
       liveTalks: creator.liveTalks.map((liveItem: any) => ({
         ...liveItem,
         createdAt: liveItem.createdAt.toISOString(),
         updatedAt: liveItem.updatedAt.toISOString(),
-        expiryDate: liveItem.expiryDate
-          ? liveItem.expiryDate.toISOString()
-          : null,
+       
         user: {
           ...liveItem.user,
           createdAt: liveItem.user.createdAt.toISOString(),
           updatedAt: liveItem.user.updatedAt.toISOString(),
-          expiryDate: liveItem.user.expiryDate
-            ? liveItem.user.expiryDate.toISOString()
-            : null,
+          
         },
       })),
     };

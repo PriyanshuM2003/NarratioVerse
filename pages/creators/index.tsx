@@ -187,17 +187,11 @@ export async function getServerSideProps(context: any) {
         ...creator,
         createdAt: creator.createdAt.toISOString(),
         updatedAt: creator.updatedAt.toISOString(),
-        expiryDate: creator.expiryDate
-          ? creator.expiryDate.toISOString()
-          : null,
       };
       return {
         ...creator,
         createdAt: creator.createdAt.toISOString(),
         updatedAt: creator.updatedAt.toISOString(),
-        expiryDate: creator.expiryDate
-          ? creator.expiryDate.toISOString()
-          : null,
         user: formattedUser,
       };
     });

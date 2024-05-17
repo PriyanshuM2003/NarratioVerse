@@ -8,15 +8,41 @@ export interface User {
   creator: boolean;
   premium: boolean;
   isVerified: boolean;
-  planType?: String;
-  expiryDate?: Date;
-  verificationToken?: string | null;
   password: string;
   profileImage?: string | null;
+  Tokens: Tokens[];
+  PlanData: PlanData[];
+  Preferences: Preferences[];
   Audio: Audio[];
   liveTalks: LiveTalk[];
   liveTalkParticipants: LiveTalkParticipant[];
-  Preferences: Preferences[];
+  following: Follower[];
+  playlists: Playlist[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Tokens {
+  id: string;
+  userId: string;
+  user: User;
+  verificationToken: string;
+  refreshToken: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface PlanData {
+  id: string;
+  userId: string;
+  user: User;
+  paymentStatus: boolean;
+  method: string;
+  amount: number;
+  currency: string;
+  category: string;
+  type: string;
+  expiryDate: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,12 +60,22 @@ export interface Preferences {
 export interface Audio {
   id: string;
   title: string;
-  slug: string;
   coverImage: string;
   category: string;
   genres: string[];
   parts: any[];
   streams: number;
+  playlists: Playlist[];
+  userId: string;
+  user: User;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface TotalCounts {
+  id: string;
+  Totalstreams: number;
+  monthlyIncome: string[];
   userId: string;
   user: User;
   createdAt: Date;

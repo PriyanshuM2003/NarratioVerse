@@ -6,11 +6,13 @@ import { loadStripe } from "@stripe/stripe-js";
 import GetLoggedUserData from "@/routes/getLoggedUserData";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/router";
+import GetUserPlanData from "@/routes/getPlanData";
 
 const Plans: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<string>("premium");
   const [planData, setPlanData] = useState<any>("");
-  const { loadingUserData, loggedUserData } = GetLoggedUserData();
+  const { loggedUserData, loadingUserData } = GetLoggedUserData();
+  const { loadingUserPlanData, userPlanData } = GetUserPlanData();
   const router = useRouter();
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -20,10 +22,10 @@ const Plans: React.FC = () => {
   }, [router]);
 
   useEffect(() => {
-    if (loggedUserData) {
-      setPlanData(loggedUserData);
+    if (userPlanData) {
+      setPlanData(userPlanData);
     }
-  }, [loggedUserData]);
+  }, [userPlanData]);
 
   const handleTabChange = (value: string) => {
     setSelectedTab(value);
@@ -67,7 +69,9 @@ const Plans: React.FC = () => {
 
       if (!response.ok) {
         const errorMessage = await response.text();
-        throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorMessage}`);
+        throw new Error(
+          `HTTP error! Status: ${response.status}, Message: ${errorMessage}`
+        );
       }
 
       const responseData = await response.json();
@@ -87,11 +91,11 @@ const Plans: React.FC = () => {
           <Skeleton className="h-[500px] w-[300px] flex items-center mx-auto mt-20" />
         ) : (
           <>
-            {planData.creator && plans.creator ? (
+            {loggedUserData?.creator && loggedUserData.creator ? (
               <div className="flex items-center justify-center mt-10">
                 {plans.creator.map((plan: any, index: number) => (
                   <div key={index}>
-                    {planData.planType === plan.title && (
+                    {planData.type === plan.title && (
                       <div className="h-full w-[500px] p-6 rounded-lg border-2 border-gray-300 flex flex-col relative overflow-hidden">
                         <h2 className="text-sm tracking-widest title-font mb-1 font-medium">
                           {plan.title}
@@ -137,7 +141,7 @@ const Plans: React.FC = () => {
               <div className="flex items-center justify-center mt-10">
                 {plans.premium.map((plan: any, index: number) => (
                   <div key={index}>
-                    {planData.planType === plan.title && (
+                    {planData.type === plan.title && (
                       <div className="h-full p-6 rounded-lg border-2 border-gray-300 flex flex-col relative overflow-hidden">
                         <h2 className="text-sm tracking-widest title-font mb-1 font-medium">
                           {plan.title}
