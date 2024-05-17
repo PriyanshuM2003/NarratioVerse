@@ -99,9 +99,7 @@ const New = ({ audio }: { audio: Audio[] }) => {
       <div className="min-h-screen px-4 py-6 lg:px-8 text-white">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <h2 className="text-2xl font-semibold tracking-tight">
-              New
-            </h2>
+            <h2 className="text-2xl font-semibold tracking-tight">New</h2>
           </div>
           <div className="flex items-center gap-2">
             <Select>
@@ -295,16 +293,11 @@ export async function getServerSideProps(context: any) {
       ...audioItem,
       createdAt: audioItem.createdAt.toISOString(),
       updatedAt: audioItem.updatedAt.toISOString(),
-      expiryDate: audioItem.user.expiryDate
-        ? audioItem.user.expiryDate.toISOString()
-        : null,
+
       user: {
         ...audioItem.user,
         createdAt: audioItem.user.createdAt.toISOString(),
         updatedAt: audioItem.user.updatedAt.toISOString(),
-        expiryDate: audioItem.user.expiryDate
-          ? audioItem.user.expiryDate.toISOString()
-          : null,
       },
     }));
 

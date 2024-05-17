@@ -3,15 +3,42 @@ import bcrypt from "bcryptjs";
 import jwt, { Secret } from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
 
-const generateRefreshToken = (userId: string) => {
-  return jwt.sign({ id: userId }, process.env.REFRESH_TOKEN_SECRET as Secret, {
-    expiresIn: "7d",
+const generateRefreshToken = async (userId: string) => {
+  const refreshToken = jwt.sign(
+    { id: userId },
+    process.env.REFRESH_TOKEN_SECRET as Secret,
+    {
+      expiresIn: "7d",
+    }
+  );
+
+  await prisma.tokens.upsert({
+    where: { userId },
+    update: { refreshToken },
+    create: {
+      userId,
+      refreshToken,
+      verificationToken: "",
+    },
   });
+
+  return refreshToken;
 };
 
-const verifyRefreshToken = (token: string) => {
+const verifyRefreshToken = async (token: string) => {
   try {
-    return jwt.verify(token, process.env.REFRESH_TOKEN_SECRET as Secret);
+    const decoded = jwt.verify(
+      token,
+      process.env.REFRESH_TOKEN_SECRET as Secret
+    );
+    const storedToken = await prisma.tokens.findUnique({
+      where: { userId: (decoded as { id: string }).id },
+    });
+
+    if (storedToken?.refreshToken === token) {
+      return decoded;
+    }
+    return null;
   } catch (error) {
     return null;
   }
@@ -26,17 +53,19 @@ export default async function handler(
       const { email, password } = req.body;
 
       if (!email || !password) {
-        return res.status(400).json({ error: "Please provide email and password." });
+        return res
+          .status(400)
+          .json({ error: "Please provide email and password." });
       }
 
       const user = await prisma.user.findUnique({
-        where: {
-          email,
-        },
+        where: { email },
       });
 
       if (!user || !user.isVerified) {
-        return res.status(401).json({ error: "Invalid credentials or user not verified." });
+        return res
+          .status(401)
+          .json({ error: "Invalid credentials or user not verified." });
       }
 
       const passwordMatch = await bcrypt.compare(password, user.password);
@@ -48,12 +77,10 @@ export default async function handler(
       const accessToken = jwt.sign(
         { id: user.id },
         process.env.JWT_SECRET_KEY as Secret,
-        {
-          expiresIn: "1d",
-        }
+        { expiresIn: "1d" }
       );
 
-      const refreshToken = generateRefreshToken(user.id);
+      const refreshToken = await generateRefreshToken(user.id);
 
       const userResponse = {
         id: user.id,
@@ -74,7 +101,7 @@ export default async function handler(
         return res.status(401).json({ error: "Refresh token not provided." });
       }
 
-      const decodedRefreshToken = verifyRefreshToken(refreshToken);
+      const decodedRefreshToken = await verifyRefreshToken(refreshToken);
 
       if (!decodedRefreshToken) {
         return res.status(401).json({ error: "Invalid refresh token." });
@@ -83,9 +110,7 @@ export default async function handler(
       const userId = (decodedRefreshToken as { id: string }).id;
 
       const user = await prisma.user.findUnique({
-        where: {
-          id: userId,
-        },
+        where: { id: userId },
       });
 
       if (!user) {
@@ -95,9 +120,7 @@ export default async function handler(
       const newAccessToken = jwt.sign(
         { id: userId },
         process.env.JWT_SECRET_KEY as Secret,
-        {
-          expiresIn: "1d",
-        }
+        { expiresIn: "1d" }
       );
 
       return res.status(200).json({ accessToken: newAccessToken });
@@ -106,6 +129,8 @@ export default async function handler(
     }
   } catch (error) {
     console.error("Error authenticating user:", error);
-    return res.status(500).json({ error: "Something went wrong while authenticating the user." });
+    return res
+      .status(500)
+      .json({ error: "Something went wrong while authenticating the user." });
   }
 }

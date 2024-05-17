@@ -28,12 +28,19 @@ export default async function handler(
         return res.status(400).json({ error: "User is already verified" });
       }
       await prisma.user.update({
-        where: { email: decodedToken.email },
+        where: { id: user.id },
         data: {
           isVerified: true,
-          verificationToken: null,
         },
       });
+
+      await prisma.tokens.updateMany({
+        where: { userId: user.id, verificationToken: token },
+        data: {
+          verificationToken: "",
+        },
+      });
+
       return res.status(200).json({ message: "Email verified successfully" });
     } else {
       return res.status(405).json({ error: "Method Not Allowed" });

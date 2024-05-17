@@ -290,16 +290,11 @@ export async function getServerSideProps(context: any) {
       ...audioItem,
       createdAt: audioItem.createdAt.toISOString(),
       updatedAt: audioItem.updatedAt.toISOString(),
-      expiryDate: audioItem.user.expiryDate
-        ? audioItem.user.expiryDate.toISOString()
-        : null,
+
       user: {
         ...audioItem.user,
         createdAt: audioItem.user.createdAt.toISOString(),
         updatedAt: audioItem.user.updatedAt.toISOString(),
-        expiryDate: audioItem.user.expiryDate
-          ? audioItem.user.expiryDate.toISOString()
-          : null,
       },
     }));
 

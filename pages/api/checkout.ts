@@ -115,13 +115,22 @@ export default async function handler(
       // const eventType = event.type;
       // switch (eventType) {
       //   case "checkout.session.completed":
+      await prisma.planData.update({
+        where: { id: decoded.id },
+        data: {
+          paymentStatus: true,
+          amount: price,
+          currency: "INR",
+          category,
+          type: title,
+          expiryDate: expiryDate,
+        },
+      });
       await prisma.user.update({
         where: { id: decoded.id },
         data: {
           premium: category === "premium" ? true : false,
           creator: category === "creator" ? true : false,
-          planType: title,
-          expiryDate: expiryDate,
         },
       });
       //     break;

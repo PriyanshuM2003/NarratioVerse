@@ -18,11 +18,10 @@ model User {
   creator              Boolean               @default(false)
   premium              Boolean               @default(false)
   isVerified           Boolean               @default(false)
-  planType             String?
-  expiryDate           DateTime?
-  verificationToken    String?
   password             String
   profileImage         String?
+  Tokens               Tokens[]
+  PlanData             PlanData[]
   Preferences          Preferences[]
   Audio                Audio[]
   liveTalks            LiveTalk[]
@@ -31,6 +30,32 @@ model User {
   playlists            Playlist[]
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
+  TotalCounts          TotalCounts[]
+}
+
+model Tokens {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id])
+  verificationToken String
+  refreshToken      String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model PlanData {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  paymentStatus Boolean  @default(false)
+  method        String   @default("card")
+  amount        Int      @default(0)
+  currency      String
+  category      String
+  type          String
+  expiryDate    DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Preferences {
@@ -46,7 +71,6 @@ model Preferences {
 model Audio {
   id         String     @id @default(uuid())
   title      String
-  slug       String     @unique
   coverImage String
   category   String
   genres     String[]
@@ -57,6 +81,16 @@ model Audio {
   user       User       @relation(fields: [userId], references: [id])
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
+}
+
+model TotalCounts {
+  id            String   @id @default(uuid())
+  Totalstreams  Int      @default(0)
+  monthlyIncome String[]
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model LiveTalk {
