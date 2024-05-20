@@ -22,7 +22,6 @@ export default async function handler(
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const now = new Date();
       const monthsOrder = [
         "Jan",
         "Feb",
@@ -37,50 +36,14 @@ export default async function handler(
         "Nov",
         "Dec",
       ];
-      const monthlyRevenues = [];
 
-      for (let i = 0; i < 12; i++) {
-        const targetDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const startOfMonth = new Date(
-          targetDate.getFullYear(),
-          targetDate.getMonth(),
-          1
-        );
-        const endOfMonth = new Date(
-          targetDate.getFullYear(),
-          targetDate.getMonth() + 1,
-          0
-        );
+      const monthlyRevenues = await prisma.totalCounts.findFirst({
+        where: { userId: decoded.id },
+        select: {
+          monthlyIncome: true,
+        },
+      });
 
-        const userMonthlyAudios = await prisma.audio.findMany({
-          where: {
-            userId: decoded.id,
-            createdAt: {
-              gte: startOfMonth,
-              lt: endOfMonth,
-            },
-          },
-          select: {
-            streams: true,
-          },
-        });
-
-        const monthlyStreams = userMonthlyAudios.reduce(
-          (total, audio) => total + audio.streams,
-          0
-        );
-
-        const monthlyRevenue = (monthlyStreams * 0.003).toFixed(3);
-
-        const monthName = startOfMonth.toLocaleString("default", {
-          month: "short",
-        });
-        const monthIndex = monthsOrder.indexOf(monthName);
-        monthlyRevenues[monthIndex] = {
-          month: monthName,
-          revenue: Number(monthlyRevenue),
-        };
-      }
       return res.status(200).json({ monthlyRevenues });
     } else {
       return res.status(405).json({ message: "Method Not Allowed" });

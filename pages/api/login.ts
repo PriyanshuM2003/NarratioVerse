@@ -8,7 +8,7 @@ const generateRefreshToken = async (userId: string) => {
     { id: userId },
     process.env.REFRESH_TOKEN_SECRET as Secret,
     {
-      expiresIn: "7d",
+      expiresIn: "90d",
     }
   );
 

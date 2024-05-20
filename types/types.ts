@@ -74,7 +74,8 @@ export interface Audio {
 
 export interface TotalCounts {
   id: string;
-  Totalstreams: number;
+  totalStreams: number;
+  totalRevenue: number;
   monthlyIncome: string[];
   userId: string;
   user: User;

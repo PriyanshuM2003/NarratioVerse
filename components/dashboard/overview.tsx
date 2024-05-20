@@ -10,10 +10,10 @@ export function Overview() {
     <>
       {loadingMonthlyRevenues ? (
         <div className="flex gap-4 px-4">
-        {Array.from({ length: 12 }, (_, index) => (
-          <Skeleton key={index} className="h-96 w-10" />
-        ))}
-      </div>
+          {Array.from({ length: 12 }, (_, index) => (
+            <Skeleton key={index} className="h-96 w-10" />
+          ))}
+        </div>
       ) : (
         <>
           <ResponsiveContainer width="100%" height={350}>

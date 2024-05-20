@@ -30,25 +30,11 @@ export default async function handler(
         },
       });
 
-      const userAudios = await prisma.audio.findMany({
-        where: {
-          userId: decoded.id,
-        },
-        select: {
-          streams: true,
-        },
+      const totalCounts = await prisma.totalCounts.findFirst({
+        where: { userId: decoded.id },
       });
 
-      const totalStreams = userAudios.reduce(
-        (total, audio) => total + audio.streams,
-        0
-      );
-
-      const totalRevenue = (totalStreams * 0.003).toFixed(3);
-
-      return res
-        .status(200)
-        .json({ followersCount, totalStreams, totalRevenue });
+      return res.status(200).json({ followersCount, totalCounts });
     } else {
       return res.status(405).json({ message: "Method Not Allowed" });
     }

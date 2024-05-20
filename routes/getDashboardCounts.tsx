@@ -1,11 +1,11 @@
 import { useToast } from "@/components/ui/use-toast";
+import { TotalCounts } from "@/types/types";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 export default function GetDashboardCounts(): {
   followersCount: number | null;
-  totalStreams: number | null;
-  totalRevenue: number | null;
+  totalCounts: TotalCounts | null;
   loadingDashboardCounts: boolean;
 } {
   const router = useRouter();
@@ -13,8 +13,7 @@ export default function GetDashboardCounts(): {
   const [loadingDashboardCounts, setLoadingDashboardCounts] =
     useState<boolean>(true);
   const [followersCount, setFollowersCount] = useState<number | null>(null);
-  const [totalRevenue, setTotalRevenue] = useState<number | null>(null);
-  const [totalStreams, setTotalStreams] = useState<number | null>(null);
+  const [totalCounts, setTotalCounts] = useState<TotalCounts | null>(null);
 
   useEffect(() => {
     const fetchDashboardCounts = async () => {
@@ -38,8 +37,7 @@ export default function GetDashboardCounts(): {
         const data = await response.json();
 
         setFollowersCount(data.followersCount);
-        setTotalRevenue(data.totalRevenue);
-        setTotalStreams(data.totalStreams);
+        setTotalCounts(data.totalCounts);
       } catch (error) {
         console.error("Error fetching dashboard counts data:", error);
         toast({
@@ -58,8 +56,7 @@ export default function GetDashboardCounts(): {
 
   return {
     followersCount,
-    totalStreams,
-    totalRevenue,
+    totalCounts,
     loadingDashboardCounts,
   };
 }

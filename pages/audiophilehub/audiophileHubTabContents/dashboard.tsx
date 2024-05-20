@@ -15,7 +15,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Dashboard = () => {
-  const { followersCount, totalStreams, totalRevenue, loadingDashboardCounts } =
+  const { followersCount, totalCounts, loadingDashboardCounts } =
     GetDashboardCounts();
   return (
     <>
@@ -46,7 +46,9 @@ const Dashboard = () => {
                 </>
               ) : (
                 <>
-                  <div className="text-2xl font-bold">{totalRevenue}</div>
+                  <div className="text-2xl font-bold">
+                    {totalCounts?.totalRevenue}
+                  </div>
                 </>
               )}
               {/* <p className="text-xs text-muted-foreground">
@@ -112,7 +114,9 @@ const Dashboard = () => {
                 </>
               ) : (
                 <>
-                  <div className="text-2xl font-bold">{totalStreams}</div>
+                  <div className="text-2xl font-bold">
+                    {totalCounts?.totalRevenue}
+                  </div>
                 </>
               )}
               {/* <p className="text-xs text-muted-foreground">

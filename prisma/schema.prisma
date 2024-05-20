@@ -85,7 +85,8 @@ model Audio {
 
 model TotalCounts {
   id            String   @id @default(uuid())
-  Totalstreams  Int      @default(0)
+  totalStreams  Int      @default(0)
+  totalRevenue  Int      @default(0)
   monthlyIncome String[]
   userId        String
   user          User     @relation(fields: [userId], references: [id])
