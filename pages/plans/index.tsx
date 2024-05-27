@@ -39,7 +39,6 @@ const Plans: React.FC = () => {
     category: string,
     title: string
   ) => {
-    console.log("Price:", price);
     const stripe = await loadStripe(
       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
     );

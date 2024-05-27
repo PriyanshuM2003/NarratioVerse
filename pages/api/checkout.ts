@@ -115,8 +115,16 @@ export default async function handler(
       // const eventType = event.type;
       // switch (eventType) {
       //   case "checkout.session.completed":
+      const planData = await prisma.planData.findFirst({
+        where: { userId: decoded.id },
+      });
+
+      if (!planData) {
+        return res.status(404).json({ error: "Plan data not found" });
+      }
+
       await prisma.planData.update({
-        where: { id: decoded.id },
+        where: { id: planData.id },
         data: {
           paymentStatus: true,
           amount: price,
@@ -126,6 +134,7 @@ export default async function handler(
           expiryDate: expiryDate,
         },
       });
+
       await prisma.user.update({
         where: { id: decoded.id },
         data: {
