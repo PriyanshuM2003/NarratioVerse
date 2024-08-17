@@ -1,5 +1,5 @@
 export const getAccessToken = () => {
-  return getAccessToken();
+  return localStorage.getItem("accessToken");
 };
 
 export const getRefreshToken = () => {
