@@ -42,10 +42,10 @@ export default function GetPlaylistsData(): {
   useEffect(() => {
     if (error) {
       console.error("Error fetching playlists data:", error);
-      toast({
-        variant: "destructive",
-        description: "Failed to fetch playlists data",
-      });
+      // toast({
+      //   variant: "destructive",
+      //   description: "Failed to fetch playlists data",
+      // });
     }
   }, [error, toast]);
   const refreshPlaylists = () => {

@@ -1,4 +1,5 @@
 "use client";
+import ReactDOMServer from "react-dom/server";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getAccessToken } from "@/lib/auth";
+import { VerificationMail } from "@/data/email";
 
 interface FormData {
   name: string;
@@ -123,6 +125,10 @@ const Signup = () => {
           description: "Account created successfully!",
         });
 
+        const htmlContent = ReactDOMServer.renderToStaticMarkup(
+          <VerificationMail token={verificationToken} />
+        );
+
         try {
           const emailResult = await fetch(
             `${process.env.NEXT_PUBLIC_HOST}/api/mailer`,
@@ -134,74 +140,7 @@ const Signup = () => {
               body: JSON.stringify({
                 recipient: formData.email,
                 subject: "Welcome to Narratioverse",
-                htmlContent: `
-                <body
-                style="
-                font-family: Arial, sans-serif;
-                background-color: #f5f5f5;
-                padding: 20px;
-                "
-                >
-                <div
-                style="
-                max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #2e3d49;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      "
-      >
-      <h1
-      style="
-      font-size: 28px;
-      font-weight: bold;
-      color: #ffffff;
-      text-align: center;
-      "
-      >
-      <span style="color: #ffffff">Narratioverse</span>
-      </h1>
-      <p style="font-size: 18px; color: #ffffff; text-align: center">
-      <strong>Welcome to Narratioverse!</strong> <br />
-      Thank you for registering with us.
-      </p>
-      <a
-      href="${process.env.NEXT_PUBLIC_HOST}/verify?token=${verificationToken}"
-      style="
-      display: block;
-      margin: 20px auto;
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
-      text-align: center;
-      text-decoration: none;
-      color: #fff;
-      background-color: #000000;
-      border: 2px solid #ffffff;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease, color 0.3s ease,
-      border-color 0.3s ease;
-      "
-      onmouseover="this.style.backgroundColor='#333333'; this.style.color='#fff'; this.style.borderColor='#000000'"
-      onmouseout="this.style.backgroundColor='#000000'; this.style.color='#fff'; this.style.borderColor='#333333'"
-      >
-      Please click this button to Verify yourself
-      </a>
-      <p
-      style="margin-top: 30px; font-size: 14px; color: #777; text-align: center"
-      >
-      If you didn't create an account with us, you can ignore this message.
-      </p>
-      
-      <p style="font-size: 14px; color: #888; text-align: center">
-      Best Regards,<br />
-      NARRATIOVERSE Team
-      </p>
-      </div>
-      </body>
-      `,
+                htmlContent,
               }),
             }
           );

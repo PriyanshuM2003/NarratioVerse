@@ -49,10 +49,10 @@ export default function GetMadeForYou(): {
   useEffect(() => {
     if (error) {
       console.error("Error fetching audio data:", error);
-      toast({
-        variant: "destructive",
-        description: "Failed to fetch audio data",
-      });
+      // toast({
+      //   variant: "destructive",
+      //   description: "Failed to fetch audio data",
+      // });
     }
   }, [error, toast]);
 
