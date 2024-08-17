@@ -2,6 +2,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Follower } from "@/types/types";
+import { getAccessToken } from "@/lib/auth";
 
 export default function GetFollowingData(): {
   followingData: Follower | null;
@@ -46,7 +47,7 @@ export default function GetFollowingData(): {
         setLoadingFollowingData(false);
       }
     };
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (token) {
       fetchFollowingeData();
     }

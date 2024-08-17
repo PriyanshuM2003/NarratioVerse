@@ -7,7 +7,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader } from "lucide-react";
-import jwt, { Secret } from "jsonwebtoken";
 import {
   Card,
   CardContent,
@@ -16,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getAccessToken } from "@/lib/auth";
 
 interface Props {
   setIsLoggedIn: React.Dispatch<boolean>;
@@ -29,21 +29,9 @@ const Login: React.FC<Props> = ({ setIsLoggedIn }) => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (token) {
       router.replace("/");
-    } else {
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (refreshToken) {
-        refreshAccessToken(refreshToken)
-          .then((accessToken) => {
-            localStorage.setItem("token", accessToken);
-            router.replace("/");
-          })
-          .catch((error) => {
-            console.error("Failed to refresh access token:", error);
-          });
-      }
     }
   }, [router]);
 
@@ -51,7 +39,7 @@ const Login: React.FC<Props> = ({ setIsLoggedIn }) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_HOST}/api/login`,
+        `${process.env.NEXT_PUBLIC_HOST}/api/auth/login`,
         {
           method: "POST",
           headers: {
@@ -63,8 +51,9 @@ const Login: React.FC<Props> = ({ setIsLoggedIn }) => {
 
       if (response.ok) {
         const { accessToken, refreshToken } = await response.json();
-        localStorage.setItem("token", accessToken);
+        localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
+
         toast({
           description: "Logged in successfully",
         });
@@ -99,31 +88,6 @@ const Login: React.FC<Props> = ({ setIsLoggedIn }) => {
       setPassword("");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const refreshAccessToken = async (refreshToken: string) => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_HOST}/api/login`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${refreshToken}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const { accessToken } = await response.json();
-        return accessToken;
-      } else {
-        throw new Error("Failed to refresh access token.");
-      }
-    } catch (error) {
-      console.error("Error refreshing access token:", error);
-      throw error;
     }
   };
 

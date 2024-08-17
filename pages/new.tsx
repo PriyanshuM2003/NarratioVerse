@@ -303,7 +303,7 @@ export async function getServerSideProps(context: any) {
 
     return {
       props: {
-        audio: formattedAudio,
+        audio: formattedAudio.length > 0 ? formattedAudio : await fetchOldAudioData(),
       },
     };
   } catch (error) {
@@ -314,6 +314,30 @@ export async function getServerSideProps(context: any) {
       },
     };
   }
+}
+
+async function fetchOldAudioData() {
+  const audio = await prisma.audio.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: 10,
+    include: {
+      user: true,
+    },
+  });
+
+  return audio.map((audioItem) => ({
+    ...audioItem,
+    createdAt: audioItem.createdAt.toISOString(),
+    updatedAt: audioItem.updatedAt.toISOString(),
+
+    user: {
+      ...audioItem.user,
+      createdAt: audioItem.user.createdAt.toISOString(),
+      updatedAt: audioItem.user.updatedAt.toISOString(),
+    },
+  }));
 }
 
 export default New;

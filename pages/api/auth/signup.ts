@@ -66,7 +66,7 @@ export default async function handler(
 
       const verificationToken = jwt.sign(
         { email: user.email },
-        process.env.JWT_SECRET_KEY as Secret,
+        process.env.ACCESS_TOKEN_SECRET as Secret,
         { expiresIn: "1d" }
       );
 

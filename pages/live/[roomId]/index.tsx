@@ -11,6 +11,7 @@ import { useSocket } from "@/context/socket";
 import { Separator } from "@/components/ui/separator";
 import prisma from "@/lib/prisma";
 import { Eye, Radio } from "lucide-react";
+import { getAccessToken } from "@/lib/auth";
 
 interface UserData {
   [key: string]: {
@@ -52,7 +53,7 @@ const Room = ({
   const [viewerCount, setViewerCount] = useState<number>(0);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (!token) {
       router.push("/");
       return;
@@ -197,7 +198,7 @@ const Room = ({
       if (!userData) {
         return;
       }
-      const token = localStorage.getItem("token");
+      const token = getAccessToken();
       if (!token) {
         router.push("/");
         return;

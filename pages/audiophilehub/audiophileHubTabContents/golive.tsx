@@ -16,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getAccessToken } from "@/lib/auth";
 
 interface Field {
   id: number;
@@ -94,7 +95,7 @@ const GoLive: React.FC = () => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("token");
+      const token = getAccessToken();
       if (!token) {
         router.push("/");
         return;

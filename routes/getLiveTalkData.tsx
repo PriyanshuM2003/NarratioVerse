@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { LiveTalk } from "@/types/types";
 import { useToast } from "@/components/ui/use-toast";
 import useSWR, { mutate } from "swr";
+import { getAccessToken } from "@/lib/auth";
 
 export default function GetLiveTalkData(): {
   liveTalkData: LiveTalk[] | null;
@@ -11,7 +12,7 @@ export default function GetLiveTalkData(): {
   const { toast } = useToast();
 
   const fetcher = async (url: string) => {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (!token) {
       throw new Error("Token not available");
     }

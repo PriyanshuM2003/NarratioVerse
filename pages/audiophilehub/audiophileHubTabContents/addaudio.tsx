@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { getAccessToken } from "@/lib/auth";
 
 interface Field {
   id: number;
@@ -118,7 +119,7 @@ const AddAudio: React.FC = () => {
   const handleAddAudioData = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
+      const token = getAccessToken();
       if (!token) {
         router.push("/");
         return;

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { cloneDeep } from "lodash";
 import { useSocket } from "@/context/socket";
 import { useRouter } from "next/router";
+import { getAccessToken } from "@/lib/auth";
 
 interface PlayerData {
   [key: string]: {
@@ -38,7 +39,7 @@ const usePlayer = (
   const leaveRoom = () => {
     socket?.emit("user-leave", myId, roomId);
     if (userData[myId]?.isHost) {
-      const token = localStorage.getItem("token");
+      const token = getAccessToken();
       if (!token) {
         router.push("/");
         return;

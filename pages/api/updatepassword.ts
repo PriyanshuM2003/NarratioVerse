@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const decoded = jwt.verify(token as string, process.env.JWT_SECRET_KEY as Secret) as { id?: string };
+      const decoded = jwt.verify(token as string, process.env.ACCESS_TOKEN_SECRET as Secret) as { id?: string };
 
       if (!decoded || !decoded.id) {
         return res.status(401).json({ error: "Unauthorized" });

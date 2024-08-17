@@ -1,4 +1,5 @@
 import { useToast } from "@/components/ui/use-toast";
+import { getAccessToken } from "@/lib/auth";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -43,7 +44,7 @@ export default function GetTotalRevenue(): {
         setLoadingTotalRevenue(false);
       }
     };
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (token) {
       fetchFollowersCount();
     }

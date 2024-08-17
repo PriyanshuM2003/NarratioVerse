@@ -1,6 +1,8 @@
+import { getAccessToken } from "@/lib/auth";
+
 export async function addFollow(creatorId: string, router: any, toast: any) {
   try {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (!token) {
       router.push("/");
       return;

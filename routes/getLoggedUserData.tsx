@@ -2,6 +2,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { User } from "@/types/types";
+import { getAccessToken } from "@/lib/auth";
 
 export default function GetLoggedUserData(): {
   loggedUserData: User | null;
@@ -13,7 +14,7 @@ export default function GetLoggedUserData(): {
   const [loggedUserData, setloggedUserData] = useState<User | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (token) {
       fetchLoggedUserData().finally(() => setLoadingUserData(false));
     }
@@ -21,7 +22,7 @@ export default function GetLoggedUserData(): {
 
   const fetchLoggedUserData = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = getAccessToken();
       if (!token) {
         router.push("/login");
         return;

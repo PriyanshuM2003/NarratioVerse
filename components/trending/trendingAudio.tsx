@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Loader, PlusCircle } from "lucide-react";
 import {
   ContextMenu,
@@ -23,6 +23,7 @@ import PlaylistDialog from "@/components/playlist/playlistDialog";
 import GetPlaylistsData from "@/routes/getPlaylistsData";
 import { createPlaylist } from "@/routes/createPlaylist";
 import { removeFromPlaylist } from "@/routes/removeFromPlaylist";
+import { Badge } from "../ui/badge";
 
 interface Audio {
   id: string;
@@ -36,6 +37,7 @@ interface Audio {
 interface AudioPart {
   audioUrl: string;
   partName: string;
+  duration: number;
 }
 
 interface Props {
@@ -46,6 +48,7 @@ const TrendingAudio: React.FC<Props> = ({ audioItem }) => {
   const router = useRouter();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [totalDuration, setTotalDuration] = useState<number>(0);
   const { playlistsData, loadingPlaylistsData, refreshPlaylists } =
     GetPlaylistsData();
 
@@ -70,16 +73,30 @@ const TrendingAudio: React.FC<Props> = ({ audioItem }) => {
   };
 
   const handleRemoveFromPlaylist = async (playlistName: string) => {
-    const removed = await removeFromPlaylist(
-      audioItem.id,
-      playlistName,
-      router,
-      toast
-    );
-    if (removed) {
+    if (await removeFromPlaylist(audioItem.id, playlistName, router, toast)) {
       refreshPlaylists();
     }
   };
+
+  useEffect(() => {
+    (async () => {
+      const durations = await Promise.all(
+        audioItem.parts.map(
+          (part) =>
+            new Promise<number>((resolve) => {
+              const audio = new Audio(part.audioUrl);
+              audio.onloadedmetadata = () => resolve(audio.duration);
+            })
+        )
+      );
+      setTotalDuration(durations.reduce((a, b) => a + b, 0));
+    })();
+  }, [audioItem.parts]);
+
+  const formatDuration = (duration: number) =>
+    duration < 60
+      ? `${Math.round(duration)} sec`
+      : `${Math.floor(duration / 60)} min ${Math.round(duration % 60)} sec`;
 
   if (!audioItem) {
     return null;
@@ -87,12 +104,12 @@ const TrendingAudio: React.FC<Props> = ({ audioItem }) => {
 
   return (
     <>
-      <div className="space-y-3">
+      <div className="space-y-3 w-fit">
         <ContextMenu>
           <ContextMenuTrigger>
             <div
               onClick={handleAudioSelect}
-              className="overflow-hidden rounded-md cursor-pointer"
+              className="relative overflow-hidden rounded-md cursor-pointer"
             >
               <Image
                 src={audioItem.coverImage}
@@ -102,6 +119,9 @@ const TrendingAudio: React.FC<Props> = ({ audioItem }) => {
                 objectFit="contain"
                 className="transition-all hover:scale-105 aspect-square"
               />
+              <Badge className="absolute bottom-1 right-2">
+                {formatDuration(totalDuration)}
+              </Badge>
             </div>
           </ContextMenuTrigger>
           <ContextMenuContent className="w-40">
@@ -174,7 +194,7 @@ const TrendingAudio: React.FC<Props> = ({ audioItem }) => {
         <div className="space-y-1 text-sm">
           <h3
             onClick={handleAudioSelect}
-            className="font-medium cursor-pointer hover:text-white/80 leading-none"
+            className="font-medium truncate w-[9.375rem] cursor-pointer hover:text-white/80 leading-none"
           >
             {audioItem.title}
           </h3>

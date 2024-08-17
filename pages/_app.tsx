@@ -12,7 +12,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { AppProps } from "next/app";
 import Navbar from "@/components/navbar";
-
+import { clearTokens, getAccessToken } from "@/lib/auth";
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
   const router = useRouter();
@@ -22,7 +22,7 @@ export default function App(props: AppProps) {
   const [isSidebarVisible, setIsSidebarVisible] = useState<boolean>(false);
 
   useEffect(() => {
-    const token: string | null = localStorage.getItem("token");
+    const token = getAccessToken();
     setIsLoggedIn(!!token);
   }, []);
 
@@ -45,14 +45,13 @@ export default function App(props: AppProps) {
   }, [router.events]);
 
   const handleLogout = (): void => {
-    localStorage.removeItem("token");
+    clearTokens();
     setIsLoggedIn(false);
     toast({
       description: "Logged out successfully",
     });
     router.push("/login");
   };
-
   const handleToggleSidebar = (): void => {
     setIsSidebarVisible((prevState) => !prevState);
   };

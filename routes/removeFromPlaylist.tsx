@@ -1,3 +1,5 @@
+import { getAccessToken } from "@/lib/auth";
+
 export async function removeFromPlaylist(
   audioId: string,
   name: string,
@@ -5,7 +7,7 @@ export async function removeFromPlaylist(
   toast: any
 ) {
   try {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (!token) {
       router.push("/");
       return;

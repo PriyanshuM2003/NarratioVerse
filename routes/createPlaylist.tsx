@@ -1,3 +1,5 @@
+import { getAccessToken } from "@/lib/auth";
+
 export async function createPlaylist(
   audioId: string,
   name: string,
@@ -5,7 +7,7 @@ export async function createPlaylist(
   toast: any
 ) {
   try {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (!token) {
       router.push("/");
       return false;

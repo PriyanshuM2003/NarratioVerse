@@ -25,6 +25,7 @@ import Link from "next/link";
 import supabase from "@/lib/supabase";
 import GetLoggedUserData from "@/routes/getLoggedUserData";
 import Image from "next/image";
+import { getAccessToken } from "@/lib/auth";
 
 const Profile = () => {
   const router = useRouter();
@@ -46,7 +47,7 @@ const Profile = () => {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (!token) {
       router.replace("/");
     }
@@ -122,7 +123,7 @@ const Profile = () => {
   const handleUpdateProfile = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
+      const token = getAccessToken();
       if (!token) {
         router.push("/");
         return;
@@ -155,7 +156,7 @@ const Profile = () => {
   const handleChangePassword = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
+      const token = getAccessToken();
       if (!token) {
         router.push("/");
         return;

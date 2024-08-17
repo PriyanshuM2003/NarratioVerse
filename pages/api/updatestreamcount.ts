@@ -22,7 +22,7 @@ export default async function handler(
 
       const decoded = jwt.verify(
         token as string,
-        process.env.JWT_SECRET_KEY as Secret
+        process.env.ACCESS_TOKEN_SECRET as Secret
       ) as { id?: string };
 
       if (!decoded || !decoded.id) {
@@ -30,6 +30,8 @@ export default async function handler(
       }
 
       const { audioId } = req.body;
+      console.log("audioId", audioId);
+
       if (!audioId) {
         return res.status(400).json({ error: "audioId is required" });
       }
@@ -45,6 +47,27 @@ export default async function handler(
 
       const userId = audio.userId;
 
+      let totalCounts = await prisma.totalCounts.findFirst({
+        where: { userId },
+        select: {
+          totalStreams: true,
+          totalRevenue: true,
+          id: true,
+          monthlyIncome: true,
+        },
+      });
+
+      if (!totalCounts) {
+        totalCounts = await prisma.totalCounts.create({
+          data: {
+            userId: userId,
+            totalStreams: 0,
+            totalRevenue: 0,
+            monthlyIncome: [],
+          },
+        });
+      }
+
       await prisma.audio.update({
         where: { id: audioId },
         data: {
@@ -55,7 +78,7 @@ export default async function handler(
       });
 
       await prisma.totalCounts.updateMany({
-        where: { userId: userId },
+        where: { userId },
         data: {
           totalStreams: {
             increment: 1,
@@ -63,30 +86,19 @@ export default async function handler(
         },
       });
 
-      const totalCounts = await prisma.totalCounts.findFirst({
-        where: { userId: userId },
-        select: { totalStreams: true, totalRevenue: true },
-      });
-
-      if (!totalCounts) {
-        return res.status(500).json({ error: "TotalCounts not found" });
-      }
-
       const totalStreams = totalCounts.totalStreams + 1;
-      const newTotalRevenue = (totalStreams * 0.003).toFixed(3);
+      const newTotalRevenue = Number((totalStreams * 0.003).toFixed(3));
 
       await prisma.totalCounts.updateMany({
-        where: { userId: userId },
+        where: { userId },
         data: {
-          totalRevenue: parseFloat(newTotalRevenue),
+          totalRevenue: {
+            increment: newTotalRevenue,
+          },
         },
       });
 
-      await updateMonthlyIncome(
-        userId,
-        new Date(),
-        parseFloat(newTotalRevenue)
-      );
+      await updateMonthlyIncome(userId, new Date(), newTotalRevenue);
 
       return res
         .status(200)

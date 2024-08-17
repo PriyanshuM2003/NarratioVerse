@@ -1,16 +1,26 @@
 import { useToast } from "@/components/ui/use-toast";
+import { getAccessToken } from "@/lib/auth";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
+interface MonthlyIncome {
+  year: number;
+  months: {
+    [month: string]: number;
+  };
+}
+
 export default function GetMonthlyRevenues(): {
-  monthlyRevenues: any[] | undefined;
+  monthlyRevenues: MonthlyIncome[] | undefined;
   loadingMonthlyRevenues: boolean;
 } {
   const router = useRouter();
   const { toast } = useToast();
   const [loadingMonthlyRevenues, setLoadingMonthlyRevenues] =
     useState<boolean>(true);
-  const [monthlyRevenues, setMonthlyRevenues] = useState<any[] | undefined>(undefined);
+  const [monthlyRevenues, setMonthlyRevenues] = useState<
+    MonthlyIncome[] | undefined
+  >(undefined);
 
   useEffect(() => {
     const fetchMonthlyRevenues = async () => {
@@ -44,7 +54,7 @@ export default function GetMonthlyRevenues(): {
         setLoadingMonthlyRevenues(false);
       }
     };
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (token) {
       fetchMonthlyRevenues();
     }

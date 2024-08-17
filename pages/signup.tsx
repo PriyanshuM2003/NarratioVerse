@@ -31,6 +31,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { getAccessToken } from "@/lib/auth";
 
 interface FormData {
   name: string;
@@ -71,7 +72,7 @@ const Signup = () => {
   }, [selectedCountry]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (token) {
       router.replace("/");
     }
@@ -106,7 +107,7 @@ const Signup = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_HOST}/api/signup`,
+        `${process.env.NEXT_PUBLIC_HOST}/api/auth/signup`,
         {
           method: "POST",
           headers: {

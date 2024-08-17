@@ -1,4 +1,5 @@
 import { useToast } from "@/components/ui/use-toast";
+import { getAccessToken } from "@/lib/auth";
 import { TotalCounts } from "@/types/types";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -48,7 +49,7 @@ export default function GetDashboardCounts(): {
         setLoadingDashboardCounts(false);
       }
     };
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (token) {
       fetchDashboardCounts();
     }

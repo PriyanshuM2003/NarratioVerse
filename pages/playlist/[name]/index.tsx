@@ -28,6 +28,7 @@ import Image from "next/image";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import Link from "next/link";
 import { updateStreamCount } from "@/routes/updateStreamCount";
+import { getAccessToken } from "@/lib/auth";
 
 interface PlaylistAudio {
   user: User;
@@ -48,7 +49,7 @@ export default function Playlist() {
   useEffect(() => {
     const fetchPlaylistAudios = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = getAccessToken();
         if (!token) {
           router.push("/login");
           return;

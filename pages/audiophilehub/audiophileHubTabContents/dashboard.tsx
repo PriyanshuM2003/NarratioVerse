@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { CalendarDateRangePicker } from "@/components/dashboard/date-range-picker";
 import { Overview } from "@/components/dashboard/overview";
 import { TopAudios } from "@/components/dashboard/top-audios";
@@ -12,11 +12,33 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import GetMonthlyRevenues from "@/routes/getMonthlyRevenues";
+interface MonthlyIncome {
+  year: number;
+  months: {
+    [month: string]: number;
+  };
+}
 
 const Dashboard = () => {
   const { followersCount, totalCounts, loadingDashboardCounts } =
     GetDashboardCounts();
+
+  const { monthlyRevenues, loadingMonthlyRevenues } = GetMonthlyRevenues();
+
+  console.log("monthlyRevenues", monthlyRevenues);
+ 
+
   return (
     <>
       <div className="px-8 pb-4 min-h-screen space-y-4">
@@ -51,9 +73,6 @@ const Dashboard = () => {
                   </div>
                 </>
               )}
-              {/* <p className="text-xs text-muted-foreground">
-        +20.1% from last month
-    </p> */}
             </CardContent>
           </Card>
           <Card>
@@ -84,9 +103,6 @@ const Dashboard = () => {
                   <div className="text-2xl font-bold">{followersCount}</div>
                 </>
               )}
-              {/* <p className="text-xs text-muted-foreground">
-        +180.1% from last month
-    </p> */}
             </CardContent>
           </Card>
           <Card>
@@ -115,48 +131,17 @@ const Dashboard = () => {
               ) : (
                 <>
                   <div className="text-2xl font-bold">
-                    {totalCounts?.totalRevenue}
+                    {totalCounts?.totalStreams}
                   </div>
                 </>
               )}
-              {/* <p className="text-xs text-muted-foreground">
-        +19% from last month
-    </p> */}
             </CardContent>
           </Card>
-          {/* <Card>
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-    <CardTitle className="text-sm font-medium">
-    Active Now
-    </CardTitle>
-    <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth="2"
-    className="h-4 w-4 text-muted-foreground"
-    >
-    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-    </svg>
-    </CardHeader>
-    <CardContent>
-    <div className="text-2xl font-bold">+573</div>
-    <p className="text-xs text-muted-foreground">
-    +201 since last hour
-    </p>
-    </CardContent>
-</Card> */}
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
           <Card className="col-span-3">
             <CardHeader>
               <CardTitle>Your Top 5 Trending Audios</CardTitle>
-              {/* <CardDescription>
-        You made 265 sales this month.
-    </CardDescription> */}
             </CardHeader>
             <CardContent>
               <TopAudios />
@@ -164,10 +149,26 @@ const Dashboard = () => {
           </Card>
           <Card className="col-span-4">
             <CardHeader>
-              <CardTitle>Monthly Overview</CardTitle>
+              <CardTitle>
+                <div className="flex items-center justify-between">
+                  <div>Monthly Overview</div>
+                  <Select>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                    {/* {years.map((year: number, index: number) => (
+                        <SelectItem key={index} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))} */}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardTitle>
             </CardHeader>
             <CardContent className="pl-2">
-              <Overview />
+              {/* <Overview loadingMonthlyRevenues={loadingMonthlyRevenues} /> */}
             </CardContent>
           </Card>
         </div>

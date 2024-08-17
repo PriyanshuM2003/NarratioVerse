@@ -48,7 +48,7 @@ const Trending = ({
                 <Separator className="my-4" />
                 <div className="relative">
                   <ScrollArea>
-                    <div className="flex space-x-4 pb-4">
+                    <div className="flex items-center space-x-4 pb-4">
                       {audio?.map(
                         (item, index) =>
                           index < 20 && (
@@ -72,7 +72,7 @@ const Trending = ({
                 <Separator className="my-4" />
                 <div className="relative">
                   <ScrollArea>
-                    <div className="flex space-x-4 pb-4">
+                    <div className="flex items-center space-x-4 pb-4">
                       {newAudio?.map(
                         (item, index) =>
                           index < 20 && (
@@ -98,7 +98,7 @@ const Trending = ({
                     <Separator className="my-4" />
                     <div className="relative">
                       <ScrollArea>
-                        <div className="flex space-x-4 pb-4">
+                        <div className="flex items-center space-x-4 pb-4">
                           {liveTalks?.map(
                             (item, index) =>
                               index < 20 && (
@@ -121,7 +121,7 @@ const Trending = ({
                     <Separator className="my-4" />
                     <div className="relative">
                       <ScrollArea>
-                        <div className="flex space-x-4 pb-4">
+                        <div className="flex items-center space-x-4 pb-4">
                           {loadingmadeforyou ? (
                             Array.from({ length: 7 }, (_, index) => (
                               <Skeleton

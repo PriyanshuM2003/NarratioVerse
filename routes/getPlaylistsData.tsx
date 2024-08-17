@@ -2,6 +2,7 @@ import useSWR, { mutate } from "swr";
 import { Playlist } from "@/types/types";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
+import { getAccessToken } from "@/lib/auth";
 
 export default function GetPlaylistsData(): {
   playlistsData: Playlist[] | null;
@@ -11,7 +12,7 @@ export default function GetPlaylistsData(): {
   const { toast } = useToast();
 
   const fetcher = async (url: string) => {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (!token) {
       throw new Error("Token not available");
     }

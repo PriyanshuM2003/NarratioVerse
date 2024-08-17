@@ -18,6 +18,7 @@ import { toast } from "./ui/use-toast";
 import GetUserPreferences from "@/routes/getUserPreferences";
 import { Loader } from "lucide-react";
 import GetMadeForYou from "@/routes/getMadeForYou";
+import { getAccessToken } from "@/lib/auth";
 
 interface Language {
   id: string;
@@ -81,7 +82,7 @@ const Preferences = ({
 
   const handleUpdatePreferences = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = getAccessToken();
       if (!token) return;
 
       const response = await fetch(
@@ -120,7 +121,7 @@ const Preferences = ({
         <DialogHeader>
           <div className="flex items-center gap-2">
             <DialogTitle>Preferences</DialogTitle>
-            {localStorage.getItem("token") && loadingUserPreferences && (
+            {getAccessToken() && loadingUserPreferences && (
               <Loader className="animate-spin" />
             )}
           </div>
@@ -174,9 +175,7 @@ const Preferences = ({
           <Button
             variant={"ghost"}
             onClick={
-              localStorage.getItem("token")
-                ? handleUpdatePreferences
-                : handleSavePreferences
+              getAccessToken() ? handleUpdatePreferences : handleSavePreferences
             }
             type="submit"
           >

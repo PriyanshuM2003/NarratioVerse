@@ -106,7 +106,7 @@ export async function getServerSideProps(context: any) {
     return {
       props: {
         audio: formattedAudio,
-        newAudio: formattedNewAudio,
+        newAudio: formattedNewAudio.length > 0 ? formattedNewAudio : formattedAudio,
         liveTalks: formattedLiveTalks,
       },
     };

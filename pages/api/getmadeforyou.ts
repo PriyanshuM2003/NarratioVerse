@@ -16,7 +16,7 @@ export default async function handler(
 
       const decoded = jwt.verify(
         token as string,
-        process.env.JWT_SECRET_KEY as Secret
+        process.env.ACCESS_TOKEN_SECRET as Secret
       ) as { id?: string };
 
       if (!decoded || !decoded.id) {
@@ -50,6 +50,24 @@ export default async function handler(
           user: true,
         },
       });
+      if (madeForYouData.length === 0) {
+        const fallbackData = await prisma.audio.findMany({
+          where: {
+            genres: {
+              hasSome: genres,
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 10,
+          include: {
+            user: true,
+          },
+        });
+
+        return res.status(200).json({ madeForYouData: fallbackData });
+      }
 
       return res.status(200).json({ madeForYouData });
     } else {

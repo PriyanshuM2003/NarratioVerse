@@ -15,7 +15,7 @@ export default async function handler(
       const { token }: TokenData = req.body;
       const decodedToken = jwt.verify(
         token,
-        process.env.JWT_SECRET_KEY as Secret
+        process.env.ACCESS_TOKEN_SECRET as Secret
       ) as { email: string };
       const user = await prisma.user.findUnique({
         where: { email: decodedToken.email },

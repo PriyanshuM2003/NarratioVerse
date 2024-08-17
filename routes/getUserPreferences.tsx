@@ -2,6 +2,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Preferences } from "@/types/types";
+import { getAccessToken } from "@/lib/auth";
 
 export default function GetUserPreferences(): {
   userPreferenceData: Preferences | null;
@@ -47,7 +48,7 @@ export default function GetUserPreferences(): {
       }
     };
 
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (token) {
       fetchUserPreferenceData();
     }

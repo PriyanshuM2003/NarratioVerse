@@ -7,6 +7,7 @@ import GetLoggedUserData from "@/routes/getLoggedUserData";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/router";
 import GetUserPlanData from "@/routes/getPlanData";
+import { getAccessToken } from "@/lib/auth";
 
 const Plans: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<string>("premium");
@@ -15,7 +16,7 @@ const Plans: React.FC = () => {
   const { loadingUserPlanData, userPlanData } = GetUserPlanData();
   const router = useRouter();
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (!token) {
       router.replace("/");
     }
@@ -48,7 +49,7 @@ const Plans: React.FC = () => {
     const stripeSignature = "stripe-signature";
 
     try {
-      const token = localStorage.getItem("token");
+      const token = getAccessToken();
       if (!token) {
         throw new Error("Unauthorized");
       }

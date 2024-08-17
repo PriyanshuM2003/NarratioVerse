@@ -16,11 +16,12 @@ import YourAudiobooks from "./audiophileHubTabContents/youraudiobooks";
 import YourPodcasts from "./audiophileHubTabContents/yourpodcasts";
 import GoLive from "./audiophileHubTabContents/golive";
 import AddAudio from "./audiophileHubTabContents/addaudio";
+import { getAccessToken } from "@/lib/auth";
 
 const AudiophileHub = () => {
   const router = useRouter();
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (!token) {
       router.replace("/");
     }

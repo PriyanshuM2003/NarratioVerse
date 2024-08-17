@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import useSWR, { mutate } from "swr";
 import { Audio } from "@/types/types";
+import { getAccessToken } from "@/lib/auth";
 
 export default function GetUserAudioData(): {
   UserAudioBookData: Audio[] | null;
@@ -14,7 +15,7 @@ export default function GetUserAudioData(): {
   const { toast } = useToast();
 
   const fetcher = async (url: string) => {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (!token) {
       throw new Error("Token not available");
     }

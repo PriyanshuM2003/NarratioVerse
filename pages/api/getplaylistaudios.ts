@@ -15,7 +15,7 @@ export default async function handler(
 
       const decoded = jwt.verify(
         token as string,
-        process.env.JWT_SECRET_KEY as Secret
+        process.env.ACCESS_TOKEN_SECRET as Secret
       ) as { id?: string };
 
       if (!decoded || !decoded.id) {

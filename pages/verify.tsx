@@ -19,7 +19,7 @@ const Verify: React.FC = () => {
         }
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_HOST}/api/verify`,
+          `${process.env.NEXT_PUBLIC_HOST}/api/auth/verify`,
           {
             method: "POST",
             headers: {

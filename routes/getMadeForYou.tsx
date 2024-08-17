@@ -2,6 +2,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
 import { Preferences } from "@/types/types";
 import useSWR from "swr";
+import { getAccessToken } from "@/lib/auth";
 
 export default function GetMadeForYou(): {
   madeForYouData: Preferences[] | null;
@@ -11,7 +12,7 @@ export default function GetMadeForYou(): {
   const { toast } = useToast();
 
   const fetcher = async (url: string) => {
-    const token = localStorage.getItem("token");
+    const token = getAccessToken();
     if (!token) {
       throw new Error("Token not available");
     }

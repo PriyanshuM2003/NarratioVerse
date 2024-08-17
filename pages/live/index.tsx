@@ -92,7 +92,6 @@ const Live = ({ liveTalks }: { liveTalks: LiveTalk[] }) => {
             </div>
           ))}
         </div>
-        <Separator />
       </div>
     </>
   );

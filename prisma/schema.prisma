@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -86,7 +85,7 @@ model Audio {
 model TotalCounts {
   id            String   @id @default(uuid())
   totalStreams  Int      @default(0)
-  totalRevenue  Int      @default(0)
+  totalRevenue  Float    @default(0)
   monthlyIncome String[]
   userId        String
   user          User     @relation(fields: [userId], references: [id])
