@@ -11,6 +11,7 @@ import React from "react";
 import prisma from "@/lib/prisma";
 import { User } from "@/types/types";
 import AudioCover from "@/components/common/AudioCover";
+import Filter from "@/components/common/Filter";
 
 interface Audio {
   user: User;
@@ -44,44 +45,7 @@ const New = ({ audio }: { audio: Audio[] }) => {
           <div className="space-y-1">
             <h2 className="text-2xl font-semibold tracking-tight">New</h2>
           </div>
-          <div className="flex items-center gap-2">
-            <Select>
-              <SelectTrigger className="w-[180px] h-7">
-                <SelectValue placeholder="Select a fruit" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="apple">Apple</SelectItem>
-                <SelectItem value="banana">Banana</SelectItem>
-                <SelectItem value="blueberry">Blueberry</SelectItem>
-                <SelectItem value="grapes">Grapes</SelectItem>
-                <SelectItem value="pineapple">Pineapple</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select>
-              <SelectTrigger className="w-[180px] h-7">
-                <SelectValue placeholder="Select a fruit" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="apple">Apple</SelectItem>
-                <SelectItem value="banana">Banana</SelectItem>
-                <SelectItem value="blueberry">Blueberry</SelectItem>
-                <SelectItem value="grapes">Grapes</SelectItem>
-                <SelectItem value="pineapple">Pineapple</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select>
-              <SelectTrigger className="w-[180px] h-7">
-                <SelectValue placeholder="Select a fruit" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="apple">Apple</SelectItem>
-                <SelectItem value="banana">Banana</SelectItem>
-                <SelectItem value="blueberry">Blueberry</SelectItem>
-                <SelectItem value="grapes">Grapes</SelectItem>
-                <SelectItem value="pineapple">Pineapple</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Filter />
         </div>
         <Separator className="my-4" />
         <div className="flex items-center gap-4 flex-wrap">

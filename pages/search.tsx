@@ -6,17 +6,13 @@ import prisma from "@/lib/prisma";
 import { User } from "@/types/types";
 import { Search } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/router";
 import Link from "next/link";
-import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { addFollow } from "@/routes/addFollow";
-import { removeFollowing } from "@/routes/removeFollowing";
-import GetFollowingData from "@/routes/getFollowingData";
 import GetLoggedUserData from "@/routes/getLoggedUserData";
 import AudioCover from "@/components/common/AudioCover";
 import LiveCover from "@/components/common/LiveCover";
+import useFollowHandler from "@/hooks/useFollowHandler";
 
 interface Audio {
   id: string;
@@ -52,52 +48,9 @@ export default function SearchPage({ audio, liveTalks, creator }: Props) {
   const [searchResults, setSearchResults] = useState<
     (Audio | LiveTalk | User)[]
   >([]);
-  const router = useRouter();
-  const { toast } = useToast();
-
-  const [isFollowing, setIsFollowing] = useState<any | null>(null);
-  const { followingData, loadingFollowingData, setLoadingFollowingData } =
-    GetFollowingData();
-
   const { loggedUserData } = GetLoggedUserData();
-
-  useEffect(() => {
-    if (followingData) {
-      setIsFollowing(followingData);
-    }
-  }, [followingData]);
-
-  const handleFollow = async (creatorId: string) => {
-    try {
-      setLoadingFollowingData(true);
-      await addFollow(creatorId, router, toast);
-      setIsFollowing((prevFollowingData: any) => ({
-        ...prevFollowingData,
-        followedId: [...prevFollowingData.followedId, creatorId],
-      }));
-    } catch (error) {
-      console.error("Error following creator:", error);
-    } finally {
-      setLoadingFollowingData(false);
-    }
-  };
-
-  const handleUnfollow = async (creatorId: string) => {
-    try {
-      setLoadingFollowingData(true);
-      await removeFollowing(creatorId, router, toast);
-      setIsFollowing((prevFollowingData: any) => ({
-        ...prevFollowingData,
-        followedId: prevFollowingData.followedId.filter(
-          (id: string) => id !== creatorId
-        ),
-      }));
-    } catch (error) {
-      console.error("Error unfollowing creator:", error);
-    } finally {
-      setLoadingFollowingData(false);
-    }
-  };
+  const { isFollowing, loadingFollowingData, handleFollow, handleUnfollow } =
+    useFollowHandler();
 
   const handleSearchInputChange = (
     event: React.ChangeEvent<HTMLInputElement>

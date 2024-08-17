@@ -1,70 +1,23 @@
 "use client";
 import { Separator } from "@/components/ui/separator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { User } from "@/types/types";
 import { Button } from "@/components/ui/button";
-import { addFollow } from "@/routes/addFollow";
-import { useRouter } from "next/router";
-import { useToast } from "@/components/ui/use-toast";
-import GetFollowingData from "@/routes/getFollowingData";
-import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { removeFollowing } from "@/routes/removeFollowing";
 import GetLoggedUserData from "@/routes/getLoggedUserData";
+import useFollowHandler from "@/hooks/useFollowHandler";
+import Filter from "@/components/common/Filter";
 
 const Creators = ({ creators }: { creators: User[] }) => {
-  const router = useRouter();
-  const { toast } = useToast();
-  const [isFollowing, setIsFollowing] = useState<any | null>(null);
-  const { followingData, loadingFollowingData, setLoadingFollowingData } =
-    GetFollowingData();
   const { loggedUserData } = GetLoggedUserData();
-  useEffect(() => {
-    if (followingData) {
-      setIsFollowing(followingData);
-    }
-  }, [followingData]);
+  const { isFollowing, loadingFollowingData, handleFollow, handleUnfollow } =
+    useFollowHandler();
 
-  const handleFollow = async (creatorId: string) => {
-    try {
-      setLoadingFollowingData(true);
-      await addFollow(creatorId, router, toast);
-      setIsFollowing((prevFollowingData: any) => ({
-        ...prevFollowingData,
-        followedId: [...prevFollowingData.followedId, creatorId],
-      }));
-    } catch (error) {
-      console.error("Error following creator:", error);
-    } finally {
-      setLoadingFollowingData(false);
-    }
-  };
-
-  const handleUnfollow = async (creatorId: string) => {
-    try {
-      setLoadingFollowingData(true);
-      await removeFollowing(creatorId, router, toast);
-      setIsFollowing((prevFollowingData: any) => ({
-        ...prevFollowingData,
-        followedId: prevFollowingData.followedId.filter(
-          (id: string) => id !== creatorId
-        ),
-      }));
-    } catch (error) {
-      console.error("Error unfollowing creator:", error);
-    } finally {
-      setLoadingFollowingData(false);
-    }
-  };
+  if (!creators) {
+    return null;
+  }
 
   return (
     <>
@@ -73,44 +26,7 @@ const Creators = ({ creators }: { creators: User[] }) => {
           <div className="space-y-1">
             <h2 className="text-2xl font-semibold tracking-tight">Creators</h2>
           </div>
-          <div className="flex items-center gap-2">
-            <Select>
-              <SelectTrigger className="w-[180px] h-7">
-                <SelectValue placeholder="Select a fruit" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="apple">Apple</SelectItem>
-                <SelectItem value="banana">Banana</SelectItem>
-                <SelectItem value="blueberry">Blueberry</SelectItem>
-                <SelectItem value="grapes">Grapes</SelectItem>
-                <SelectItem value="pineapple">Pineapple</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select>
-              <SelectTrigger className="w-[180px] h-7">
-                <SelectValue placeholder="Select a fruit" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="apple">Apple</SelectItem>
-                <SelectItem value="banana">Banana</SelectItem>
-                <SelectItem value="blueberry">Blueberry</SelectItem>
-                <SelectItem value="grapes">Grapes</SelectItem>
-                <SelectItem value="pineapple">Pineapple</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select>
-              <SelectTrigger className="w-[180px] h-7">
-                <SelectValue placeholder="Select a fruit" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="apple">Apple</SelectItem>
-                <SelectItem value="banana">Banana</SelectItem>
-                <SelectItem value="blueberry">Blueberry</SelectItem>
-                <SelectItem value="grapes">Grapes</SelectItem>
-                <SelectItem value="pineapple">Pineapple</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Filter />
         </div>
         <Separator className="my-4" />
         <div className="flex gap-6 flex-wrap">

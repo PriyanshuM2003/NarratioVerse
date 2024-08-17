@@ -28,8 +28,8 @@ const JoinLiveRoom = () => {
   return (
     <>
       <Dialog>
-        <DialogTrigger>
-          <div className="flex items-center gap-1 hover:text-pink-600">
+        <DialogTrigger className="w-full">
+          <div className="flex items-center w-full gap-1 hover:text-pink-600">
             <Radio className="w-5 h-5" />
             Join Live
           </div>
