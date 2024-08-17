@@ -24,7 +24,9 @@ export default function useFollowHandler() {
       await addFollow(creatorId, router, toast);
       setIsFollowing((prevFollowingData: any) => ({
         ...prevFollowingData,
-        followedId: [...prevFollowingData.followedId, creatorId],
+        followedId: prevFollowingData?.followedId
+          ? [...prevFollowingData.followedId, creatorId]
+          : [creatorId],
       }));
     } catch (error) {
       console.error("Error following creator:", error);
@@ -39,9 +41,10 @@ export default function useFollowHandler() {
       await removeFollowing(creatorId, router, toast);
       setIsFollowing((prevFollowingData: any) => ({
         ...prevFollowingData,
-        followedId: prevFollowingData.followedId.filter(
-          (id: string) => id !== creatorId
-        ),
+        followedId:
+          prevFollowingData.followedId.filter(
+            (id: string) => id !== creatorId
+          ) || [],
       }));
     } catch (error) {
       console.error("Error unfollowing creator:", error);

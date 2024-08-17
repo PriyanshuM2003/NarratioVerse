@@ -54,7 +54,7 @@ const Creators = ({ creators }: { creators: User[] }) => {
                   </p>
                 </div>
               </Link>
-              {creator.id !== loggedUserData?.id ? (
+              {creator.id !== loggedUserData?.id && loggedUserData ? (
                 <>
                   {loadingFollowingData ? (
                     <Skeleton className="h-5 w-full" />
@@ -81,9 +81,7 @@ const Creators = ({ creators }: { creators: User[] }) => {
                     </>
                   )}
                 </>
-              ) : (
-                <></>
-              )}
+              ) : null}
             </div>
           ))}
         </div>

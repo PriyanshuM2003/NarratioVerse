@@ -55,7 +55,7 @@ const Profile = () => {
 
   useEffect(() => {
     if (loggedUserData) {
-      setUserData(loggedUserData);
+      setUserData({ ...loggedUserData, password: "" });
     }
   }, [loggedUserData]);
 
@@ -229,7 +229,7 @@ const Profile = () => {
               <div className="mx-auto flex items-center mb-10 justify-center md:flex-row flex-col">
                 <div className="flex items-center justify-center md:mb-5 md:mr-5 flex-col">
                   <Image
-                    className="md:w-52 md:h-52 w-32 h-32 mx-auto object-cover object-center rounded-full"
+                    className="md:w-52 bg-white md:h-52 w-32 h-32 mx-auto object-cover object-center rounded-full"
                     alt={userData.name}
                     src={userData.profileImage}
                     width={208}
@@ -257,7 +257,7 @@ const Profile = () => {
             ) : (
               <div className="mx-auto flex items-center mb-10 justify-center flex-col">
                 <Image
-                  className="md:w-52 md:h-52 w-32 h-32 mx-auto object-cover object-center rounded-full"
+                  className="md:w-52 bg-white md:h-52 w-32 h-32 mx-auto object-cover object-center rounded-full"
                   alt={userData.name}
                   src={userData.profileImage}
                   width={208}
@@ -265,9 +265,7 @@ const Profile = () => {
                 />
                 {userData.premium ? (
                   <Award className="text-yellow-400" />
-                ) : (
-                  <></>
-                )}
+                ) : null}
                 <div className="text-center lg:w-2/3 w-full">
                   <h1 className="title-font sm:text-4xl text-3xl font-medium text-white">
                     {userData.name}

@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Filter from "@/components/common/Filter";
 
 const Creator = ({ creator }: { creator: User }) => {
-  const { loggedUserData } = GetLoggedUserData();
+  const { loggedUserData, loadingUserData } = GetLoggedUserData();
   const { isFollowing, loadingFollowingData, handleFollow, handleUnfollow } =
     useFollowHandler();
 
@@ -22,8 +22,8 @@ const Creator = ({ creator }: { creator: User }) => {
   return (
     <>
       <div className="min-h-screen px-4 py-6 lg:px-8 text-white">
-        <div className="flex items-center gap-6">
-          <div className="space-y-1 w-full">
+        <div className="flex justify-center items-center gap-6">
+          <div className="min-w-max">
             <Image
               className="md:w-52 rounded-full aspect-square border-4 border-yellow-500 md:h-52 w-32 h-32 mx-auto object-cover object-center"
               alt={creator.name}
@@ -34,18 +34,21 @@ const Creator = ({ creator }: { creator: User }) => {
           </div>
           <div className="flex items-start flex-col space-y-2">
             <div className="flex items-center gap-4">
-              <h3 className="font-bold text-3xl text-yellow-500">
-                <span className="font-medium text-white">Creator</span>&nbsp;
+              <h3 className="font-bold text-nowrap text-3xl text-yellow-500">
                 {creator.id !== loggedUserData?.id ? (
-                  <>{creator.name}</>
+                  <>
+                    <span className="font-medium text-white">Creator</span>
+                    &nbsp;
+                    {creator.name}
+                  </>
                 ) : (
                   <>You</>
                 )}
               </h3>
-              {creator.id !== loggedUserData?.id ? (
+              {creator.id !== loggedUserData?.id && loggedUserData ? (
                 <>
                   {loadingFollowingData ? (
-                    <Skeleton className="h-5 w-full" />
+                    <Skeleton className="h-5 w-20" />
                   ) : (
                     <>
                       {isFollowing &&
@@ -69,9 +72,7 @@ const Creator = ({ creator }: { creator: User }) => {
                     </>
                   )}
                 </>
-              ) : (
-                <></>
-              )}
+              ) : null}
             </div>
             <p>{creator.bio}</p>
           </div>

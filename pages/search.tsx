@@ -130,11 +130,15 @@ export default function SearchPage({ audio, liveTalks, creator }: Props) {
                             className="rounded-full aspect-square border-4 border-yellow-500"
                           />
                           <p className="font-semibold text-center">
-                            {(result as User).name}
+                            {result.id !== loggedUserData?.id ? (
+                              <>{(result as User).name}</>
+                            ) : (
+                              <>You</>
+                            )}
                           </p>
                         </div>
                       </Link>
-                      {result.id !== loggedUserData?.id ? (
+                      {result.id !== loggedUserData?.id && loggedUserData ? (
                         <>
                           {loadingFollowingData ? (
                             <Skeleton className="h-5 w-full" />
@@ -161,9 +165,7 @@ export default function SearchPage({ audio, liveTalks, creator }: Props) {
                             </>
                           )}
                         </>
-                      ) : (
-                        <>You</>
-                      )}
+                      ) : null}
                     </div>
                   </>
                 )}

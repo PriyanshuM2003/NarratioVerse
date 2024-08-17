@@ -16,6 +16,9 @@ export async function addFollow(creatorId: string, router: any, toast: any) {
       },
       body: JSON.stringify({ creatorId }),
     });
+    toast({
+      description: "You are now following this creator.",
+    });
     return true;
   } catch (error) {
     console.error("Error adding following:", error);

@@ -90,9 +90,10 @@ const Navbar: React.FC<NavbarProps> = ({
                     <AvatarImage
                       src={loggedUser?.profileImage || ""}
                       alt={loggedUser?.name}
+                      className="bg-white"
                     />
                     <AvatarFallback>
-                      <User className="text-black" />
+                      <User />
                     </AvatarFallback>
                   </Avatar>
                   <span>My Account</span>
