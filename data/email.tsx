@@ -1,4 +1,3 @@
-import Link from "next/link";
 import React from "react";
 interface VerificationMailProps {
   token: string;
@@ -41,40 +40,35 @@ export const VerificationMail: React.FC<VerificationMailProps> = ({
             <strong>Welcome to Narratioverse!</strong> <br />
             Thank you for registering with us.
           </p>
-          <Link
+          <a
             target="_blank"
             href={`${process.env.NEXT_PUBLIC_HOST}/verify?token=${token}`}
             style={{
-              display: "flex",
+              textAlign: "center",
               justifyContent: "center",
               margin: "20px auto",
+              height: "40px",
+              width: "80px",
+              paddingLeft: "16px",
+              paddingRight: "16px",
+              paddingTop: "8px",
+              paddingBottom: "8px",
+              display: "inline-flex",
+              alignItems: "center",
+              whiteSpace: "nowrap",
+              borderRadius: "6px",
+              fontSize: "14px",
+              fontWeight: "500",
+              transition: "background-color 0.2s",
+              backgroundColor: "#0e162d",
+              color: "#ffffff",
+              outline: "none",
+              boxShadow: "0 0 0 2px transparent",
+              cursor: "pointer",
             }}
           >
-            <button
-              style={{
-                height: "40px",
-                paddingLeft: "16px",
-                paddingRight: "16px",
-                paddingTop: "8px",
-                paddingBottom: "8px",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                whiteSpace: "nowrap",
-                borderRadius: "6px",
-                fontSize: "14px",
-                fontWeight: "500",
-                transition: "background-color 0.2s",
-                backgroundColor: "#0e162d",
-                color: "#ffffff",
-                outline: "none",
-                boxShadow: "0 0 0 2px transparent",
-                cursor: "pointer",
-              }}
-            >
-              Verify
-            </button>
-          </Link>
+            Verify
+          </a>
           <p
             style={{
               marginTop: "32px",

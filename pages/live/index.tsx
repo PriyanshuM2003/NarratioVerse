@@ -2,9 +2,6 @@
 import { Separator } from "@/components/ui/separator";
 import prisma from "@/lib/prisma";
 import { LiveTalk } from "@/types/types";
-import { Radio } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 import React from "react";
 import {
   Select,
@@ -13,8 +10,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import LiveCover from "@/components/common/LiveCover";
 
 const Live = ({ liveTalks }: { liveTalks: LiveTalk[] }) => {
+  if (!liveTalks) {
+    return (
+      <>
+        <div className="text-xl text-white text-center my-8">
+          No Live Talk Available!!
+        </div>
+      </>
+    );
+  }
   return (
     <>
       <div className="h-full px-4 py-6 lg:px-8 text-white">
@@ -66,30 +73,7 @@ const Live = ({ liveTalks }: { liveTalks: LiveTalk[] }) => {
         <Separator className="my-4" />
         <div className="flex items-center gap-4 flex-wrap">
           {liveTalks?.map((live) => (
-            <div className="space-y-3" key={live.roomId}>
-              <Link href={`/live/${live.roomId}`}>
-                <div className="relative">
-                  <Image
-                    src={live.user.profileImage || ""}
-                    alt={live.title}
-                    width={150}
-                    height={150}
-                    className="rounded-full relative border-4 border-red-600 aspect-square"
-                  />
-                  <div className="bg-white absolute -bottom-2 left-1/2 px-1 rounded-3xl transform -translate-x-1/2">
-                    <Radio className="animate-pulse text-red-600" />
-                  </div>
-                </div>
-              </Link>
-              <div className="space-y-1 text-sm text-center">
-                <p className="text-xs text-muted-foreground">
-                  {live.user.name}
-                </p>
-                <Link href={`/live/${live.roomId}`}>
-                  <p className="font-medium leading-none">{live.title}</p>
-                </Link>
-              </div>
-            </div>
+            <LiveCover key={live.roomId} liveItem={live} />
           ))}
         </div>
       </div>

@@ -2,25 +2,25 @@
 import React, { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import TrendingAudio from "@/components/trending/trendingAudio";
 import { Audio, LiveTalk } from "@/types/types";
-import TrendingLive from "@/components/trending/trendingLive";
-import AudioMadeForYou from "@/components/trending/foryou";
-import NewReleases from "@/components/trending/newReleases";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import GetMadeForYou from "@/routes/getMadeForYou";
+import AudioCover from "@/components/common/AudioCover";
+import LiveCover from "@/components/common/LiveCover";
 
 const Trending = ({
   audio,
   newAudio,
   liveTalks,
   isLoggedIn,
+  loading,
 }: {
   audio: Audio[];
   newAudio: Audio[];
   isLoggedIn: boolean;
   liveTalks: LiveTalk[];
+  loading: boolean;
 }) => {
   const [madeForYou, setMadeForYou] = useState<any[]>([]);
   const { madeForYouData, loadingmadeforyou } = GetMadeForYou();
@@ -49,11 +49,22 @@ const Trending = ({
                 <div className="relative">
                   <ScrollArea>
                     <div className="flex items-center space-x-4 pb-4">
-                      {audio?.map(
-                        (item, index) =>
-                          index < 20 && (
-                            <TrendingAudio key={item.id} audioItem={item} />
-                          )
+                      {loading ? (
+                        Array.from({ length: 7 }, (_, index) => (
+                          <Skeleton
+                            key={index}
+                            className="h-[150px] w-[150px] bg-gray-300 rounded-md"
+                          />
+                        ))
+                      ) : (
+                        <>
+                          {audio?.map(
+                            (item, index) =>
+                              index < 20 && (
+                                <AudioCover key={item.id} audioItem={item} />
+                              )
+                          )}
+                        </>
                       )}
                     </div>
                     <ScrollBar orientation="horizontal" />
@@ -73,11 +84,22 @@ const Trending = ({
                 <div className="relative">
                   <ScrollArea>
                     <div className="flex items-center space-x-4 pb-4">
-                      {newAudio?.map(
-                        (item, index) =>
-                          index < 20 && (
-                            <NewReleases key={item.id} audioItem={item} />
-                          )
+                      {loading ? (
+                        Array.from({ length: 7 }, (_, index) => (
+                          <Skeleton
+                            key={index}
+                            className="h-[150px] w-[150px] bg-gray-300 rounded-md"
+                          />
+                        ))
+                      ) : (
+                        <>
+                          {newAudio?.map(
+                            (item, index) =>
+                              index < 20 && (
+                                <AudioCover key={item.id} audioItem={item} />
+                              )
+                          )}
+                        </>
                       )}
                     </div>
                     <ScrollBar orientation="horizontal" />
@@ -99,11 +121,22 @@ const Trending = ({
                     <div className="relative">
                       <ScrollArea>
                         <div className="flex items-center space-x-4 pb-4">
-                          {liveTalks?.map(
-                            (item, index) =>
-                              index < 20 && (
-                                <TrendingLive key={item.id} liveItem={item} />
-                              )
+                          {loading ? (
+                            Array.from({ length: 7 }, (_, index) => (
+                              <Skeleton
+                                key={index}
+                                className="h-[150px] w-[150px] bg-gray-300 rounded-md"
+                              />
+                            ))
+                          ) : (
+                            <>
+                              {liveTalks?.map(
+                                (item, index) =>
+                                  index < 20 && (
+                                    <LiveCover key={item.id} liveItem={item} />
+                                  )
+                              )}
+                            </>
                           )}
                         </div>
                         <ScrollBar orientation="horizontal" />
@@ -132,10 +165,7 @@ const Trending = ({
                           ) : (
                             <>
                               {madeForYou?.map((item) => (
-                                <AudioMadeForYou
-                                  key={item.id}
-                                  audioItem={item}
-                                />
+                                <AudioCover key={item.id} audioItem={item} />
                               ))}
                             </>
                           )}

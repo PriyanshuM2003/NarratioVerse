@@ -7,31 +7,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
-import React, { useState } from "react";
+import React from "react";
 import prisma from "@/lib/prisma";
 import { User } from "@/types/types";
-import Image from "next/image";
-import { useRouter } from "next/router";
-import { useAudioPlayer } from "@/context/AudioPlayerContext";
-import Link from "next/link";
-import { updateStreamCount } from "@/routes/updateStreamCount";
-import { useToast } from "@/components/ui/use-toast";
-import GetPlaylistsData from "@/routes/getPlaylistsData";
-import { removeFromPlaylist } from "@/routes/removeFromPlaylist";
-import { Loader, PlusCircle } from "lucide-react";
-import { createPlaylist } from "@/routes/createPlaylist";
-import PlaylistDialog from "@/components/playlist/playlistDialog";
+import AudioCover from "@/components/common/AudioCover";
 
 interface Audio {
   user: User;
@@ -48,51 +27,14 @@ interface AudioPart {
 }
 
 const Podcasts = ({ audio }: { audio: Audio[] }) => {
-  const router = useRouter();
-  const { toast } = useToast();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedAudioId, setSelectedAudioId] = useState<string | null>(null);
-  const { playlistsData, loadingPlaylistsData, refreshPlaylists } =
-    GetPlaylistsData();
-
-  const {
-    setAudioData,
-    setCurrentIndex,
-    playPauseHandler,
-    audioRef,
-    currentIndex,
-    isPlaying,
-  } = useAudioPlayer();
-
-  const handleAudioSelect = (audio: Audio, startIndex: number = 0) => {
-    setAudioData(audio);
-    setCurrentIndex(startIndex);
-    if (audioRef.current) {
-      const audioItem = audio.parts[startIndex];
-      audioRef.current.src = audioItem.audioUrl;
-      audioRef.current.load();
-      playPauseHandler();
-    }
-    updateStreamCount(audio.id as string, router, toast);
-  };
-
-  const handleRemoveFromPlaylist = async (
-    playlistName: string,
-    audioId: string
-  ) => {
-    const removed = await removeFromPlaylist(
-      audioId,
-      playlistName,
-      router,
-      toast
-    );
-    if (removed) {
-      refreshPlaylists();
-    }
-  };
-
   if (!audio) {
-    return null;
+    return (
+      <>
+        <div className="text-xl text-white text-center my-8">
+          No Podcasts Available!!
+        </div>
+      </>
+    );
   }
 
   return (
@@ -144,133 +86,11 @@ const Podcasts = ({ audio }: { audio: Audio[] }) => {
         <Separator className="my-4" />
         <div className="flex items-center gap-4 flex-wrap">
           {audio.map((podcast) => (
-            <div className="space-y-3 gap-4" key={podcast.id}>
-              <ContextMenu>
-                <ContextMenuTrigger>
-                  <div
-                    onClick={() => handleAudioSelect(podcast)}
-                    className="overflow-hidden cursor-pointer rounded-md"
-                  >
-                    <Image
-                      src={podcast.coverImage}
-                      alt={podcast.title}
-                      width={150}
-                      height={150}
-                      objectFit="contain"
-                      className={cn(
-                        "transition-all hover:scale-105 aspect-square"
-                      )}
-                    />
-                  </div>
-                </ContextMenuTrigger>
-                <ContextMenuContent className="w-40">
-                  <ContextMenuSub>
-                    <ContextMenuSubTrigger>
-                      Add to Playlist
-                    </ContextMenuSubTrigger>
-                    <ContextMenuSubContent className="w-48">
-                      <ContextMenuItem
-                        onClick={() => {
-                          setDialogOpen(true);
-                          setSelectedAudioId(podcast.id);
-                        }}
-                      >
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        New Playlist
-                      </ContextMenuItem>
-                      <ContextMenuSeparator />
-                      {loadingPlaylistsData ? (
-                        <Loader className="animate-spin flex mx-auto my-4" />
-                      ) : (
-                        playlistsData?.map((playlist) => (
-                          <ContextMenuItem
-                            key={playlist.id}
-                            onClick={async () => {
-                              await createPlaylist(
-                                podcast.id,
-                                playlist.name,
-                                router,
-                                toast
-                              );
-
-                              refreshPlaylists();
-                            }}
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              className="mr-2 h-4 w-4"
-                              viewBox="0 0 24 24"
-                            >
-                              <path d="M21 15V6M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM12 12H3M16 6H3M12 18H3" />
-                            </svg>
-                            {playlist.name}
-                          </ContextMenuItem>
-                        ))
-                      )}
-                    </ContextMenuSubContent>
-                  </ContextMenuSub>
-                  <ContextMenuSeparator />
-                  {playlistsData?.map((playlist) => {
-                    const audioExistsInPlaylist = playlist.audios.some(
-                      (audio) => audio.id === podcast.id
-                    );
-                    if (audioExistsInPlaylist) {
-                      return (
-                        <ContextMenuItem
-                          key={playlist.id}
-                          className="text-nowrap"
-                          onClick={() =>
-                            handleRemoveFromPlaylist(playlist.name, podcast.id)
-                          }
-                        >
-                          Remove from {playlist.name}
-                        </ContextMenuItem>
-                      );
-                    }
-                    return null;
-                  })}
-
-                  {/* <ContextMenuSeparator />
-          <ContextMenuItem>Like</ContextMenuItem>
-          <ContextMenuItem>Share</ContextMenuItem> */}
-                </ContextMenuContent>
-              </ContextMenu>
-              <div className="space-y-1 text-sm">
-                <h3
-                  onClick={() => handleAudioSelect(podcast)}
-                  className="font-medium leading-none cursor-pointer hover:text-white/80"
-                >
-                  {podcast.title}
-                </h3>
-                <p
-                  onClick={() => handleAudioSelect(podcast)}
-                  className="text-xs cursor-pointer text-muted-foreground hover:text-white/50"
-                >
-                  {podcast.category}
-                </p>
-                <Link href={`/creators/${podcast.user.id}`}>
-                  <p className="text-xs cursor-pointer text-muted-foreground hover:text-white/50">
-                    {podcast.user.name}
-                  </p>
-                </Link>
-              </div>
-            </div>
+            <AudioCover key={podcast.id} audioItem={podcast} />
           ))}
           <div className="flex items-center gap-4 flex-wrap"></div>
         </div>
       </div>
-      {dialogOpen && (
-        <PlaylistDialog
-          audioId={selectedAudioId || ""}
-          setDialogOpen={setDialogOpen}
-          dialogOpen={dialogOpen}
-        />
-      )}
     </>
   );
 };

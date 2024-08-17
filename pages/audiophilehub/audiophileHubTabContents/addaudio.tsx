@@ -101,10 +101,42 @@ const AddAudio: React.FC = () => {
     ]);
   };
 
-  const handleRemoveAudioPart = (fieldId: number) => {
-    setFields((prevFields) =>
-      prevFields.filter((field) => field.id !== fieldId)
-    );
+  const handleRemoveAudioPart = async (e: FormEvent, fieldId: number) => {
+    e.preventDefault();
+    try {
+      const fieldToRemove = fields.find((field) => field.id === fieldId);
+      if (fieldToRemove && fieldToRemove.audioUrl) {
+        const fileName = fieldToRemove.audioUrl.split("/").pop();
+
+        if (fileName) {
+          const { data: removeData, error: removeError } =
+            await supabase.storage
+              .from("AudioFiles")
+              .remove([`${category}/${fileName}`]);
+
+          if (removeError) {
+            console.error("Error removing old audio file:", removeError);
+            toast({
+              variant: "destructive",
+              description: "Error removing audio file",
+            });
+          } else {
+            toast({
+              description: "Audio file removed successfully",
+            });
+          }
+        }
+      }
+      setFields((prevFields) =>
+        prevFields.filter((field) => field.id !== fieldId)
+      );
+    } catch (error) {
+      console.error("Error removing audio part:", (error as Error).message);
+      toast({
+        variant: "destructive",
+        description: "Error removing audio part",
+      });
+    }
   };
 
   const clearFileInput = (selector: string) => {
@@ -456,7 +488,7 @@ const AddAudio: React.FC = () => {
                         />
                         {field.id !== fields[0].id && (
                           <Button
-                            onClick={() => handleRemoveAudioPart(field.id)}
+                            onClick={(e) => handleRemoveAudioPart(e, field.id)}
                           >
                             <X color="#ffffff" />
                           </Button>

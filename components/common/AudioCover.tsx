@@ -1,5 +1,8 @@
-"use client";
+import Image from "next/image";
 import React, { useState } from "react";
+import { Badge } from "../ui/badge";
+import PlaylistDialog from "../playlist/playlistDialog";
+import Link from "next/link";
 import { Loader, PlusCircle } from "lucide-react";
 import {
   ContextMenu,
@@ -11,41 +14,20 @@ import {
   ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-
-import Image from "next/image";
-import { User } from "@/types/types";
-import { useAudioPlayer } from "@/context/AudioPlayerContext";
-import Link from "next/link";
+import useFormatDuration from "@/hooks/useFormattedDuration";
+import { useToast } from "../ui/use-toast";
 import { useRouter } from "next/router";
-import { useToast } from "@/components/ui/use-toast";
-import { updateStreamCount } from "@/routes/updateStreamCount";
 import GetPlaylistsData from "@/routes/getPlaylistsData";
-import { removeFromPlaylist } from "@/routes/removeFromPlaylist";
-import PlaylistDialog from "@/components/playlist/playlistDialog";
 import { createPlaylist } from "@/routes/createPlaylist";
+import { useAudioPlayer } from "@/context/AudioPlayerContext";
+import { updateStreamCount } from "@/routes/updateStreamCount";
+import { removeFromPlaylist } from "@/routes/removeFromPlaylist";
 
-interface AudioForYou {
-  id: string;
-  user: User;
-  title: string;
-  category: string;
-  coverImage: string;
-  parts: AudioPart[];
-}
-
-interface AudioPart {
-  audioUrl: string;
-  partName: string;
-}
-
-interface Props {
-  audioItem: AudioForYou;
-}
-
-const AudioMadeForYou: React.FC<Props> = ({ audioItem }) => {
+const AudioCover = ({ audioItem }: any) => {
   const router = useRouter();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { Duration } = useFormatDuration(audioItem.parts);
   const { playlistsData, loadingPlaylistsData, refreshPlaylists } =
     GetPlaylistsData();
 
@@ -82,9 +64,14 @@ const AudioMadeForYou: React.FC<Props> = ({ audioItem }) => {
   };
 
   if (!audioItem) {
-    return null;
+    return (
+      <>
+        <div className="text-xl text-white text-center my-8">
+          No Audio Books Available!!
+        </div>
+      </>
+    );
   }
-
   return (
     <>
       <div className="space-y-3">
@@ -92,16 +79,16 @@ const AudioMadeForYou: React.FC<Props> = ({ audioItem }) => {
           <ContextMenuTrigger>
             <div
               onClick={handleAudioSelect}
-              className="overflow-hidden rounded-md cursor-pointer"
+              className="relative overflow-hidden rounded-md cursor-pointer"
             >
               <Image
                 src={audioItem.coverImage}
                 alt={audioItem.title}
                 width={150}
                 height={150}
-                objectFit="contain"
-                className="transition-all aspect-square hover:scale-105"
+                className="transition-all object-cover aspect-square hover:scale-105"
               />
+              <Badge className="absolute bottom-1 right-2">{Duration}</Badge>
             </div>
           </ContextMenuTrigger>
           <ContextMenuContent className="w-40">
@@ -174,7 +161,7 @@ const AudioMadeForYou: React.FC<Props> = ({ audioItem }) => {
         <div className="space-y-1 text-sm">
           <h3
             onClick={handleAudioSelect}
-            className="font-medium cursor-pointer hover:text-white/80 leading-none"
+            className="font-medium truncate w-[9.375rem] cursor-pointer hover:text-white/80 leading-none"
           >
             {audioItem.title}
           </h3>
@@ -201,4 +188,4 @@ const AudioMadeForYou: React.FC<Props> = ({ audioItem }) => {
   );
 };
 
-export default AudioMadeForYou;
+export default AudioCover;

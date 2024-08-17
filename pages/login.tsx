@@ -61,6 +61,7 @@ const Login: React.FC<Props> = ({ setIsLoggedIn }) => {
         setPassword("");
         router.push("/");
         setIsLoggedIn(true);
+        window.location.reload();
       } else {
         const { error } = await response.json();
 

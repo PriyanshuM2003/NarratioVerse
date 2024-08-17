@@ -9,11 +9,13 @@ export default function Home({
   liveTalks,
   isLoggedIn,
   newAudio,
+  isLoading
 }: {
   isLoggedIn: boolean;
   audio: Audio[];
   newAudio: Audio[];
   liveTalks: LiveTalk[];
+  isLoading: boolean;
 }) {
   return (
     <>
@@ -28,6 +30,7 @@ export default function Home({
           liveTalks={liveTalks}
           isLoggedIn={isLoggedIn}
           newAudio={newAudio}
+          loading={isLoading}
         />
       </main>
     </>
@@ -106,8 +109,10 @@ export async function getServerSideProps(context: any) {
     return {
       props: {
         audio: formattedAudio,
-        newAudio: formattedNewAudio.length > 0 ? formattedNewAudio : formattedAudio,
+        newAudio:
+          formattedNewAudio.length > 0 ? formattedNewAudio : formattedAudio,
         liveTalks: formattedLiveTalks,
+        isLoading: false,
       },
     };
   } catch (error) {
@@ -117,6 +122,7 @@ export async function getServerSideProps(context: any) {
         liveTalks: [],
         audio: [],
         newAudio: [],
+        isLoading: true,
       },
     };
   }

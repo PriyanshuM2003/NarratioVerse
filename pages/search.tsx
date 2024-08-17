@@ -4,42 +4,19 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import prisma from "@/lib/prisma";
 import { User } from "@/types/types";
-import { Radio, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import Image from "next/image";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
-import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { updateStreamCount } from "@/routes/updateStreamCount";
 import { useToast } from "@/components/ui/use-toast";
-import GetPlaylistsData from "@/routes/getPlaylistsData";
-import { removeFromPlaylist } from "@/routes/removeFromPlaylist";
 import { Skeleton } from "@/components/ui/skeleton";
-import { createPlaylist } from "@/routes/createPlaylist";
-import { Loader, PlusCircle } from "lucide-react";
-import PlaylistDialog from "@/components/playlist/playlistDialog";
 import { Button } from "@/components/ui/button";
 import { addFollow } from "@/routes/addFollow";
 import { removeFollowing } from "@/routes/removeFollowing";
 import GetFollowingData from "@/routes/getFollowingData";
 import GetLoggedUserData from "@/routes/getLoggedUserData";
+import AudioCover from "@/components/common/AudioCover";
+import LiveCover from "@/components/common/LiveCover";
 
 interface Audio {
   id: string;
@@ -77,46 +54,6 @@ export default function SearchPage({ audio, liveTalks, creator }: Props) {
   >([]);
   const router = useRouter();
   const { toast } = useToast();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedAudioId, setSelectedAudioId] = useState<string | null>(null);
-  const { playlistsData, loadingPlaylistsData, refreshPlaylists } =
-    GetPlaylistsData();
-
-  const {
-    setAudioData,
-    setCurrentIndex,
-    playPauseHandler,
-    audioRef,
-    currentIndex,
-    isPlaying,
-  } = useAudioPlayer();
-
-  const handleAudioSelect = (audio: Audio, startIndex: number = 0) => {
-    setAudioData(audio);
-    setCurrentIndex(startIndex);
-    if (audioRef.current) {
-      const audioItem = audio.parts[startIndex];
-      audioRef.current.src = audioItem.audioUrl;
-      audioRef.current.load();
-      playPauseHandler();
-    }
-    updateStreamCount(audio.id as string, router, toast);
-  };
-
-  const handleRemoveFromPlaylist = async (
-    playlistName: string,
-    audioId: string
-  ) => {
-    const removed = await removeFromPlaylist(
-      audioId,
-      playlistName,
-      router,
-      toast
-    );
-    if (removed) {
-      refreshPlaylists();
-    }
-  };
 
   const [isFollowing, setIsFollowing] = useState<any | null>(null);
   const { followingData, loadingFollowingData, setLoadingFollowingData } =
@@ -214,155 +151,13 @@ export default function SearchPage({ audio, liveTalks, creator }: Props) {
                 {!("name" in result) && "id" in result && (
                   <>
                     <div className="space-y-3 gap-4" key={(result as Audio).id}>
-                      <ContextMenu>
-                        <ContextMenuTrigger>
-                          <div
-                            onClick={() => handleAudioSelect(result as Audio)}
-                            className="overflow-hidden cursor-pointer rounded-md"
-                          >
-                            <Image
-                              src={(result as Audio).coverImage}
-                              alt={(result as Audio).title}
-                              width={150}
-                              height={150}
-                              objectFit="contain"
-                              className={cn(
-                                "transition-all hover:scale-105 aspect-square"
-                              )}
-                            />
-                          </div>
-                        </ContextMenuTrigger>
-                        <ContextMenuContent className="w-40">
-                          <ContextMenuSub>
-                            <ContextMenuSubTrigger>
-                              Add to Playlist
-                            </ContextMenuSubTrigger>
-                            <ContextMenuSubContent className="w-48">
-                              <ContextMenuItem
-                                onClick={() => {
-                                  setDialogOpen(true);
-                                  setSelectedAudioId((result as Audio).id);
-                                }}
-                              >
-                                <PlusCircle className="mr-2 h-4 w-4" />
-                                New Playlist
-                              </ContextMenuItem>
-                              <ContextMenuSeparator />
-                              {loadingPlaylistsData ? (
-                                <Loader className="animate-spin flex mx-auto my-4" />
-                              ) : (
-                                playlistsData?.map((playlist) => (
-                                  <ContextMenuItem
-                                    key={playlist.id}
-                                    onClick={async () => {
-                                      await createPlaylist(
-                                        (result as Audio).id,
-                                        playlist.name,
-                                        router,
-                                        toast
-                                      );
-
-                                      refreshPlaylists();
-                                    }}
-                                  >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth="2"
-                                      className="mr-2 h-4 w-4"
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <path d="M21 15V6M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM12 12H3M16 6H3M12 18H3" />
-                                    </svg>
-                                    {playlist.name}
-                                  </ContextMenuItem>
-                                ))
-                              )}
-                            </ContextMenuSubContent>
-                          </ContextMenuSub>
-                          <ContextMenuSeparator />
-                          {playlistsData?.map((playlist) => {
-                            const audioExistsInPlaylist = playlist.audios.some(
-                              (audio) => audio.id === (result as Audio).id
-                            );
-                            if (audioExistsInPlaylist) {
-                              return (
-                                <ContextMenuItem
-                                  key={playlist.id}
-                                  className="text-nowrap"
-                                  onClick={() =>
-                                    handleRemoveFromPlaylist(
-                                      playlist.name,
-                                      (result as Audio).id
-                                    )
-                                  }
-                                >
-                                  Remove from {playlist.name}
-                                </ContextMenuItem>
-                              );
-                            }
-                            return null;
-                          })}
-
-                          {/* <ContextMenuSeparator />
-                  <ContextMenuItem>Like</ContextMenuItem>
-                  <ContextMenuItem>Share</ContextMenuItem> */}
-                        </ContextMenuContent>
-                      </ContextMenu>
-                      <div className="space-y-1 text-sm">
-                        <h3
-                          onClick={() => handleAudioSelect(result as Audio)}
-                          className="font-medium leading-none cursor-pointer hover:text-white/80"
-                        >
-                          {(result as Audio).title}
-                        </h3>
-                        <p
-                          onClick={() => handleAudioSelect(result as Audio)}
-                          className="text-xs cursor-pointer text-muted-foreground hover:text-white/50"
-                        >
-                          {(result as Audio).category}
-                        </p>
-                        <Link href={`/creators/${(result as Audio).user.id}`}>
-                          <p className="text-xs cursor-pointer text-muted-foreground hover:text-white/50">
-                            {(result as Audio).user.name}
-                          </p>
-                        </Link>
-                      </div>
+                      <AudioCover audioItem={result as Audio} />
                     </div>
                   </>
                 )}
                 {"title" in result && "status" in result && (
                   <>
-                    <div className="space-y-3">
-                      <Link href={`/live/${(result as LiveTalk).roomId}`}>
-                        <div className="relative">
-                          <Image
-                            src={(result as LiveTalk).user.profileImage || ""}
-                            alt={(result as LiveTalk).title}
-                            width={150}
-                            height={150}
-                            objectFit="contain"
-                            className="rounded-full aspect-square relative border-4 border-red-600"
-                          />
-                          <div className="bg-white absolute -bottom-2 left-1/2 px-1 rounded-3xl transform -translate-x-1/2">
-                            <Radio className="animate-pulse text-red-600" />
-                          </div>
-                        </div>
-                      </Link>
-                      <div className="space-y-1 text-sm text-center">
-                        <p className="text-xs text-muted-foreground">
-                          {(result as LiveTalk).user.name}
-                        </p>
-                        <Link href={`/live/${(result as LiveTalk).roomId}`}>
-                          <p className="font-medium leading-none">
-                            {(result as LiveTalk).title}
-                          </p>
-                        </Link>
-                      </div>
-                    </div>
+                    <LiveCover liveItem={result as LiveTalk} />
                   </>
                 )}
                 {"name" in result && (
@@ -426,13 +221,6 @@ export default function SearchPage({ audio, liveTalks, creator }: Props) {
           )}
         </div>
       </div>
-      {dialogOpen && (
-        <PlaylistDialog
-          audioId={selectedAudioId || ""}
-          setDialogOpen={setDialogOpen}
-          dialogOpen={dialogOpen}
-        />
-      )}
     </>
   );
 }
