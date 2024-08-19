@@ -1,4 +1,4 @@
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
 import { Playlist } from "@/types/types";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
@@ -37,8 +37,11 @@ export default function GetPlaylistsData(): {
     data: playlistsData,
     error,
     isValidating: loadingPlaylistsData,
+    mutate: swrMutate,
   } = useSWR(`${process.env.NEXT_PUBLIC_HOST}/api/getplaylists`, fetcher);
-
+  const refreshPlaylists = () => {
+    swrMutate();
+  };
   useEffect(() => {
     if (error) {
       console.error("Error fetching playlists data:", error);
@@ -48,9 +51,6 @@ export default function GetPlaylistsData(): {
       // });
     }
   }, [error, toast]);
-  const refreshPlaylists = () => {
-    mutate(`${process.env.NEXT_PUBLIC_HOST}/api/getplaylists`);
-  };
 
   return { playlistsData, loadingPlaylistsData, refreshPlaylists };
 }

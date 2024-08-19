@@ -38,7 +38,9 @@ export default async function handler(
         req.body;
 
       const { id: hostUserId } = decoded;
-
+      if (!hostUserId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
       const hostUser = await prisma.user.findUnique({
         where: {
           id: hostUserId,
@@ -52,6 +54,10 @@ export default async function handler(
       const guestUserIds: string[] = [];
 
       for (const participant of participants) {
+        if (!participant.email) {
+          console.error("Participant email is undefined");
+          continue;
+        }
         const user = await prisma.user.findUnique({
           where: {
             email: participant.email,

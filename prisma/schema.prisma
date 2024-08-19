@@ -71,6 +71,7 @@ model Audio {
   id         String     @id @default(uuid())
   title      String
   coverImage String
+  about      String
   category   String
   genres     String[]
   parts      Json[]

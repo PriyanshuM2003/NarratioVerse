@@ -12,7 +12,10 @@ interface UserData {
   profileImage: string;
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   try {
     if (req.method === "PUT") {
       const token = req.headers.authorization?.replace("Bearer ", "");
@@ -20,13 +23,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const decoded = jwt.verify(token as string, process.env.ACCESS_TOKEN_SECRET as Secret) as { id?: string };
+      const decoded = jwt.verify(
+        token as string,
+        process.env.ACCESS_TOKEN_SECRET as Secret
+      ) as { id?: string };
 
       if (!decoded || !decoded.id) {
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const { id, name, email, phone, country, bio, profileImage }: UserData = req.body;
+      const { name, email, phone, country, bio, profileImage }: UserData =
+        req.body;
 
       const updatedUser = await prisma.user.update({
         where: { id: decoded.id },

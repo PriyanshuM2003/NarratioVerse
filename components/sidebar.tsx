@@ -11,7 +11,7 @@ import {
   Info,
   PlayCircle,
   Radio,
-  BadgePlus,
+  BadgeAlert,
 } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
@@ -21,7 +21,7 @@ import GetLoggedUserData from "@/routes/getLoggedUserData";
 import JoinLiveRoom from "./liveRoom/joinLiveRoom";
 import GetPlaylistsData from "@/routes/getPlaylistsData";
 import { Skeleton } from "./ui/skeleton";
-import PlaylistDeleteAlert from "./playlist/playlistDeleteAlert";
+import PlaylistDeleteAlert from "./dialogs/playlistDeleteAlert";
 
 interface LinkData {
   href: string;
@@ -43,7 +43,7 @@ const commonLinks: LinkData[] = [
     icon: <Podcast className="w-5 h-5" />,
   },
   { href: "/live", text: "Live", icon: <Radio className="w-5 h-5" /> },
-  { href: "/new", text: "New", icon: <BadgePlus className="w-5 h-5" /> },
+  { href: "/new", text: "New", icon: <BadgeAlert className="w-5 h-5" /> },
   { href: "/creators", icon: <Mic2 className="w-5 h-5" />, text: "Creators" },
 ];
 

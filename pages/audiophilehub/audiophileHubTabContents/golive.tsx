@@ -6,10 +6,20 @@ import { Loader, PlusCircle, Radio, X } from "lucide-react";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { genres } from "@/data/preferences";
 import { v4 as uuidv4 } from "uuid";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,27 +27,51 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getAccessToken } from "@/lib/auth";
+import { Label } from "@/components/ui/label";
 
-interface Field {
-  id: number;
-  guestEmail: string;
+interface GoLiveFormInputs {
+  title: string;
+  record: "Yes" | "No";
+  genres: string[];
+  participants: { guestEmail: string }[];
 }
-
 const GoLive: React.FC = () => {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState<boolean>(false);
-  const [title, setTitle] = useState<string>("");
-  const [record, setRecord] = useState<string>("No");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [open, setOpen] = useState<boolean>(false);
-  const [fields, setFields] = useState<Field[]>([
-    {
-      id: 1,
-      guestEmail: "",
-    },
-  ]);
 
+  const formSchema = z.object({
+    title: z.string().min(1, "Title is required"),
+    record: z.enum(["Yes", "No"]),
+    genres: z.array(z.string()).min(1, "At least one genre is required"),
+    participants: z.array(
+      z.object({
+        guestEmail: z
+          .string()
+          .email("Invalid email address")
+          .nonempty("Email is required"),
+      })
+    ),
+  });
+  const formMethods = useForm<GoLiveFormInputs>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      record: "No",
+      genres: [],
+      participants: [{ guestEmail: "" }],
+    },
+  });
+  const { control, handleSubmit, setValue, watch, register, getValues } =
+    formMethods;
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "participants",
+  });
+  const record = watch("record");
   const [roomId, setRoomId] = useState<string>("");
 
   const joinRoom = () => {
@@ -46,52 +80,23 @@ const GoLive: React.FC = () => {
       alert("Please provide a valid room id");
     }
   };
-
-  const handleTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(event.target.value);
-  };
-
   const handleGenreSelect = (selectedGenre: string) => {
     if (!selectedGenres.includes(selectedGenre)) {
-      setSelectedGenres((prevGenres) => [...prevGenres, selectedGenre]);
+      const updatedGenres = [...selectedGenres, selectedGenre];
+      setSelectedGenres(updatedGenres);
+      setValue("genres", updatedGenres, { shouldValidate: true });
     }
   };
 
   const handleGenreRemove = (genreToRemove: string) => {
-    setSelectedGenres((prevGenres) =>
-      prevGenres.filter((genre) => genre !== genreToRemove)
+    const updatedGenres = selectedGenres.filter(
+      (genre) => genre !== genreToRemove
     );
+    setSelectedGenres(updatedGenres);
+    setValue("genres", updatedGenres, { shouldValidate: true });
   };
 
-  const handleGuestEmailPart = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    fieldId: number
-  ) => {
-    const updatedFields = fields.map((field) =>
-      field.id === fieldId
-        ? { ...field, guestEmail: event.target.value }
-        : field
-    );
-    setFields(updatedFields);
-  };
-
-  const handleRemoveGuestEmailPart = (fieldId: number) => {
-    setFields((prevFields) =>
-      prevFields.filter((field) => field.id !== fieldId)
-    );
-  };
-
-  const handleAddField = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    const newField = {
-      id: fields.length + 1,
-      guestEmail: "",
-    };
-    setFields((prevFields) => [...prevFields, newField]);
-  };
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const onSubmit: SubmitHandler<GoLiveFormInputs> = async (data) => {
     setLoading(true);
 
     try {
@@ -110,21 +115,19 @@ const GoLive: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            title,
-            record: record === "Yes",
+            ...data,
+            record: data.record === "Yes",
             roomId,
-            genres: selectedGenres,
-            participants: fields.map((field) => ({
-              email: field.guestEmail,
-            })),
           }),
         }
       );
 
       if (response.ok) {
         const { liveTalk, hostUserName } = await response.json();
-        for (const field of fields) {
+        const participants = getValues().participants;
+        for (const participant of participants) {
           try {
+            console.log("Sending email to:", participant.guestEmail);
             const emailResult = await fetch(
               `${process.env.NEXT_PUBLIC_HOST}/api/mailer`,
               {
@@ -133,7 +136,7 @@ const GoLive: React.FC = () => {
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                  recipient: field.guestEmail,
+                  recipient: participant.guestEmail,
                   subject: "Invitation to Live Talk",
                   htmlContent: `
                     <title>Invitation to Live Podcast</title>
@@ -157,7 +160,7 @@ const GoLive: React.FC = () => {
                           color: #666;">
                               <p>Hello,</p>
                               <p>You are invited to join our live podcast hosted by ${hostUserName}.</p>
-                              <p>The podcast titled "${title}" will be starting soon. We would love to have you as a guest!</p>
+                              <p>The podcast titled "${data.title}" will be starting soon. We would love to have you as a guest!</p>
                               <p>Join us by using the code below:</p>
                               <div style=" display: inline-block;
                               padding: 10px 20px;
@@ -181,22 +184,25 @@ const GoLive: React.FC = () => {
 
             if (emailResult.ok) {
               toast({
-                description: `Email sent to ${field.guestEmail} successfully!`,
+                description: `Email sent to ${participant.guestEmail} successfully!`,
               });
-              console.log(`Email sent to ${field.guestEmail} successfully!`);
+              router.push(`/live/${roomId}`);
+              console.log(
+                `Email sent to ${participant.guestEmail} successfully!`
+              );
             } else {
               toast({
                 variant: "destructive",
-                description: `Failed to send email to ${field.guestEmail}!`,
+                description: `Failed to send email to ${participant.guestEmail}!`,
               });
-              console.error(`Failed to send email to ${field.guestEmail}`);
+              console.error(
+                `Failed to send email to ${participant.guestEmail}`
+              );
             }
           } catch (error) {
             console.error("Error sending email:", error);
           }
         }
-
-        router.push(`/live/${roomId}`);
       } else {
         console.error("Error creating LiveTalk:", response.statusText);
       }
@@ -225,141 +231,177 @@ const GoLive: React.FC = () => {
               <Button onClick={joinRoom}>Join Room</Button>
             </div>
             <Separator className="my-4" />
-            <form onSubmit={handleSubmit}>
-              <div className="flex flex-wrap -mx-3 mb-6 text-white">
-                <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                  <Label htmlFor="title">Title</Label>
-                  <Input
+            <Form {...formMethods}>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="grid grid-cols-2 items-center gap-4">
+                  <FormField
+                    control={control}
                     name="title"
-                    id="title"
-                    value={title}
-                    onChange={handleTitle}
-                    type="text"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Title</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
+                  {/* <div className="flex items-center gap-4">
+                    <Label htmlFor="record">
+                      Do you want to record this podcast audio?
+                    </Label>
+                    <FormField
+                      control={control}
+                      name="record"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center gap-1">
+                          <FormLabel>Yes</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="radio"
+                              value={"Yes"}
+                              checked={record === "Yes"}
+                              {...register("record")}
+                              className="h-5 w-5"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={control}
+                      name="record"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center gap-1">
+                          <FormLabel>No</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="radio"
+                              value={"No"}
+                              checked={record === "No"}
+                              {...register("record")}
+                              className="h-5 w-5"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div> */}
                 </div>
-                {/* <div className="w-full md:w-1/2 flex items-center space-x-4">
-                  <Label htmlFor="record">
-                    Do you want to record this podcast audio?
-                  </Label>
-                  <div className="flex items-center space-x-4">
-                    <Input
-                      type="radio"
-                      id="yes"
-                      name="record"
-                      value="Yes"
-                      checked={record === "Yes"}
-                      onChange={() => setRecord("Yes")}
-                      className="h-5 w-5"
-                    />
-                    <Label htmlFor="yes">Yes</Label>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <Input
-                      type="radio"
-                      id="no"
-                      name="record"
-                      value="No"
-                      checked={record === "No"}
-                      onChange={() => setRecord("No")}
-                      className="h-5 w-5"
-                    />
-                    <Label htmlFor="no">No</Label>
-                  </div>
-                </div> */}
-              </div>
-              <div className="flex flex-wrap -mx-3 mb-2 text-white">
-                <div className="w-full px-3 mb-6">
-                  <Label>Genres</Label>
-                  <div className="flex items-center space-x-1">
-                    <DropdownMenu
-                      open={open}
-                      onOpenChange={(val) => setOpen(val)}
-                    >
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="text-black">
-                          Select Genre
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="overflow-y-auto scrollbar-none h-56">
-                        {genres.map((genre) => (
-                          <DropdownMenuItem
-                            key={genre.id}
-                            onSelect={() => handleGenreSelect(genre.label)}
-                          >
-                            {genre.label}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    {selectedGenres.length > 0 && (
-                      <div className="flex flex-wrap space-x-1 space-y-1">
-                        {selectedGenres.map((selectedGenre) => (
-                          <Badge
-                            key={selectedGenre}
-                            className="px-4 text-sm cursor-pointer"
-                          >
-                            {selectedGenre}&nbsp;
-                            <span
-                              className="text-lg"
-                              onClick={() => handleGenreRemove(selectedGenre)}
+                <div className="flex flex-wrap -mx-3 mb-2 text-white">
+                  <div className="w-full px-3 mb-6">
+                    <FormField
+                      control={control}
+                      name="genres"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Genres</FormLabel>
+                          <div className="flex items-center space-x-1">
+                            <DropdownMenu
+                              open={open}
+                              onOpenChange={(val) => setOpen(val)}
                             >
-                              &times;
-                            </span>
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  className="text-black"
+                                >
+                                  Select Genre
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className="overflow-y-auto scrollbar-none h-56">
+                                {genres.map((genre) => (
+                                  <DropdownMenuItem
+                                    key={genre.id}
+                                    onSelect={() =>
+                                      handleGenreSelect(genre.label)
+                                    }
+                                  >
+                                    {genre.label}
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                            {selectedGenres.length > 0 && (
+                              <div className="flex flex-wrap space-x-1 space-y-1">
+                                {selectedGenres.map((selectedGenre) => (
+                                  <Badge
+                                    key={selectedGenre}
+                                    className="px-4 text-sm cursor-pointer"
+                                  >
+                                    {selectedGenre}&nbsp;
+                                    <span
+                                      className="text-lg"
+                                      onClick={() =>
+                                        handleGenreRemove(selectedGenre)
+                                      }
+                                    >
+                                      &times;
+                                    </span>
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 </div>
-              </div>
-              <div className="flex flex-wrap items-center text-white mb-2">
-                {fields.map((field, index) => (
-                  <div
-                    className="w-full md:w-1/3 flex items-center mb-6"
-                    key={field.id}
-                  >
-                    <div className="w-full mr-1">
-                      <Label htmlFor={`guestEmail-${field.id}`}>{`Enter Guest ${
-                        index + 1
-                      } Email to Invite`}</Label>
-                      <Input
-                        name={`guestEmail-${field.id}`}
-                        id={`guestEmail-${field.id}`}
-                        value={field.guestEmail}
-                        onChange={(event) =>
-                          handleGuestEmailPart(event, field.id)
-                        }
-                        type="text"
-                      />
-                    </div>
-                    {field.id !== fields[0].id && (
-                      <Button
-                        className="mt-6 mr-1"
-                        onClick={() => handleRemoveGuestEmailPart(field.id)}
-                      >
-                        <X color="#ffffff" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
-                <Button className="ml-1" onClick={handleAddField}>
-                  <PlusCircle color="#ffffff" />
-                  &nbsp;Add Field
-                </Button>
-              </div>
-              <div className="flex mx-auto items-center justify-center mt-4">
-                <Button type="submit">
-                  {loading ? (
-                    <Loader className="animate-spin" />
-                  ) : (
+                <div className="flex flex-wrap items-center gap-2">
+                  {fields.map((field, index) => (
                     <>
-                      <Radio className="w-4 h-4" />
-                      &nbsp;Go Live
+                      <FormField
+                        key={field.id}
+                        control={control}
+                        name={`participants.${index}.guestEmail`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{`Enter Guest ${
+                              index + 1
+                            } Email to Invite`}</FormLabel>
+                            <div className="flex items-center gap-2">
+                              <FormControl>
+                                <Input className="w-[22.5rem]" {...field} />
+                              </FormControl>
+                              {index !== 0 && (
+                                <Button onClick={() => remove(index)}>
+                                  <X color="#ffffff" />
+                                </Button>
+                              )}
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </>
-                  )}
-                </Button>
-              </div>
-            </form>
+                  ))}
+                  <Button
+                    className="mt-1"
+                    onClick={() => append({ guestEmail: "" })}
+                  >
+                    <PlusCircle color="#ffffff" />
+                    &nbsp;Add Field
+                  </Button>
+                </div>
+                <div className="flex mx-auto items-center justify-center mt-4">
+                  <Button type="submit">
+                    {loading ? (
+                      <Loader className="animate-spin" />
+                    ) : (
+                      <>
+                        <Radio className="w-4 h-4" />
+                        &nbsp;Go Live
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           </div>
         </div>
       </div>

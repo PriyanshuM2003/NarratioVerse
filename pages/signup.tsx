@@ -3,14 +3,17 @@ import ReactDOMServer from "react-dom/server";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
@@ -20,11 +23,9 @@ import {
 } from "@/components/ui/select";
 import { Info, Loader, Settings2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
 import supabase from "@/lib/supabase";
-import Image from "next/image";
 import Preferences from "@/components/preferences";
 import { countries } from "@/data/countries";
 import {
@@ -34,6 +35,7 @@ import {
 } from "@/components/ui/tooltip";
 import { getAccessToken } from "@/lib/auth";
 import { VerificationMail } from "@/data/email";
+import Collage from "@/components/Collage";
 
 interface FormData {
   name: string;
@@ -47,31 +49,76 @@ interface FormData {
   genres: string[];
 }
 
-const Signup = () => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState("");
+export const Signup = () => {
   const { toast } = useToast();
   const router = useRouter();
-  const [formData, setFormData] = useState<FormData>({
-    name: "",
-    email: "",
-    country: selectedCountry,
-    phone: "",
-    password: "",
-    cpassword: "",
-    languages: [],
-    genres: [],
-    profileImage:
-      "https://pluspng.com/img-png/user-png-icon-big-image-png-2240.png",
+  const [loading, setLoading] = useState<boolean>(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
+  const formSchema = z
+    .object({
+      name: z.string().min(2, {
+        message: "Name must be at least 2 characters.",
+      }),
+      email: z.string().email({ message: "Invalid email address." }),
+      country: z.string().min(1, { message: "Country is required." }),
+      phone: z
+        .string()
+        .regex(/^\d{10}$/, { message: "Name must be 10 digits." }),
+      password: z
+        .string()
+        .min(8, { message: "Password must be at least 8 characters." }),
+      cpassword: z
+        .string()
+        .min(8, { message: "Confirm password is required." }),
+      profileImage: z.string().url().optional(),
+      languages: z.array(z.string()).optional(),
+      genres: z.array(z.string()).optional(),
+    })
+    .refine((data) => data.password === data.cpassword, {
+      path: ["cpassword"],
+      message: "Passwords do not match",
+    });
+
+  const formMethods = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      country: "",
+      phone: "",
+      password: "",
+      cpassword: "",
+      profileImage:
+        "https://pluspng.com/img-png/user-png-icon-big-image-png-2240.png",
+      languages: [],
+      genres: [],
+    },
   });
 
+  const resetForm = () => {
+    formMethods.reset({
+      name: "",
+      email: "",
+      country: "",
+      phone: "",
+      password: "",
+      cpassword: "",
+      profileImage:
+        "https://pluspng.com/img-png/user-png-icon-big-image-png-2240.png",
+      languages: [],
+      genres: [],
+    });
+  };
+
+  const { handleSubmit, control, setValue, watch } = formMethods;
+
+  const selectedCountry = watch("country");
+
   useEffect(() => {
-    setFormData((prevData) => ({
-      ...prevData,
-      country: selectedCountry,
-    }));
-  }, [selectedCountry]);
+    setValue("country", selectedCountry);
+  }, [selectedCountry, setValue]);
 
   useEffect(() => {
     const token = getAccessToken();
@@ -80,34 +127,33 @@ const Signup = () => {
     }
   }, [router]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-
-    setFormData({
-      ...formData,
-      [id]: value,
-    });
-  };
-
-  const SavePreferences = (languages: string[], genres: string[]) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      languages,
-      genres,
-    }));
-  };
-
-  const handleSignup = async () => {
-    if (formData.password !== formData.cpassword) {
-      toast({
-        variant: "destructive",
-        description: "Passwords do not match",
-      });
-      return;
-    }
-
+  const onSubmit: SubmitHandler<FormData> = async (formData) => {
     try {
       setLoading(true);
+
+      let profileImageUrl = formData.profileImage;
+
+      if (imageFile) {
+        const uniqueId = Math.random().toString(36).substring(7);
+        const { data, error } = await supabase.storage
+          .from("Images")
+          .upload(`Avatar/${uniqueId}_${imageFile.name}`, imageFile);
+
+        if (error) {
+          toast({
+            variant: "destructive",
+            description: "Error uploading profile image",
+          });
+          resetForm();
+          return;
+        }
+
+        const downloadUrl = await supabase.storage
+          .from("Images")
+          .getPublicUrl(`Avatar/${uniqueId}_${imageFile.name}`);
+        profileImageUrl = downloadUrl.data.publicUrl;
+      }
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_HOST}/api/auth/signup`,
         {
@@ -115,7 +161,7 @@ const Signup = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({ ...formData, profileImage: profileImageUrl }),
         }
       );
 
@@ -124,302 +170,259 @@ const Signup = () => {
         toast({
           description: "Account created successfully!",
         });
+        resetForm();
 
         const htmlContent = ReactDOMServer.renderToStaticMarkup(
           <VerificationMail token={verificationToken} />
         );
 
-        try {
-          const emailResult = await fetch(
-            `${process.env.NEXT_PUBLIC_HOST}/api/mailer`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                recipient: formData.email,
-                subject: "Welcome to Narratioverse",
-                htmlContent,
-              }),
-            }
-          );
-
-          if (emailResult.ok) {
-            toast({
-              description: "Verification Email sent successfully!",
-            });
-            console.log("Email sent successfully!");
-          } else {
-            toast({
-              variant: "destructive",
-              description: "Failed to send email!",
-            });
-            console.error("Failed to send email");
+        const emailResult = await fetch(
+          `${process.env.NEXT_PUBLIC_HOST}/api/mailer`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              recipient: formData.email,
+              subject: "Welcome to Narratioverse",
+              htmlContent,
+            }),
           }
-        } catch (error) {
-          console.error("Error:", error);
-        }
-        setFormData({
-          name: "",
-          email: "",
-          country: "",
-          phone: "",
-          password: "",
-          cpassword: "",
-          profileImage: "",
-          languages: [],
-          genres: [],
-        });
+        );
 
-        router.push("/login");
-        setLoading(false);
+        if (emailResult.ok) {
+          toast({
+            description: "Verification Email sent successfully!",
+          });
+          router.push("/login");
+          resetForm();
+        } else {
+          toast({
+            variant: "destructive",
+            description: "Failed to send email!",
+          });
+          resetForm();
+        }
       } else {
         const errorData = await response.json();
         toast({
           variant: "destructive",
           description: errorData.error || "Error creating account",
         });
-        setFormData({
-          name: "",
-          email: "",
-          country: "",
-          phone: "",
-          password: "",
-          cpassword: "",
-          profileImage: "",
-          languages: [],
-          genres: [],
-        });
-
-        setLoading(false);
+        resetForm();
       }
     } catch (error) {
       console.error("Error:", error);
       toast({
         variant: "destructive",
-        description: `Something went wrong:${error}`,
+        description: `Something went wrong: ${error}`,
       });
-      setFormData({
-        name: "",
-        email: "",
-        country: "",
-        phone: "",
-        password: "",
-        cpassword: "",
-        profileImage: "",
-        languages: [],
-        genres: [],
-      });
+      resetForm();
+    } finally {
       setLoading(false);
+      resetForm();
     }
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
     const file = e.target.files?.[0];
-
     if (file) {
-      try {
-        setLoading(true);
-        const uniqueId = Math.random().toString(36).substring(7);
-        const { data, error } = await supabase.storage
-          .from("Images")
-          .upload(`Avatar/${uniqueId}_${file.name}`, file);
-
-        if (error) {
-          toast({
-            variant: "destructive",
-            description: "Error uploading profile image",
-          });
-        } else {
-          const downloadUrl = await supabase.storage
-            .from("Images")
-            .getPublicUrl(`Avatar/${uniqueId}_${file.name}`);
-          setFormData((prevData) => ({
-            ...prevData,
-            profileImage: downloadUrl.data.publicUrl,
-          }));
-          toast({
-            description: "Profile image uploaded successfully",
-          });
-        }
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          description: "Error uploading profile image",
-        });
-      } finally {
-        setLoading(false);
-      }
+      setImageFile(file);
     } else {
-      setFormData({
-        ...formData,
-        profileImage:
-          "https://pluspng.com/img-png/user-png-icon-big-image-png-2240.png",
-      });
+      setValue(
+        "profileImage",
+        "https://pluspng.com/img-png/user-png-icon-big-image-png-2240.png"
+      );
+      setImageFile(null);
     }
+  };
+
+  const SavePreferences = (languages: string[], genres: string[]) => {
+    setValue("languages", languages);
+    setValue("genres", genres);
   };
 
   return (
     <>
-      <div className="w-full flex justify-between p-4">
-        <div className="grid grid-cols-2">
-          <div>
-            <Image
-              src="./narratioverse1.jpg"
-              alt="1"
-              width={347}
-              height={347}
-            />
-          </div>
-          <div>
-            <Image
-              src="./narratioverse2.jpg"
-              alt="2"
-              width={347}
-              height={347}
-            />
-          </div>
-          <div>
-            <Image
-              src="./narratioverse3.jpg"
-              alt="3"
-              width={347}
-              height={347}
-            />
-          </div>
-          <div>
-            <Image
-              src="./narratioverse4.jpg"
-              alt="4"
-              width={347}
-              height={347}
-            />
-          </div>
-        </div>
-        <Card className="bg-gray-900">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center text-white">
+      <div className="w-full flex justify-center p-4">
+        {/* <Collage /> */}
+        <div className="w-3/4">
+          <div className="space-y-1">
+            <h2 className="text-2xl text-center text-white">
               Create an account
-            </CardTitle>
-            <CardDescription className="text-center">
+            </h2>
+            <h4 className="text-center text-sm text-muted-foreground">
               Enter your details below to create your account
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4 text-white">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="flex justify-between flex-wrap">
-              <div className="grid gap-2 text-black">
-                <Select
-                  value={selectedCountry}
-                  onValueChange={(val) => setSelectedCountry(val)}
-                >
-                  <div className="flex items-center gap-1">
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Select country" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {countries.map((country) => (
-                        <SelectItem key={country.code} value={country.name}>
-                          {country.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                    <Tooltip delayDuration={1}>
-                      <TooltipTrigger asChild>
-                        <Info className="text-white cursor-pointer" size={16} />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>
-                          Use the built-in search feature by entering the
-                          country&apos;s first letter to select it quickly.
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                </Select>
+            </h4>
+          </div>
+          <Form {...formMethods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+              <div className="grid grid-cols-2 items-center w-full gap-4">
+                <FormField
+                  control={control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
-              <div className="grid gap-2 text-black">
-                <Button
-                  variant={"outline"}
-                  onClick={() => {
-                    setDialogOpen(true);
-                  }}
-                >
-                  <Settings2 className="mr-2 h-4 w-4" />
-                  <span>Preferences</span>
+              <div className="grid grid-cols-3 gap-4 items-center">
+                <FormField
+                  control={control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone No.</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="tel"
+                          maxLength={10}
+                          pattern="[0-9]*"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem className="pt-8">
+                      <FormControl>
+                        <Select
+                          value={selectedCountry}
+                          onValueChange={(val) => setValue("country", val)}
+                        >
+                          <div className="flex items-center gap-1">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select country" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {countries.map((country) => (
+                                <SelectItem
+                                  key={country.code}
+                                  value={country.name}
+                                >
+                                  {country.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                            <Tooltip delayDuration={1}>
+                              <TooltipTrigger asChild>
+                                <Info
+                                  className="text-white cursor-pointer"
+                                  size={16}
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>
+                                  Use the built-in search feature by entering
+                                  the country&apos;s first letter to select it
+                                  quickly.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="pt-7">
+                  <Button
+                    variant={"outline"}
+                    className="flex items-center justify-start w-max"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setDialogOpen(true);
+                    }}
+                  >
+                    <Settings2 className="mr-2 h-4 w-4" />
+                    <span>Preferences</span>
+                  </Button>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <FormField
+                  control={control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name="cpassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name="profileImage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Profile Image</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          onChange={handleFileChange}
+                          accept="image/*"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="pt-4 flex justify-center">
+                <Button type="submit" className="w-max bg-black font-semibold">
+                  {loading ? (
+                    <Loader className="animate-spin" />
+                  ) : (
+                    <p>Create Account</p>
+                  )}
                 </Button>
               </div>
-            </div>
-            <div className="flex space-x-2 items-center">
-              <div className="grid gap-2">
-                <Label htmlFor="phone">Phone No.</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  maxLength={10}
-                  pattern="[0-9]*"
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="profileImage">Profile Image</Label>
-                <Input
-                  id="profileImage"
-                  name="profileImage"
-                  type="file"
-                  onChange={handleFileChange}
-                />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="cpassword">Confirm Password</Label>
-              <Input
-                id="cpassword"
-                name="cpassword"
-                type="password"
-                onChange={handleInputChange}
-              />
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col">
-            <Button
-              className="w-full bg-black font-semibold"
-              onClick={handleSignup}
-            >
-              {loading ? (
-                <Loader className="animate-spin" />
-              ) : (
-                <p>Create Account</p>
-              )}
-            </Button>
+            </form>
+          </Form>
+          <div>
             <p className="mt-2 text-xs text-center text-gray-400">
               By clicking Create Account, you agree to our&nbsp;
               <Link
@@ -445,8 +448,8 @@ const Signup = () => {
                 Log in
               </Link>
             </p>
-          </CardFooter>
-        </Card>
+          </div>
+        </div>
       </div>
       {dialogOpen && (
         <Preferences

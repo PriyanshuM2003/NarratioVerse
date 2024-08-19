@@ -1,7 +1,7 @@
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Badge } from "../ui/badge";
-import PlaylistDialog from "../playlist/playlistDialog";
+import PlaylistDialog from "../dialogs/playlistDialog";
 import Link from "next/link";
 import { Loader, PlusCircle } from "lucide-react";
 import {
@@ -14,7 +14,6 @@ import {
   ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import useFormatDuration from "@/hooks/useFormattedDuration";
 import { useToast } from "../ui/use-toast";
 import { useRouter } from "next/router";
 import GetPlaylistsData from "@/routes/getPlaylistsData";
@@ -22,12 +21,14 @@ import { createPlaylist } from "@/routes/createPlaylist";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import { updateStreamCount } from "@/routes/updateStreamCount";
 import { removeFromPlaylist } from "@/routes/removeFromPlaylist";
+import { Skeleton } from "../ui/skeleton";
 
 const AudioCover = ({ audioItem }: any) => {
   const router = useRouter();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const { Duration } = useFormatDuration(audioItem.parts);
+  const [totalDuration, setTotalDuration] = useState<number>(0);
+  const [loadingDuration, setLoadingDuration] = useState(true);
   const { playlistsData, loadingPlaylistsData, refreshPlaylists } =
     GetPlaylistsData();
 
@@ -63,6 +64,36 @@ const AudioCover = ({ audioItem }: any) => {
     }
   };
 
+  useEffect(() => {
+    const calculateTotalDuration = () => {
+      let total = 0;
+
+      audioItem.parts.forEach((part: any, index: number) => {
+        const audio = new Audio(part.audioUrl);
+        audio.onloadedmetadata = () => {
+          total += audio.duration;
+          setTotalDuration(total);
+          if (index === audioItem.parts.length - 1) {
+            setLoadingDuration(false);
+          }
+        };
+      });
+    };
+
+    calculateTotalDuration();
+  }, [audioItem.parts]);
+
+  const formattedDuration = (duration: number) => {
+    const minutes = Math.floor(duration / 60);
+    const seconds = Math.floor(duration % 60);
+
+    if (minutes > 0) {
+      return `${minutes} min ${seconds.toString().padStart(2, "0")} sec`;
+    } else {
+      return `${seconds} sec`;
+    }
+  };
+
   if (!audioItem) {
     return (
       <>
@@ -88,7 +119,13 @@ const AudioCover = ({ audioItem }: any) => {
                 height={150}
                 className="transition-all object-cover aspect-square hover:scale-105"
               />
-              <Badge className="absolute bottom-1 right-2">{Duration}</Badge>
+              {loadingDuration ? (
+                <Skeleton className="w-16 h-3 absolute bottom-1 right-2" />
+              ) : (
+                <Badge className="absolute bottom-1 right-2">
+                  {formattedDuration(totalDuration)}
+                </Badge>
+              )}
             </div>
           </ContextMenuTrigger>
           <ContextMenuContent className="w-40">

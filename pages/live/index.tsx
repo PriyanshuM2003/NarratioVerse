@@ -3,13 +3,6 @@ import { Separator } from "@/components/ui/separator";
 import prisma from "@/lib/prisma";
 import { LiveTalk } from "@/types/types";
 import React from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import LiveCover from "@/components/common/LiveCover";
 import Filter from "@/components/common/Filter";
 

@@ -1,55 +1,74 @@
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { User } from "@/types/types";
 import { getAccessToken } from "@/lib/auth";
+import useSWR from "swr";
 
-export default function GetLoggedUserData(): {
+export default function useLoggedUserData(): {
   loggedUserData: User | null;
   loadingUserData: boolean;
+  refreshLoggedUserData: () => void;
 } {
   const router = useRouter();
   const { toast } = useToast();
-  const [loadingUserData, setLoadingUserData] = useState<boolean>(true);
-  const [loggedUserData, setloggedUserData] = useState<User | null>(null);
 
-  useEffect(() => {
+  const fetcher = async (url: string) => {
     const token = getAccessToken();
-    if (token) {
-      fetchLoggedUserData().finally(() => setLoadingUserData(false));
+    if (!token) {
+      return null;
     }
-  }, []);
 
-  const fetchLoggedUserData = async () => {
-    try {
-      const token = getAccessToken();
-      if (!token) {
-        router.push("/login");
-        return;
-      }
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      setLoadingUserData(true);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_HOST}/api/getuser`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
+    if (!response.ok) {
+      if (response.status === 401) {
         throw new Error("Unauthorized");
       }
-
-      const data = await response.json();
-      setloggedUserData(data.user);
-    } catch (error) {
-      console.error("Token verification failed:", error);
-      router.push("/");
+      throw new Error("Failed to fetch user data");
     }
+
+    const data = await response.json();
+    return data.user as User;
   };
-  return { loggedUserData, loadingUserData };
+
+  const {
+    data,
+    error,
+    isValidating,
+    mutate: swrMutate,
+  } = useSWR<User | null>(
+    `${process.env.NEXT_PUBLIC_HOST}/api/getuser`,
+    fetcher
+  );
+
+  const loggedUserData = data ?? null;
+  const loadingUserData = !loggedUserData && !error;
+
+  const refreshLoggedUserData = () => {
+    swrMutate();
+  };
+
+  useEffect(() => {
+    if (error) {
+      console.error("Token verification failed:", error);
+      if (error.message === "Unauthorized") {
+        null;
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to load user data.",
+          variant: "destructive",
+        });
+      }
+    }
+  }, [error, router, toast]);
+
+  return { loggedUserData, loadingUserData, refreshLoggedUserData };
 }

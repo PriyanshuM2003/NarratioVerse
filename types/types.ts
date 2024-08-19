@@ -61,6 +61,7 @@ export interface Audio {
   id: string;
   title: string;
   coverImage: string;
+  about: string;
   category: string;
   genres: string[];
   parts: any[];

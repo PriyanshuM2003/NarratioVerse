@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import Image from "next/image";
 import GetUserAudioData from "@/routes/getUserAudioData";
-import AudioDeleteAlert from "./audioDeleteAlert";
+import AudioDeleteAlert from "../../../components/dialogs/audioDeleteAlert";
 
 const YourAudiobooks = () => {
   const [audiobooks, setAudiobooks] = useState<any[]>([]);
