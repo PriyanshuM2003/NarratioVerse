@@ -430,8 +430,11 @@ const AddAudio: React.FC = () => {
                     render={({ field }) => (
                       <>
                         {fields.map((field, index) => (
-                          <div className="flex items-center gap-2">
-                            <FormItem key={index}>
+                          <div
+                            key={field.id}
+                            className="flex items-center gap-2"
+                          >
+                            <FormItem>
                               <FormLabel>
                                 {String(category)} Part {index + 1} Name
                               </FormLabel>
