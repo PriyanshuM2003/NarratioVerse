@@ -8,29 +8,46 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Trash2 } from "lucide-react";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
-import { deleteAudio } from "@/routes/deleteAudio";
 import GetUserAudioData from "@/routes/getUserAudioData";
-interface AudioDeleteAlertProps {
-  setAudioDeleteAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  audioDeleteAlertOpen: boolean;
-  audioId: string;
-}
-const AudioDeleteAlert = ({
+import deleteAudioPart from "@/routes/deleteAudioPart";
+
+const AudioPartDeleteAlert = ({
   audioId,
-  setAudioDeleteAlertOpen,
-  audioDeleteAlertOpen,
-}: AudioDeleteAlertProps) => {
+  partName,
+  audioURL,
+}: {
+  audioId: string;
+  partName: string;
+  audioURL: string;
+}) => {
   const router = useRouter();
   const { toast } = useToast();
   const { refreshAudioData } = GetUserAudioData();
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
   return (
-    <AlertDialog
-      open={audioDeleteAlertOpen}
-      onOpenChange={(val) => setAudioDeleteAlertOpen(val)}
-    >
+    <AlertDialog>
+      <AlertDialogTrigger onClick={handleClick}>
+        <Tooltip>
+          <TooltipTrigger>
+            <Trash2 className="w-4 h-4 hover:text-pink-600" />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Delete this Audio Part</p>
+          </TooltipContent>
+        </Tooltip>
+      </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -40,10 +57,11 @@ const AudioDeleteAlert = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={handleClick}>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={async () => {
-              await deleteAudio(audioId, router, toast);
+            onClick={async (e) => {
+              e.stopPropagation();
+              await deleteAudioPart(audioId, router, toast, partName, audioURL);
               refreshAudioData();
             }}
           >
@@ -55,4 +73,4 @@ const AudioDeleteAlert = ({
   );
 };
 
-export default AudioDeleteAlert;
+export default AudioPartDeleteAlert;

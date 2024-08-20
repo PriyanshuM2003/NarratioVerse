@@ -13,15 +13,15 @@ import {
   Radio,
   BadgeAlert,
 } from "lucide-react";
-import { ScrollArea } from "./ui/scroll-area";
-import { Separator } from "./ui/separator";
+import { ScrollArea } from "../ui/scroll-area";
+import { Separator } from "../ui/separator";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import GetLoggedUserData from "@/routes/getLoggedUserData";
-import JoinLiveRoom from "./liveRoom/joinLiveRoom";
+import JoinLiveRoom from "../liveRoom/joinLiveRoom";
 import GetPlaylistsData from "@/routes/getPlaylistsData";
-import { Skeleton } from "./ui/skeleton";
-import PlaylistDeleteAlert from "./dialogs/playlistDeleteAlert";
+import { Skeleton } from "../ui/skeleton";
+import PlaylistDeleteAlert from "../dialogs/playlistDeleteAlert";
 
 interface LinkData {
   href: string;

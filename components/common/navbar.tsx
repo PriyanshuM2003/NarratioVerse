@@ -7,9 +7,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from "./ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import Preferences from "@/components/preferences";
 import {
   CreditCard,
   LogOut,
@@ -20,8 +19,9 @@ import {
   Settings2,
   AudioLines,
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import GetLoggedUserData from "@/routes/getLoggedUserData";
+import Preferences from "@/components/common/preferences";
 
 interface NavbarProps {
   isLoggedIn: boolean;

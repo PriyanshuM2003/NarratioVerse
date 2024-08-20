@@ -3,15 +3,15 @@ import "../styles/globals.css";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import LoadingBar from "react-top-loading-bar";
-import Sidebar from "@/components/sidebar";
+import Sidebar from "@/components/common/sidebar";
 import { AudioPlayerProvider } from "@/context/AudioPlayerContext";
+import Navbar from "@/components/common/navbar";
 import Layout from "@/components/player/layout";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SocketProvider } from "@/context/socket";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { AppProps } from "next/app";
-import Navbar from "@/components/navbar";
 import { clearTokens, getAccessToken } from "@/lib/auth";
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
@@ -85,7 +85,7 @@ export default function App(props: AppProps) {
         onLoaderFinished={() => setProgress(0)}
       />
       <Toaster />
-      <TooltipProvider>
+      <TooltipProvider delayDuration={0}>
         <Navbar
           isLoggedIn={isLoggedIn}
           handleLogout={handleLogout}

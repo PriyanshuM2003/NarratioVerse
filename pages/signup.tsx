@@ -26,7 +26,6 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
 import supabase from "@/lib/supabase";
-import Preferences from "@/components/preferences";
 import { countries } from "@/data/countries";
 import {
   Tooltip,
@@ -35,7 +34,8 @@ import {
 } from "@/components/ui/tooltip";
 import { getAccessToken } from "@/lib/auth";
 import { VerificationMail } from "@/data/email";
-import Collage from "@/components/Collage";
+import Collage from "@/components/common/Collage";
+import Preferences from "@/components/common/preferences";
 
 interface FormData {
   name: string;

@@ -22,11 +22,13 @@ import { useAudioPlayer } from "@/context/AudioPlayerContext";
 import { updateStreamCount } from "@/routes/updateStreamCount";
 import { removeFromPlaylist } from "@/routes/removeFromPlaylist";
 import { Skeleton } from "../ui/skeleton";
+import AboutDialog from "../dialogs/aboutDialog";
 
 const AudioCover = ({ audioItem }: any) => {
   const router = useRouter();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
   const [totalDuration, setTotalDuration] = useState<number>(0);
   const [loadingDuration, setLoadingDuration] = useState(true);
   const { playlistsData, loadingPlaylistsData, refreshPlaylists } =
@@ -122,9 +124,20 @@ const AudioCover = ({ audioItem }: any) => {
               {loadingDuration ? (
                 <Skeleton className="w-16 h-3 absolute bottom-1 right-2" />
               ) : (
-                <Badge className="absolute bottom-1 right-2">
-                  {formattedDuration(totalDuration)}
-                </Badge>
+                <div className="absolute bottom-1 right-2 left-2 flex items-center justify-between">
+                  <Badge
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setAboutDialogOpen(true);
+                    }}
+                    className=""
+                  >
+                    About
+                  </Badge>
+                  <Badge className="ml-auto">
+                    {formattedDuration(totalDuration)}
+                  </Badge>
+                </div>
               )}
             </div>
           </ContextMenuTrigger>
@@ -214,6 +227,14 @@ const AudioCover = ({ audioItem }: any) => {
           </Link>
         </div>
       </div>
+      {aboutDialogOpen && (
+        <AboutDialog
+          audioAbout={audioItem.about}
+          audioTitle={audioItem.title}
+          setAboutDialogOpen={setAboutDialogOpen}
+          aboutDialogOpen={aboutDialogOpen}
+        />
+      )}
       {dialogOpen && (
         <PlaylistDialog
           audioId={audioItem.id}

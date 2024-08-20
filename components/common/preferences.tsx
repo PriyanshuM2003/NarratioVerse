@@ -14,11 +14,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { language, genres } from "@/data/preferences";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { toast } from "./ui/use-toast";
 import GetUserPreferences from "@/routes/getUserPreferences";
 import { Loader } from "lucide-react";
 import GetMadeForYou from "@/routes/getMadeForYou";
 import { getAccessToken } from "@/lib/auth";
+import { toast } from "@/components/ui/use-toast";
 
 interface Language {
   id: string;
