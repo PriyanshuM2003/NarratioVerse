@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import addAudioPart from "@/routes/addAudioPart";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
-import GetUserAudioData from "@/routes/getUserAudioData";
+import GetUserAudiosData from "@/routes/getUserAudiosData";
 
 interface AddAudioPartDialogProps {
   setAddAudioPartDialogOpen: React.Dispatch<
@@ -33,7 +33,7 @@ const AddAudioPartDialog = ({
 }: AddAudioPartDialogProps) => {
   const router = useRouter();
   const { toast } = useToast();
-  const { refreshAudioData } = GetUserAudioData();
+  const { refreshAudiosData } = GetUserAudiosData(category);
   const [partName, setPartName] = useState("");
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const handleAddPart = async () => {
@@ -48,7 +48,7 @@ const AddAudioPartDialog = ({
       );
       if (success) {
         setAddAudioPartDialogOpen(null);
-        refreshAudioData();
+        refreshAudiosData();
       }
     } else {
       toast({

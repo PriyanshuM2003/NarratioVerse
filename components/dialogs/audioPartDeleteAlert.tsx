@@ -18,21 +18,23 @@ import {
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
-import GetUserAudioData from "@/routes/getUserAudioData";
+import GetUserAudiosData from "@/routes/getUserAudiosData";
 import deleteAudioPart from "@/routes/deleteAudioPart";
 
 const AudioPartDeleteAlert = ({
   audioId,
   partName,
+  category,
   audioURL,
 }: {
   audioId: string;
   partName: string;
+  category: string;
   audioURL: string;
 }) => {
   const router = useRouter();
   const { toast } = useToast();
-  const { refreshAudioData } = GetUserAudioData();
+  const { refreshAudiosData } = GetUserAudiosData(category);
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -62,7 +64,7 @@ const AudioPartDeleteAlert = ({
             onClick={async (e) => {
               e.stopPropagation();
               await deleteAudioPart(audioId, router, toast, partName, audioURL);
-              refreshAudioData();
+              refreshAudiosData();
             }}
           >
             Delete

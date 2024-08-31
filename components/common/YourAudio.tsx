@@ -28,12 +28,13 @@ import EditAboutDialog from "../dialogs/editAboutDialog";
 import AddAudioPartDialog from "../dialogs/addAudioPartDialog";
 
 interface yourAudioProps {
+  category: string;
   section: string;
   loading: boolean;
   audios: Audio[];
 }
 
-const YourAudio = ({ section, audios, loading }: yourAudioProps) => {
+const YourAudio = ({ section, audios, loading, category }: yourAudioProps) => {
   const [expandedItem, setExpandedItem] = useState<string | undefined>(
     undefined
   );
@@ -192,6 +193,7 @@ const YourAudio = ({ section, audios, loading }: yourAudioProps) => {
                         </div>
                         <div className="flex items-center gap-4">
                           <AudioPartDeleteAlert
+                            category={category}
                             audioId={audio.id}
                             partName={part.partName}
                             audioURL={part.audioUrl}
@@ -223,6 +225,7 @@ const YourAudio = ({ section, audios, loading }: yourAudioProps) => {
                 )}
                 {audioDeleteAlertOpen === audio.id && (
                   <AudioDeleteAlert
+                    category={category}
                     audioDeleteAlertOpen={audioDeleteAlertOpen === audio.id}
                     setAudioDeleteAlertOpen={setAudioDeleteAlertOpen}
                     audioId={audio.id}

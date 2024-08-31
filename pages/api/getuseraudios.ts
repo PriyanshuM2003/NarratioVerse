@@ -22,13 +22,16 @@ export default async function handler(
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const userAudio = await prisma.audio.findMany({
+      const category = req.query.category as string;
+
+      const userAudios = await prisma.audio.findMany({
         where: {
           userId: decoded.id,
+          category,
         },
       });
 
-      return res.status(200).json({ userAudio });
+      return res.status(200).json({ userAudios });
     } else {
       return res.status(405).json({ message: "Method Not Allowed" });
     }

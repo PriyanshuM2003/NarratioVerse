@@ -1,22 +1,24 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import GetUserAudioData from "@/routes/getUserAudioData";
+import GetUserAudiosData from "@/routes/getUserAudiosData";
 import YourAudio from "@/components/common/YourAudio";
 
 const YourAudiobooks = () => {
-  const { loadingAudioData, UserAudioBookData } = GetUserAudioData();
+  const category = "Audiobook";
+  const { loadingAudiosData, UserAudiosData } = GetUserAudiosData(category);
   const [audiobooks, setAudiobooks] = useState<any[]>([]);
   useEffect(() => {
-    if (UserAudioBookData) {
-      setAudiobooks(UserAudioBookData);
+    if (UserAudiosData) {
+      setAudiobooks(UserAudiosData);
     }
-  }, [UserAudioBookData]);
+  }, [UserAudiosData]);
   return (
     <>
       <YourAudio
+        category={category}
         audios={audiobooks}
         section={"Audio Books"}
-        loading={loadingAudioData}
+        loading={loadingAudiosData}
       />
     </>
   );
