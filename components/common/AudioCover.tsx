@@ -153,34 +153,40 @@ const AudioCover = ({ audioItem }: any) => {
                 {loadingPlaylistsData ? (
                   <Loader className="animate-spin flex mx-auto my-4" />
                 ) : (
-                  playlistsData?.map((playlist) => (
-                    <ContextMenuItem
-                      key={playlist.id}
-                      onClick={async () => {
-                        await createPlaylist(
-                          audioItem.id,
-                          playlist.name,
-                          router,
-                          toast
-                        );
-                        refreshPlaylists();
-                      }}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        className="mr-2 h-4 w-4"
-                        viewBox="0 0 24 24"
+                  playlistsData
+                    ?.filter((playlist) => {
+                      return !playlist.audios.some(
+                        (audio) => audio.id === audioItem.id
+                      );
+                    })
+                    .map((playlist) => (
+                      <ContextMenuItem
+                        key={playlist.id}
+                        onClick={async () => {
+                          await createPlaylist(
+                            audioItem.id,
+                            playlist.name,
+                            router,
+                            toast
+                          );
+                          refreshPlaylists();
+                        }}
                       >
-                        <path d="M21 15V6M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM12 12H3M16 6H3M12 18H3" />
-                      </svg>
-                      {playlist.name}
-                    </ContextMenuItem>
-                  ))
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          className="mr-2 h-4 w-4"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M21 15V6M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM12 12H3M16 6H3M12 18H3" />
+                        </svg>
+                        {playlist.name}
+                      </ContextMenuItem>
+                    ))
                 )}
               </ContextMenuSubContent>
             </ContextMenuSub>
