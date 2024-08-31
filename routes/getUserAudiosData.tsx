@@ -1,9 +1,9 @@
 import { useToast } from "@/components/ui/use-toast";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useSWR, { mutate } from "swr";
 import { Audio } from "@/types/types";
 import { getAccessToken } from "@/lib/auth";
+import { useRouter } from "next/router";
 
 type UserAudioDataResult = {
   UserAudiosData: Audio[] | null;
@@ -14,25 +14,25 @@ type UserAudioDataResult = {
 export default function GetUserAudiosData(
   category: string
 ): UserAudioDataResult {
-  const router = useRouter();
   const { toast } = useToast();
+  const router = useRouter();
+  const [loadingAudiosData, setLoadingAudiosData] = useState<boolean>(true);
+  const apiUrl = `${process.env.NEXT_PUBLIC_HOST}/api/getuseraudios`;
 
   const fetcher = async (url: string) => {
     const token = getAccessToken();
     if (!token) {
-      throw new Error("Token not available");
+      router.push("/");
+      return;
     }
 
-    const response = await fetch(
-      `${url}?category=${encodeURIComponent(category)}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error("Failed to fetch audio data");
@@ -43,8 +43,12 @@ export default function GetUserAudiosData(
   };
 
   const { data, error } = useSWR(
-    `${process.env.NEXT_PUBLIC_HOST}/api/getuseraudios`,
-    fetcher
+    `${apiUrl}?category=${encodeURIComponent(category)}`,
+    fetcher,
+    {
+      onSuccess: () => setLoadingAudiosData(false),
+      onError: () => setLoadingAudiosData(false),
+    }
   );
 
   useEffect(() => {
@@ -57,14 +61,9 @@ export default function GetUserAudiosData(
     }
   }, [error, toast]);
 
-  const loadingAudiosData = !data && !error;
-
   const refreshAudiosData = () => {
-    mutate(
-      `${
-        process.env.NEXT_PUBLIC_HOST
-      }/api/getuseraudios?category=${encodeURIComponent(category)}`
-    );
+    setLoadingAudiosData(true);
+    mutate(`${apiUrl}?category=${encodeURIComponent(category)}`);
   };
 
   return {

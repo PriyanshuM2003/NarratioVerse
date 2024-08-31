@@ -21,12 +21,12 @@ export default async function handler(
       if (!decoded || !decoded.id) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      const { name } = req.query;
+      const name = req.query.name as string;
 
       const playlistAudios = await prisma.playlist.findFirst({
         where: {
           userId: decoded.id,
-          name: name as string,
+          name: name,
         },
         include: {
           user: true,

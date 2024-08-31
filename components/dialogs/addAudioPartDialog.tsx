@@ -13,6 +13,7 @@ import addAudioPart from "@/routes/addAudioPart";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
 import GetUserAudiosData from "@/routes/getUserAudiosData";
+import { Loader } from "lucide-react";
 
 interface AddAudioPartDialogProps {
   setAddAudioPartDialogOpen: React.Dispatch<
@@ -36,8 +37,10 @@ const AddAudioPartDialog = ({
   const { refreshAudiosData } = GetUserAudiosData(category);
   const [partName, setPartName] = useState("");
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
   const handleAddPart = async () => {
     if (audioFile && partName) {
+      setLoading(true);
       const success = await addAudioPart(
         audioId,
         router,
@@ -47,10 +50,12 @@ const AddAudioPartDialog = ({
         category
       );
       if (success) {
+        setLoading(false);
         setAddAudioPartDialogOpen(null);
         refreshAudiosData();
       }
     } else {
+      setLoading(false);
       toast({
         variant: "destructive",
         description: "Please provide both part name and audio file.",
@@ -84,11 +89,12 @@ const AddAudioPartDialog = ({
           />
           <DialogFooter>
             <Button
+              disabled={loading}
               onClick={handleAddPart}
               variant={"destructive"}
               type="submit"
             >
-              Add
+              {loading ? <Loader className="animate-spin" /> : <>Add</>}
             </Button>
           </DialogFooter>
         </DialogContent>

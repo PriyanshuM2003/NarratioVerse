@@ -5,13 +5,6 @@ import { Audio, User } from "@/types/types";
 import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { getAccessToken } from "@/lib/auth";
 import AudioCover from "@/components/common/AudioCover";
 import Filter from "@/components/common/Filter";

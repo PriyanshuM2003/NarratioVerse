@@ -2,9 +2,9 @@ import { getAccessToken } from "@/lib/auth";
 
 export default async function editAbout(
   audioId: string,
+  about: string,
   router: any,
-  toast: any,
-  about: string
+  toast: any
 ) {
   try {
     const token = getAccessToken();
