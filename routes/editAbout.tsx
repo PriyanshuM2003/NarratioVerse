@@ -1,6 +1,11 @@
 import { getAccessToken } from "@/lib/auth";
 
-export async function addFollow(creatorId: string, router: any, toast: any) {
+export default async function editAbout(
+  audioId: string,
+  router: any,
+  toast: any,
+  about: string
+) {
   try {
     const token = getAccessToken();
     if (!token) {
@@ -9,33 +14,33 @@ export async function addFollow(creatorId: string, router: any, toast: any) {
     }
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_HOST}/api/addfollow`,
+      `${process.env.NEXT_PUBLIC_HOST}/api/editabout`,
       {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ creatorId }),
+        body: JSON.stringify({ audioId, about }),
       }
     );
     if (response.ok) {
       toast({
-        description: "You are now following this creator.",
+        description: "About updated successfully",
       });
       return true;
     } else {
       toast({
         variant: "destructive",
-        description: "Failed to add following",
+        description: "Failed to update about",
       });
       return false;
     }
   } catch (error) {
-    console.error("Error adding following:", error);
+    console.error("Error updating about:", error);
     toast({
       variant: "destructive",
-      description: "Failed to add following",
+      description: "Failed to update about",
     });
     return false;
   }

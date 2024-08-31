@@ -49,7 +49,7 @@ export default async function handler(
         return res.status(404).json({ error: "Audio not found" });
       }
 
-      const { category, parts } = audio;
+      const { coverImage, category, parts } = audio;
       const audioFileName = partToDelete.audioURL.split("/").pop();
 
       if (audioFileName) {
@@ -70,6 +70,22 @@ export default async function handler(
       ) as any[];
 
       if (updatedParts.length === 0) {
+        const coverImageFileName = decodeURIComponent(
+          coverImage.split("/").pop() || ""
+        );
+
+        if (coverImageFileName) {
+          const { data: removeData, error: removeError } =
+            await supabase.storage
+              .from("Images")
+              .remove([`${category}/${coverImageFileName}`]);
+
+          if (removeError) {
+            console.error("Error removing audio image:", removeError);
+          } else {
+            console.log("Audio image removed successfully:", removeData);
+          }
+        }
         await prisma.audio.delete({
           where: { id: audioId },
         });

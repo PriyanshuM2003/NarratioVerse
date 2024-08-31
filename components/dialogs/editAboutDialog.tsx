@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 
 interface AddAudioPartDialogProps {
-  setEditAboutDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setEditAboutDialogOpen: React.Dispatch<React.SetStateAction<string | null>>;
   editAboutDialogOpen: boolean;
 }
 
@@ -20,7 +20,7 @@ const EditAboutDialog = ({
     <>
       <Dialog
         open={editAboutDialogOpen}
-        onOpenChange={(val) => setEditAboutDialogOpen(val)}
+        onOpenChange={(val) => setEditAboutDialogOpen(val ? "" : null)}
       >
         <DialogContent>
           <DialogHeader>

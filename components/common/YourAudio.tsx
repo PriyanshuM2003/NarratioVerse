@@ -37,9 +37,15 @@ const YourAudio = ({ section, audios, loading }: yourAudioProps) => {
   const [expandedItem, setExpandedItem] = useState<string | undefined>(
     undefined
   );
-  const [addAudioPartDialogOpen, setAddAudioPartDialogOpen] = useState(false);
-  const [editAboutDialogOpen, setEditAboutDialogOpen] = useState(false);
-  const [audioDeleteAlertOpen, setAudioDeleteAlertOpen] = useState(false);
+  const [addAudioPartDialogOpen, setAddAudioPartDialogOpen] = useState<
+    string | null
+  >(null);
+  const [editAboutDialogOpen, setEditAboutDialogOpen] = useState<string | null>(
+    null
+  );
+  const [audioDeleteAlertOpen, setAudioDeleteAlertOpen] = useState<
+    string | null
+  >(null);
   const {
     setAudioData,
     setCurrentIndex,
@@ -115,7 +121,7 @@ const YourAudio = ({ section, audios, loading }: yourAudioProps) => {
                         <FilePen
                           onClick={(e) => {
                             handleIconClick(e);
-                            setEditAboutDialogOpen(true);
+                            setEditAboutDialogOpen(audio.id);
                           }}
                           className="w-5 h-5 hover:text-pink-600"
                         />
@@ -127,9 +133,10 @@ const YourAudio = ({ section, audios, loading }: yourAudioProps) => {
                     <Tooltip>
                       <TooltipTrigger>
                         <FileMusic
+                          key={audio.id}
                           onClick={(e) => {
                             handleIconClick(e);
-                            setAddAudioPartDialogOpen(true);
+                            setAddAudioPartDialogOpen(audio.id);
                           }}
                           className="w-5 h-5 hover:text-pink-600"
                         />
@@ -143,7 +150,7 @@ const YourAudio = ({ section, audios, loading }: yourAudioProps) => {
                         <Trash2
                           onClick={(e) => {
                             handleIconClick(e);
-                            setAudioDeleteAlertOpen(true);
+                            setAudioDeleteAlertOpen(audio.id);
                           }}
                           className="w-5 h-5 hover:text-pink-600"
                         />
@@ -199,21 +206,24 @@ const YourAudio = ({ section, audios, loading }: yourAudioProps) => {
                     ))}
                   </ul>
                 </AccordionContent>
-                {editAboutDialogOpen && (
+                {editAboutDialogOpen === audio.id && (
                   <EditAboutDialog
-                    editAboutDialogOpen={editAboutDialogOpen}
+                    editAboutDialogOpen={editAboutDialogOpen === audio.id}
                     setEditAboutDialogOpen={setEditAboutDialogOpen}
                   />
                 )}
-                {addAudioPartDialogOpen && (
+                {addAudioPartDialogOpen === audio.id && (
                   <AddAudioPartDialog
-                    addAudioPartDialogOpen={addAudioPartDialogOpen}
+                    category={audio.category}
+                    title={audio.title}
+                    audioId={audio.id}
+                    addAudioPartDialogOpen={addAudioPartDialogOpen === audio.id}
                     setAddAudioPartDialogOpen={setAddAudioPartDialogOpen}
                   />
                 )}
-                {audioDeleteAlertOpen && (
+                {audioDeleteAlertOpen === audio.id && (
                   <AudioDeleteAlert
-                    audioDeleteAlertOpen={audioDeleteAlertOpen}
+                    audioDeleteAlertOpen={audioDeleteAlertOpen === audio.id}
                     setAudioDeleteAlertOpen={setAudioDeleteAlertOpen}
                     audioId={audio.id}
                   />

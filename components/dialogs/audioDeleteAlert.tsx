@@ -11,10 +11,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/router";
 import { useToast } from "@/components/ui/use-toast";
-import { deleteAudio } from "@/routes/deleteAudio";
 import GetUserAudioData from "@/routes/getUserAudioData";
+import { deleteAudio } from "@/routes/deleteAudio";
 interface AudioDeleteAlertProps {
-  setAudioDeleteAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setAudioDeleteAlertOpen: React.Dispatch<React.SetStateAction<string | null>>;
   audioDeleteAlertOpen: boolean;
   audioId: string;
 }
@@ -29,7 +29,7 @@ const AudioDeleteAlert = ({
   return (
     <AlertDialog
       open={audioDeleteAlertOpen}
-      onOpenChange={(val) => setAudioDeleteAlertOpen(val)}
+      onOpenChange={(val) => setAudioDeleteAlertOpen(val ? audioId : null)}
     >
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -45,6 +45,7 @@ const AudioDeleteAlert = ({
             onClick={async () => {
               await deleteAudio(audioId, router, toast);
               refreshAudioData();
+              setAudioDeleteAlertOpen(null);
             }}
           >
             Delete

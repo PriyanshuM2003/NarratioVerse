@@ -1,35 +1,96 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import addAudioPart from "@/routes/addAudioPart";
+import { useRouter } from "next/router";
+import { useToast } from "@/components/ui/use-toast";
+import GetUserAudioData from "@/routes/getUserAudioData";
 
 interface AddAudioPartDialogProps {
-  setAddAudioPartDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setAddAudioPartDialogOpen: React.Dispatch<
+    React.SetStateAction<string | null>
+  >;
   addAudioPartDialogOpen: boolean;
+  title: string;
+  audioId: string;
+  category: string;
 }
 
 const AddAudioPartDialog = ({
   addAudioPartDialogOpen,
   setAddAudioPartDialogOpen,
+  title,
+  audioId,
+  category,
 }: AddAudioPartDialogProps) => {
+  const router = useRouter();
+  const { toast } = useToast();
+  const { refreshAudioData } = GetUserAudioData();
+  const [partName, setPartName] = useState("");
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const handleAddPart = async () => {
+    if (audioFile && partName) {
+      const success = await addAudioPart(
+        audioId,
+        router,
+        toast,
+        partName,
+        audioFile,
+        category
+      );
+      if (success) {
+        setAddAudioPartDialogOpen(null);
+        refreshAudioData();
+      }
+    } else {
+      toast({
+        variant: "destructive",
+        description: "Please provide both part name and audio file.",
+      });
+    }
+  };
   return (
     <>
       <Dialog
         open={addAudioPartDialogOpen}
-        onOpenChange={(val) => setAddAudioPartDialogOpen(val)}
+        onOpenChange={(val) => setAddAudioPartDialogOpen(val ? audioId : null)}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Are you absolutely sure?</DialogTitle>
-            <DialogDescription>
-              This action cannot be undone. This will permanently delete your
-              account and remove your data from our servers.
-            </DialogDescription>
+            <DialogTitle>Add Audio Part in {title}</DialogTitle>
           </DialogHeader>
+          <Label htmlFor="addAudioPartName">Part Name</Label>
+          <Input
+            required
+            id="addAudioPartName"
+            value={partName}
+            onChange={(e) => setPartName(e.target.value)}
+          />
+          <Label htmlFor="addAudioPartUrl">Audio File</Label>
+          <Input
+            required
+            type="file"
+            accept="audio/*"
+            onChange={(e) => setAudioFile(e.target.files?.[0] || null)}
+            id="addAudioPartUrl"
+          />
+          <DialogFooter>
+            <Button
+              onClick={handleAddPart}
+              variant={"destructive"}
+              type="submit"
+            >
+              Add
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
