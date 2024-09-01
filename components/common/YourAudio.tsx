@@ -149,9 +149,9 @@ const YourAudio = ({ audios }: yourAudioProps) => {
                 />
               </div>
             </AccordionTrigger>
-            <AccordionContent className="grid grid-cols-2 gap-4">
-              <p className="border-r border-white pr-1">{audio.about}</p>
-              <ul>
+            <AccordionContent className="grid grid-cols-2">
+              <p className="border-r border-white pr-2">{audio.about}</p>
+              <ul className="border-l border-white pl-2">
                 {audio.parts.map((part: any, index: number) => (
                   <li
                     className="flex items-center space-y-2 justify-between text-base"

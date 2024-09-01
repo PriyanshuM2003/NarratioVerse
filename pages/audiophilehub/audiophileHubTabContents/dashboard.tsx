@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import GetMonthlyRevenues from "@/routes/getMonthlyRevenues";
+import { Button } from "@/components/ui/button";
 interface MonthlyIncome {
   year: number;
   months: {
@@ -37,7 +38,6 @@ const Dashboard = () => {
   const { monthlyRevenues, loadingMonthlyRevenues } = GetMonthlyRevenues();
 
   console.log("monthlyRevenues", monthlyRevenues);
- 
 
   return (
     <>
@@ -137,6 +137,11 @@ const Dashboard = () => {
               )}
             </CardContent>
           </Card>
+          <Card>
+            <CardContent className="flex items-center justify-center pt-6">
+              <Button disabled>Pay Request</Button>
+            </CardContent>
+          </Card>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
           <Card className="col-span-3">
@@ -147,7 +152,7 @@ const Dashboard = () => {
               <TopAudios />
             </CardContent>
           </Card>
-          <Card className="col-span-4">
+          {/* <Card className="col-span-4">
             <CardHeader>
               <CardTitle>
                 <div className="flex items-center justify-between">
@@ -157,20 +162,20 @@ const Dashboard = () => {
                       <SelectValue placeholder="Select year" />
                     </SelectTrigger>
                     <SelectContent>
-                    {/* {years.map((year: number, index: number) => (
+                 {years.map((year: number, index: number) => (
                         <SelectItem key={index} value={year.toString()}>
                           {year}
                         </SelectItem>
-                      ))} */}
+                      ))} 
                     </SelectContent>
                   </Select>
                 </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="pl-2">
-              {/* <Overview loadingMonthlyRevenues={loadingMonthlyRevenues} /> */}
+             <Overview loadingMonthlyRevenues={loadingMonthlyRevenues} />
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
       </div>
     </>

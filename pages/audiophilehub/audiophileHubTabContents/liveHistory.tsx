@@ -1,4 +1,3 @@
-"use client";
 import { Separator } from "@/components/ui/separator";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
