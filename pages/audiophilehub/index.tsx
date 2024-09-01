@@ -29,7 +29,7 @@ const AudiophileHub = () => {
   return (
     <>
       <Tabs defaultValue="dashboard" className="space-y-6">
-        <TabsList className="bg-gray-900 text-white sticky top-0 left-7">
+        <TabsList className="bg-gray-900 text-white sticky top-0 left-7 z-50">
           <TabsTrigger value="dashboard" className="gap-1">
             <LayoutDashboard className="h-5 w-5" />
             Dashboard
